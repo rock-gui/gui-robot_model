@@ -1,0 +1,7 @@
+<package>
+  <description brief="robot visualization based on base::samples::Joints data">
+  </description>
+  <author>Malte Wirkus/malte.wirkus@dfki.de</author>
+  <license>LGPLv2 or later</license>
+  <depend package="control/kdl_parser" />
+</package>
