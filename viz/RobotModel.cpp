@@ -13,7 +13,6 @@
 //#include <resource_retriever/retriever.h>
 //#include "ros/ros.h"
 #include "OSGHelpers.hpp"
-#include <urdf/collada_parser/collada_parser.h>
 #include <base/Logging.hpp>
 
 
@@ -296,7 +295,7 @@ osg::Node* RobotModel::makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_mod
     return root_;
 }
 
-osg::Node* RobotModel::loadCollada(QString path){
+osg::Node* RobotModel::load(QString path){
 
     root_ = loadEmptyScene()->asGroup();
     //Read the urdf file
@@ -308,22 +307,9 @@ osg::Node* RobotModel::loadCollada(QString path){
     std::string xml_str = xml.str();
 
     //Parse urdf
-    boost::shared_ptr<urdf::ModelInterface> urdf_model = urdf::parseCollada(xml_str);
-    return makeOsg(urdf_model);
-}
-
-osg::Node* RobotModel::loadURDF(QString path){
-    root_ = loadEmptyScene()->asGroup();
-    //Read the urdf file
-    std::ifstream fin;
-    std::stringstream xml;
-    fin.open(path.toLatin1().data());
-    xml << fin.rdbuf();
-    fin.close();
-    std::string xml_str = xml.str();
-
-    //Parse urdf
-    boost::shared_ptr<urdf::ModelInterface> urdf_model = urdf::parseURDF(xml_str);
+    urdf::Model* model = new urdf::Model();
+    model->initString(xml_str);
+    boost::shared_ptr<urdf::ModelInterface> urdf_model(model);
     return makeOsg(urdf_model);
 }
 

@@ -159,8 +159,7 @@ public:
      * @param path: Path to URDF file.
      * @return osg::Node: Root node of the constructed OSG scene for the robot.
      */
-    osg::Node* loadURDF(QString path);
-    osg::Node* loadCollada(QString path);
+    osg::Node* load(QString path);
 
     /**
      * @brief Create an empty scene.

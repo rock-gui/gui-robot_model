@@ -26,33 +26,10 @@ public:
         QStringList tokens = modelFile.split(QChar('.'));
         QString ext = tokens.back();
 
-        //Check if urdf or collada and load it
-        std::cout << QString::compare(ext, "urdf", Qt::CaseInsensitive) << "   " << ext.toLatin1().data() <<std::endl;
-        if(QString::compare(ext, "urdf", Qt::CaseInsensitive) == 0){
-            LOG_INFO("%s is a URDF model file", modelFile.toLatin1().data());
-            _modelFile = modelFile;
-            if(!loadURDF(_modelFile))
-                throw std::runtime_error("Error while loading model file");
-        }
-        else if(QString::compare(ext, "xml", Qt::CaseInsensitive) == 0){
-            LOG_WARN("Could not determine model format from %s. Assuming it is a URDF model file",
-                     modelFile.toLatin1().data());
-            _modelFile = modelFile;
-            if(!loadURDF(_modelFile))
-                throw std::runtime_error("Error while loading model file");
-        }
-        else if(QString::compare(ext, "zae", Qt::CaseInsensitive) == 0
-                || QString::compare(ext, "dae", Qt::CaseInsensitive) == 0){
-            LOG_INFO("%s is a Collada model file", modelFile.toLatin1().data());
-            _modelFile = modelFile;
-            if(!loadCollada(_modelFile))
-                throw std::runtime_error("Error while loading model file");
-        }
-        else{
-            LOG_ERROR("Could not determine model format from %s. Only Collada archives (.zae), collada models (.dae) and URDF files (.urdf) are supported.",
-                      modelFile.toLatin1().data());
-            throw std::runtime_error("Could not determine model file format.");
-        }
+        LOG_INFO("loading %s", modelFile.toLatin1().data());
+        if(!load(_modelFile))
+            throw std::runtime_error("Error while loading model file");
+        _modelFile = modelFile;
         //        emit(modelFileChanged(_modelFile));
     }
 
