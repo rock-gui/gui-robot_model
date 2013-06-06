@@ -347,6 +347,7 @@ bool RobotModel::setJointState(std::string jointName, double jointVal)
 
     OSGSegment* jnt = dynamic_cast<OSGSegment*>(node->getUserData());
     jnt->setJointPos(jointVal);
+    return true;
 }
 
 bool RobotModel::setJointState(const std::map<std::string, double>& jointVals)
@@ -360,6 +361,7 @@ bool RobotModel::setJointState(const std::map<std::string, double>& jointVals)
         OSGSegment* jnt = dynamic_cast<OSGSegment*>(node->getUserData());
         jnt->setJointPos(it->second);
     }
+    return true;
 }
 
 bool RobotModel::toggleHighlight(std::string name)
@@ -368,4 +370,5 @@ bool RobotModel::toggleHighlight(std::string name)
     if(!seg)
         return false;
     seg->toggleSelected();
+    return true;
 }
