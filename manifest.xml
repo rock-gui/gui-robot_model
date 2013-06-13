@@ -1,0 +1,12 @@
+<package>
+  <description brief="A simple user interface that allows to set position commands to robot joints">
+  
+  </description>
+  <author>Malte Wirkus/malte.wirkus@dfki.de</author>
+  <license></license>
+  <url>http://</url>
+  <logo>http://</logo>
+
+  <depend package="base/types" />
+  <depend package="control/kdl_parser" />
+</package>
