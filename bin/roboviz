@@ -1,0 +1,49 @@
+#! /usr/bin/env ruby
+
+require 'vizkit'
+
+def usage()
+   puts("\nUsage:")
+   usage_string =  "   roboviz " + "[path to robot model file] " + "[task context for joint data]"
+   puts(usage_string+"\n")
+end
+
+task_context = ""
+robot_model = ""
+ARGV.each_with_index do|a,i|
+  if i == 0
+    puts "Choosing #{a} as robot model"
+    robot_model = a
+  elsif i == 1
+    puts "Choosing #{a} as task context for joint data"
+    task_context = a
+  end
+end
+
+if robot_model=="" or task_context==""
+  puts("\nWrong arguments")
+  usage
+  exit(-1)
+end
+puts("")
+
+
+include Orocos
+Orocos.initialize
+
+view3d = Vizkit.vizkit3d_widget
+view3d.show()
+
+vis_gui = Vizkit.default_loader.RobotVisualization
+vis_gui.modelFile = robot_model
+
+#Assume already existing task context
+control = TaskContext.get task_context
+
+control.joint_state.connect_to do |data, port_name|
+   vis_gui.updateData(data)
+end
+
+Vizkit.exec()
+
+

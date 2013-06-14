@@ -1,7 +1,9 @@
 <package>
-  <description brief="robot visualization based on base::samples::Joints data">
+  <description brief="robot visualization based on URDF/Collada models and base::samples::Joints data">
   </description>
   <author>Malte Wirkus/malte.wirkus@dfki.de</author>
   <license>LGPLv2 or later</license>
+
+  <depend package="base/types" />
   <depend package="control/kdl_parser" />
 </package>
