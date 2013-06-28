@@ -7,6 +7,7 @@
 #include <base/samples/Joints.hpp>
 #include <base/Logging.hpp>
 #include "RobotModel.h"
+#include <QMessageBox>
 
 
 namespace vizkit
@@ -27,9 +28,14 @@ public:
         QString ext = tokens.back();
 
         LOG_INFO("loading %s", modelFile.toLatin1().data());
-        if(!load(_modelFile))
-            throw std::runtime_error("Error while loading model file");
-        _modelFile = modelFile;
+        if(!load(modelFile))
+        {
+            QMessageBox::critical(NULL, "vizkit::RobotVisualization", "cannot load " + modelFile + ", it either does not exist or is not a proper robot model file");
+        }
+        else
+        {
+            _modelFile = modelFile;
+        }
         //        emit(modelFileChanged(_modelFile));
     }
 

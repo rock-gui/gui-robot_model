@@ -298,17 +298,15 @@ osg::Node* RobotModel::makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_mod
 osg::Node* RobotModel::load(QString path){
 
     root_ = loadEmptyScene()->asGroup();
-    //Read the urdf file
-    std::ifstream fin;
-    std::stringstream xml;
-    fin.open(path.toLatin1().data());
-    xml << fin.rdbuf();
-    fin.close();
-    std::string xml_str = xml.str();
 
     //Parse urdf
     urdf::Model* model = new urdf::Model();
-    model->initString(xml_str);
+    if (!model->initFile(path.toStdString()))
+    {
+        delete model;
+        return NULL;
+    }
+
     boost::shared_ptr<urdf::ModelInterface> urdf_model(model);
     return makeOsg(urdf_model);
 }
