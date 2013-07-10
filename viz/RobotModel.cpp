@@ -14,6 +14,7 @@
 //#include "ros/ros.h"
 #include "OSGHelpers.hpp"
 #include <base/Logging.hpp>
+#include <QFileInfo>
 
 
 OSGSegment::OSGSegment(osg::Node* node, KDL::Segment seg)
@@ -32,7 +33,7 @@ void OSGSegment::updateJoint(){
     kdl_to_osg(toTipKdl_, *toTipOsg_);
 }
 
-void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual)
+void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir baseDir)
 {
     osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
     urdf_to_osg(visual->origin, *to_visual);
@@ -83,6 +84,11 @@ void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual)
             else
                 filename = mesh->filename;
             LOG_DEBUG("Trying to load mesh file %s", filename.c_str());
+
+            QString qfilename = QString::fromStdString(filename);
+            if (QFileInfo(qfilename).isRelative())
+                filename = baseDir.absoluteFilePath(qfilename).toStdString();
+
             osg_visual = osgDB::readNodeFile(filename);
             if(!osg_visual){
                 LOG_ERROR("OpenSceneGraph did not succees loading the mesh file %s.", filename.c_str());
@@ -242,7 +248,7 @@ osg::Node* RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg:
     //Attach visual to joint
     boost::shared_ptr<urdf::Visual> visual = urdf_link.visual;
     if(visual){
-        seg->attachVisual(visual);
+        seg->attachVisual(visual, rootPrefix);
     }
     return joint_forward;
 }
@@ -301,6 +307,7 @@ osg::Node* RobotModel::load(QString path){
 
     //Parse urdf
     urdf::Model* model = new urdf::Model();
+    rootPrefix = QDir(QFileInfo(path).absoluteDir());
     if (!model->initFile(path.toStdString()))
     {
         delete model;

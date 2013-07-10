@@ -13,6 +13,7 @@
 #include <osgDB/ReadFile>
 #include <osgFX/Outline>
 #include <QObject>
+#include <QDir>
 
 
 /**
@@ -86,7 +87,7 @@ protected:
     *
     * @param visual: Parsed URDF tag (using urdf_parser) of the visual.
     */
-   void attachVisual(boost::shared_ptr<urdf::Visual> visual);
+   void attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir prefix = QDir());
 
 private:
     KDL::Segment seg_; /**< KDKL representation of the segment */
@@ -200,6 +201,7 @@ protected:
     osg::Group* root_; /**< Root of the OSG scene containing the robot */
     std::vector<std::string> jointNames_; /**< Joint names defined in URDF (joint of type none are NOT included) */
     std::vector<std::string> segmentNames_; /**< Segment names defined in URDF */
+    QDir rootPrefix;
 
 public:
     //bool set_joint_state(std::vector<double> joint_vals);
