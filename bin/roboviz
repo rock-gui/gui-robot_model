@@ -8,8 +8,8 @@ def usage()
    puts(usage_string+"\n")
 end
 
-task_context = ""
-robot_model = ""
+task_context = nil
+robot_model = nil
 ARGV.each_with_index do|a,i|
   if i == 0
     puts "Choosing #{a} as robot model"
@@ -20,16 +20,16 @@ ARGV.each_with_index do|a,i|
   end
 end
 
-if robot_model=="" or task_context==""
-  puts("\nWrong arguments")
-  usage
-  exit(-1)
+if !robot_model
+    puts("\nWrong arguments")
+    usage
+    exit(-1)
 end
-puts("")
 
-
-include Orocos
-Orocos.initialize
+if task_context
+    include Orocos
+    Orocos.initialize
+end
 
 view3d = Vizkit.vizkit3d_widget
 view3d.show()
@@ -37,11 +37,12 @@ view3d.show()
 vis_gui = Vizkit.default_loader.RobotVisualization
 vis_gui.modelFile = robot_model
 
-#Assume already existing task context
-control = TaskContext.get task_context
-
-control.joint_state.connect_to do |data, port_name|
-   vis_gui.updateData(data)
+if task_context
+    #Assume already existing task context
+    control = TaskContext.get task_context
+    control.joint_state.connect_to do |data, port_name|
+        vis_gui.updateData(data)
+    end
 end
 
 Vizkit.exec()
