@@ -2,6 +2,7 @@
 #include "RobotVisualization.hpp"
 
 using namespace vizkit;
+using namespace std;
 
 struct RobotVisualization::Data {
     // Copy of the value given to updateDataIntern.
@@ -39,8 +40,14 @@ void RobotVisualization::updateMainNode ( osg::Node* node )
 
 void RobotVisualization::updateDataIntern(base::samples::Joints const& value)
 {
-    for(uint i=0; i<value.names.size(); i++){
-        setJointState(value.names[i], value.states[i].position);
+    vector<string> names = getJointNames();
+    if (value.hasNames())
+        names = value.names;
+    else if (names.size() != value.states.size())
+        throw std::runtime_error("RobotVisualization::updateDataIntern: state vector size and expected joint size differ, and there are no names in the Joints sample");
+
+    for(uint i=0; i<names.size(); i++){
+        setJointState(names[i], value.states[i].position);
     }
 }
 
