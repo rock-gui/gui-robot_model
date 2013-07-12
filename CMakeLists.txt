@@ -7,3 +7,6 @@ rock_init(robot_model 1.0)
 include(RockRuby)
 rock_standard_layout()
  
+install(PROGRAMS bin/rock-roboviz
+    DESTINATION bin)
+    
