@@ -44,10 +44,10 @@ void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir baseD
     toTipOsg_->addChild(to_visual);
     toTipOsg_->setName(seg_.getJoint().getName());
 
+    osg::Node* osg_visual = 0;
     if(visual->geometry->type == urdf::Geometry::MESH){
         urdf::Mesh* mesh = dynamic_cast<urdf::Mesh*>(visual->geometry.get());
         to_visual->setScale(urdf_to_osg(mesh->scale));
-        osg::Node* osg_visual = 0;
 
         std::string prefix = "file://";
         std::string filename = "";
@@ -88,12 +88,16 @@ void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir baseD
             //Attaching the newly defined state set object to the node state set
             nodess->setAttribute(nodematerial.get());
         }
-
-        to_visual->addChild(osg_visual);
-        osg_visual->setUserData(this);
-        osg_visual->setName(seg_.getName());
-        visual_ = osg_visual->asGeode();
     }
+    else
+    {
+        osg_visual = new osg::Geode;
+    }
+
+    to_visual->addChild(osg_visual);
+    osg_visual->setUserData(this);
+    osg_visual->setName(seg_.getName());
+    visual_ = osg_visual->asGeode();
 }
 
 void OSGSegment::removeLabel(){
