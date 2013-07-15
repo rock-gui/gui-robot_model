@@ -103,7 +103,7 @@ void RobotVisualization::updateDataIntern(base::samples::Joints const& value)
     vector<string> names = getJointNames();
     if (value.hasNames())
         names = value.names;
-    else if (names.size() != value.elements.size())
+    if (names.size() != value.elements.size())
         throw std::runtime_error("RobotVisualization::updateDataIntern: state vector size and expected joint size differ, and there are no names in the Joints sample");
 
     for(uint i=0; i<names.size(); i++){
