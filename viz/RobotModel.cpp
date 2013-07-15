@@ -40,12 +40,13 @@ void OSGSegment::updateJoint(){
 void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir baseDir)
 {
     osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
-    urdf_to_osg(visual->origin, *to_visual);
+    if (visual)
+        urdf_to_osg(visual->origin, *to_visual);
     toTipOsg_->addChild(to_visual);
     toTipOsg_->setName(seg_.getJoint().getName());
 
     osg::Node* osg_visual = 0;
-    if(visual->geometry->type == urdf::Geometry::MESH){
+    if(visual && visual->geometry->type == urdf::Geometry::MESH){
         urdf::Mesh* mesh = dynamic_cast<urdf::Mesh*>(visual->geometry.get());
         to_visual->setScale(urdf_to_osg(mesh->scale));
 
@@ -212,9 +213,7 @@ osg::Node* RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg:
 
     //Attach visual to joint
     boost::shared_ptr<urdf::Visual> visual = urdf_link.visual;
-    if(visual){
-        seg->attachVisual(visual, rootPrefix);
-    }
+    seg->attachVisual(visual, rootPrefix);
     return joint_forward;
 }
 
