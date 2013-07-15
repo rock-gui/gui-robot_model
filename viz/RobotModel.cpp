@@ -45,66 +45,23 @@ void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir baseD
         to_visual->setScale(urdf_to_osg(mesh->scale));
         osg::Node* osg_visual = 0;
 
-        std::string prefix = "package://";
-        //Is define relative to package, use resource retriever from ros
-        if(mesh->filename.compare(0, prefix.length(), prefix) == 0)
-        {
-#if 0
-            resource_retriever::Retriever r;
-            resource_retriever::MemoryResource resource;
-
-            try
-            {
-                resource = r.get(mesh->filename);
-            }
-            catch (resource_retriever::Exception& e)
-            {
-                ROS_ERROR("Failed to retrieve file: %s", e.what());
-                return;
-            }
-
-            int pos = mesh->filename.find_last_of('.');
-            std::string suffix = mesh->filename.substr(pos);
-            std::string fname = (std::string("/tmp/some_fancy_mesh_file")+suffix);
-
-            FILE* f = fopen(fname.c_str(), "w");
-            fwrite(resource.data.get(), resource.size, 1, f);
-            fclose(f);
-
-            osg_visual = osgDB::readNodeFile(fname);
-#endif
-            throw(std::runtime_error("URDF files points to ROS resource. This is not supported. Change file to use absolute or relative files."));
+        std::string prefix = "file://";
+        std::string filename = "";
+        if(mesh->filename.compare(0, prefix.length(), prefix) == 0){
+            filename = mesh->filename.substr(prefix.length());
         }
-        else{ //Assume its an absolute path or relative to execution folder
-            prefix = "file://";
-            std::string filename = "";
-            if(mesh->filename.compare(0, prefix.length(), prefix) == 0){
-                filename = mesh->filename.substr(prefix.length());
-            }
-            else
-                filename = mesh->filename;
-            LOG_DEBUG("Trying to load mesh file %s", filename.c_str());
+        else
+            filename = mesh->filename;
+        LOG_DEBUG("Trying to load mesh file %s", filename.c_str());
 
-            QString qfilename = QString::fromStdString(filename);
-            if (QFileInfo(qfilename).isRelative())
-                filename = baseDir.absoluteFilePath(qfilename).toStdString();
+        QString qfilename = QString::fromStdString(filename);
+        if (QFileInfo(qfilename).isRelative())
+            filename = baseDir.absoluteFilePath(qfilename).toStdString();
 
-            osg_visual = osgDB::readNodeFile(filename);
-            if(!osg_visual){
-                LOG_ERROR("OpenSceneGraph did not succees loading the mesh file %s.", filename.c_str());
-                throw std::runtime_error("Error loading mesh file.");
-#if 0
-
-                std::stringstream ss;
-                ss << "assimp export " << filename << " /tmp/vizkit_robotmodel_mesh_conversion.obj";
-                if(system(ss.str().c_str()) == 0){
-                    osg_visual = osgDB::readNodeFile("/tmp/vizkit_robotmodel_mesh_conversion.obj");
-                }
-                else{
-                    LOG_ERROR("Conversion failed");
-                }
-#endif
-            }
+        osg_visual = osgDB::readNodeFile(filename);
+        if(!osg_visual){
+            LOG_ERROR("OpenSceneGraph did not succees loading the mesh file %s.", filename.c_str());
+            throw std::runtime_error("Error loading mesh file.");
         }
         if(!osg_visual){
             LOG_ERROR("Unecpected error loading mesh file %s", mesh->filename.c_str());
