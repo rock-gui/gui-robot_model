@@ -38,8 +38,6 @@ if task_context_name
     end
     Orocos.initialize
 end
-Orocos.keep_orocos_logfile = false
-
 
 view3d = Vizkit.vizkit3d_widget
 view3d.show
