@@ -51,6 +51,7 @@ void RobotVisualization::setModelFile(QString modelFile)
             new vizkit::RigidBodyStateVisualization(this);
         frame->setPluginName(QString::fromStdString(segments[i]));
         frame->setPluginEnabled(framesEnabled_);
+        frame->resetModel(0.2);
         segment->getGroup()->addChild(frame->getRootNode());
         _frameVisualizers[segments[i]] = frame;
     }
