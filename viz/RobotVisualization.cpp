@@ -39,7 +39,7 @@ void RobotVisualization::setModelFile(QString modelFile)
         QMessageBox::critical(NULL, "vizkit::RobotVisualization", "cannot load " + modelFile + ", it either does not exist or is not a proper robot model file");
     else
         _modelFile = modelFile;
-    emit propertyChanged("modelFile");
+    //emit propertyChanged("modelFile");
 
     // Now create a RBS visualization for each of the frames in the model
     deleteFrameVisualizers();
