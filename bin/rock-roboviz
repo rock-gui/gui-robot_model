@@ -1,50 +1,74 @@
 #! /usr/bin/env ruby
 
 require 'vizkit'
+require 'optparse'
 
-def usage()
-   puts("\nUsage:")
-   usage_string =  "   roboviz " + "[path to robot model file] " + "[task context for joint data]"
-   puts(usage_string+"\n")
-end
-
-task_context = nil
-robot_model = nil
-ARGV.each_with_index do|a,i|
-  if i == 0
-    puts "Choosing #{a} as robot model"
-    robot_model = a
-  elsif i == 1
-    puts "Choosing #{a} as task context for joint data"
-    task_context = a
-  end
-end
-
-if !robot_model
-    puts("\nWrong arguments")
-    usage
-    exit(-1)
-end
-
-if task_context
-    include Orocos
-    Orocos.initialize
-end
-
-view3d = Vizkit.vizkit3d_widget
-view3d.show()
-
-vis_gui = Vizkit.default_loader.RobotVisualization
-vis_gui.modelFile = robot_model
-
-if task_context
-    #Assume already existing task context
-    control = TaskContext.get task_context
-    control.joint_state.connect_to do |data, port_name|
-        vis_gui.updateData(data)
+use_test_gui = true
+hostname = nil
+options = OptionParser.new do |opt|
+    opt.banner = <<-EOD
+rock-roboviz [options] /path/to/model/file [task context for joint data]
+  If no task context is given, a UI window is started to allow changing
+  the joint values. Use --no-joint-gui to disable
+    EOD
+    opt.on '--no-test-gui', 'disable the test GUI if no task context has been given' do
+        use_test_gui = false
+    end
+    opt.on '--host=HOSTNAME', String, 'the host we should contact to find RTT tasks' do |host|
+        hostname = host
+    end
+    opt.on '--help', 'this help message' do
+        puts opt
     end
 end
 
-Vizkit.exec()
+args = options.parse(ARGV)
+model_file = args.shift
+task_context_name = args.shift
+
+if !model_file
+    puts "missing model file argument"
+    puts options
+    exit 1
+end
+
+if task_context_name
+    if hostname
+        Orocos::CORBA.name_service.ip = hostname
+    end
+    Orocos.initialize
+end
+Orocos.keep_orocos_logfile = false
+
+
+view3d = Vizkit.vizkit3d_widget
+view3d.show
+vis_gui = Vizkit.default_loader.RobotVisualization
+vis_gui.modelFile = model_file.dup
+
+if task_context_name
+    control = Orocos::Async.name_service.get task_context
+    control.joint_state.connect_to do |data|
+        vis_gui.updateData(data)
+    end
+
+elsif use_test_gui
+    main = Qt::Widget.new
+    layout = Qt::VBoxLayout.new(main)
+    layout.add_widget(view3d)
+
+    ctrl_gui = Vizkit.default_loader.ControlBot
+    ctrl_gui.initModel(model_file.dup)
+    ctrl_gui.connect(SIGNAL('newVal(QString, double)')) do |name, val|
+        sample = Types::Base::Samples::Joints.new
+        sample.names = [name]
+        sample.states = [Types::Base::JointState.new(:position => val)]
+        vis_gui.updateData(sample)
+    end
+    layout.add_widget(ctrl_gui)
+    main.show
+end
+
+Vizkit.exec
 
 
