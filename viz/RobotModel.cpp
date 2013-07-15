@@ -28,6 +28,10 @@ OSGSegment::OSGSegment(osg::Node* node, KDL::Segment seg)
     updateJoint();
 }
 
+osg::ref_ptr<osg::Group> OSGSegment::getGroup() const{
+    return toTipOsg_;
+}
+
 void OSGSegment::updateJoint(){
     toTipKdl_ = seg_.pose(jointPos_);
     kdl_to_osg(toTipKdl_, *toTipOsg_);

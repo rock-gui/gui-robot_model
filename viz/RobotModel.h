@@ -72,6 +72,12 @@ public:
      * @return const KDL::Segment
      */
     const KDL::Segment& getSegment(){return seg_;}
+    
+    /**
+     * @brief returns the osg Node that is the root of the visualization for
+     *   this segment
+     */
+    osg::ref_ptr<osg::Group> getGroup() const; 
 
 protected:
     /**
