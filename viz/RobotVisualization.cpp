@@ -1,5 +1,8 @@
 #include <iostream>
 #include "RobotVisualization.hpp"
+#include <QMessageBox>
+#include <base/Logging.hpp>
+#include <osg/Geode>
 
 using namespace vizkit;
 using namespace std;

@@ -3,11 +3,8 @@
 
 #include <boost/noncopyable.hpp>
 #include <vizkit/Vizkit3DPlugin.hpp>
-#include <osg/Geode>
 #include <base/samples/Joints.hpp>
-#include <base/Logging.hpp>
 #include "RobotModel.h"
-#include <QMessageBox>
 
 
 namespace vizkit
