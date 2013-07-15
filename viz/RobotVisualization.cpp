@@ -106,6 +106,9 @@ void RobotVisualization::updateDataIntern(base::samples::Joints const& value)
         throw std::runtime_error("RobotVisualization::updateDataIntern: state vector size and expected joint size differ, and there are no names in the Joints sample");
 
     for(uint i=0; i<names.size(); i++){
+        if (value.states.size() < i)
+            throw std::runtime_error("joint state vector smaller than expected");
+
         setJointState(names[i], value.states[i].position);
     }
 }
