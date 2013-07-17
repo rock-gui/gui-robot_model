@@ -60,7 +60,7 @@ elsif use_test_gui
     ctrl_gui.connect(SIGNAL('newVal(QString, double)')) do |name, val|
         sample = Types::Base::Samples::Joints.new
         sample.names = [name]
-        sample.states = [Types::Base::JointState.new(:position => val)]
+        sample.elements = [Types::Base::JointState.new(:position => val)]
         vis_gui.updateData(sample)
     end
     layout.add_widget(ctrl_gui)
