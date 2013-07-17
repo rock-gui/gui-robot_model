@@ -55,7 +55,7 @@ elsif use_test_gui
     layout = Qt::VBoxLayout.new(main)
     layout.add_widget(view3d)
 
-    ctrl_gui = Vizkit.default_loader.ControlBot
+    ctrl_gui = Vizkit.default_loader.ControlUi
     ctrl_gui.initModel(model_file.dup)
     ctrl_gui.connect(SIGNAL('newVal(QString, double)')) do |name, val|
         sample = Types::Base::Samples::Joints.new
