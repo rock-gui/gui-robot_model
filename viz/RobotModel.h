@@ -1,7 +1,7 @@
 #ifndef ROBOTMODEL_H
 #define ROBOTMODEL_H
 
-#include <urdf/model.h>
+#include <urdf_model/model.h>
 #include <kdl_parser/kdl_parser.hpp>
 #include <kdl/chain.hpp>
 #include <osg/Node>

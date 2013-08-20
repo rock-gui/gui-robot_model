@@ -1,4 +1,5 @@
 #include "RobotModel.h"
+#include <urdf_parser/urdf_parser.h>
 #include "fstream"
 #include "sstream"
 #include "osg/Texture2D"
@@ -270,16 +271,11 @@ osg::Node* RobotModel::load(QString path){
     root_ = loadEmptyScene()->asGroup();
 
     //Parse urdf
-    urdf::Model* model = new urdf::Model();
+    boost::shared_ptr<urdf::ModelInterface> model = urdf::parseURDF(path.toStdString());
     rootPrefix = QDir(QFileInfo(path).absoluteDir());
-    if (!model->initFile(path.toStdString()))
-    {
-        delete model;
+    if (!model)
         return NULL;
-    }
-
-    boost::shared_ptr<urdf::ModelInterface> urdf_model(model);
-    return makeOsg(urdf_model);
+    return makeOsg(model);
 }
 
 OSGSegment* RobotModel::getSegment(std::string name)
