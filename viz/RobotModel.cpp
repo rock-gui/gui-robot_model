@@ -17,6 +17,8 @@
 #include <base/Logging.hpp>
 #include <QFileInfo>
 
+#include <fstream>
+#include <streambuf>
 
 OSGSegment::OSGSegment(osg::Node* node, KDL::Segment seg)
 {
@@ -270,8 +272,11 @@ osg::Node* RobotModel::load(QString path){
 
     root_ = loadEmptyScene()->asGroup();
 
+    std::ifstream t( path.toStdString().c_str() );
+    std::string xml_str((std::istreambuf_iterator<char>(t)),
+	                     std::istreambuf_iterator<char>());
     //Parse urdf
-    boost::shared_ptr<urdf::ModelInterface> model = urdf::parseURDF(path.toStdString());
+    boost::shared_ptr<urdf::ModelInterface> model = urdf::parseURDF( xml_str );
     rootPrefix = QDir(QFileInfo(path).absoluteDir());
     if (!model)
         return NULL;
