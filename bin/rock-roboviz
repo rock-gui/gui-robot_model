@@ -46,7 +46,18 @@ vis_gui.modelFile = model_file.dup
 
 if task_context_name
     control = Orocos::Async.name_service.get task_context_name
-    control.joint_state.connect_to do |data|
+    #find joint state port
+    matching_ports = control.ports.find_all {|p| p.is_a? Orocos::OutputPort and p.type == Types::Base::Samples::Joints}
+    if matching_ports.size > 1
+      puts "Multiple joint state producer ports. Don't know which to use."
+      matching_ports.each do |p| puts p.name end
+      exit 1
+    end
+    if matching_ports.size < 1 
+      puts "No joint state producer port available."
+      exit 1
+    end
+    matching_ports[0].connect_to do |data|
         vis_gui.updateData(data)
     end
 
