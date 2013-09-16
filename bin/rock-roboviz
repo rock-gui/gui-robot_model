@@ -45,7 +45,7 @@ vis_gui = Vizkit.default_loader.RobotVisualization
 vis_gui.modelFile = model_file.dup
 
 if task_context_name
-    control = Orocos::Async.name_service.get task_context
+    control = Orocos::Async.name_service.get task_context_name
     control.joint_state.connect_to do |data|
         vis_gui.updateData(data)
     end
