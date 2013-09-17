@@ -48,7 +48,7 @@ void RobotVisualization::setModelFile(QString modelFile)
     {
         OSGSegment* segment = getSegment(segments[i]);
         vizkit::RigidBodyStateVisualization* frame =
-            new vizkit::RigidBodyStateVisualization(this);
+                new vizkit::RigidBodyStateVisualization(this);
         frame->setPluginName(QString::fromStdString(segments[i]));
         frame->setPluginEnabled(framesEnabled_);
         frame->resetModel(0.2);
@@ -107,6 +107,15 @@ void RobotVisualization::updateDataIntern(base::samples::Joints const& value)
         throw std::runtime_error("RobotVisualization::updateDataIntern: state vector size and expected joint size differ, and there are no names in the Joints sample");
 
     for(uint i=0; i<names.size(); i++){
+        if(base::isUnknown(value[i].position) || base::isInfinity(value[i].position)){
+            if(names.size()){
+                LOG_ERROR("Position of joint %s is invalid.", value.names[i].c_str());
+            }
+            else{
+                LOG_ERROR("Position of joint %d is invalid.", i);
+            }
+            throw std::runtime_error("RobotVisualization::updateDataIntern: invalid joint posiiotn detected.");
+        }
         setJointState(names[i], value[i].position);
     }
 }
