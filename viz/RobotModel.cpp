@@ -78,15 +78,17 @@ void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir baseD
 
         if(visual->material){
             osg::ref_ptr<osg::StateSet> nodess = osg_visual->getOrCreateStateSet();
+            nodess->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
+
             osg::ref_ptr<osg::Material> nodematerial = new osg::Material;
-            //Specifying the yellow colour of the object
-            nodematerial->setDiffuse(osg::Material::FRONT,osg::Vec4(visual->material->color.r*mesh->scale.x,
-                                                                    visual->material->color.g*mesh->scale.x,
-                                                                    visual->material->color.b*mesh->scale.x,
+            //Specifying the colour of the object
+            nodematerial->setDiffuse(osg::Material::FRONT,osg::Vec4(visual->material->color.r,
+                                                                    visual->material->color.g,
+                                                                    visual->material->color.b,
                                                                     visual->material->color.a));
-            nodematerial->setSpecular(osg::Material::FRONT,osg::Vec4(1.*mesh->scale.x,
-                                                                     1.*mesh->scale.x,
-                                                                     1.*mesh->scale.x,
+            nodematerial->setSpecular(osg::Material::FRONT,osg::Vec4(0.2,
+                                                                     0.2,
+                                                                     0.2,
                                                                      1));
 
             //Attaching the newly defined state set object to the node state set
