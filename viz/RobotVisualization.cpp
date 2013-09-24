@@ -109,14 +109,17 @@ void RobotVisualization::updateDataIntern(base::samples::Joints const& value)
     for(uint i=0; i<names.size(); i++){
         if(base::isUnknown(value[i].position) || base::isInfinity(value[i].position)){
             if(names.size()){
-                LOG_ERROR("Position of joint %s is invalid.", value.names[i].c_str());
+                LOG_ERROR("Position of joint %s is invalid: %d", value.names[i].c_str(), value[i].position);
             }
             else{
-                LOG_ERROR("Position of joint %d is invalid.", i);
+                LOG_ERROR("Position of joint %d is invalid: %d", i, value[i].position);
             }
-            throw std::runtime_error("RobotVisualization::updateDataIntern: invalid joint posiiotn detected.");
+            //throw std::runtime_error("RobotVisualization::updateDataIntern: invalid joint position detected.");
+            setJointState(names[i], 0);
         }
-        setJointState(names[i], value[i].position);
+        else{
+            setJointState(names[i], value[i].position);
+        }
     }
 }
 
