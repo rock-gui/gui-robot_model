@@ -1,11 +1,11 @@
 #include <iostream>
 #include "RobotVisualization.hpp"
-#include <vizkit/RigidBodyStateVisualization.hpp>
+#include <vizkit3d/RigidBodyStateVisualization.hpp>
 #include <QMessageBox>
 #include <base/Logging.hpp>
 #include <osg/Geode>
 
-using namespace vizkit;
+using namespace vizkit3d;
 using namespace std;
 
 struct RobotVisualization::Data {
@@ -36,7 +36,7 @@ void RobotVisualization::setModelFile(QString modelFile)
 
     LOG_INFO("loading %s", modelFile.toLatin1().data());
     if(!load(modelFile))
-        QMessageBox::critical(NULL, "vizkit::RobotVisualization", "cannot load " + modelFile + ", it either does not exist or is not a proper robot model file");
+        QMessageBox::critical(NULL, "vizkit3d::RobotVisualization", "cannot load " + modelFile + ", it either does not exist or is not a proper robot model file");
     else
         _modelFile = modelFile;
     //emit propertyChanged("modelFile");
@@ -47,8 +47,8 @@ void RobotVisualization::setModelFile(QString modelFile)
     for (std::size_t i = 0; i != segments.size(); ++i)
     {
         OSGSegment* segment = getSegment(segments[i]);
-        vizkit::RigidBodyStateVisualization* frame =
-                new vizkit::RigidBodyStateVisualization(this);
+        vizkit3d::RigidBodyStateVisualization* frame =
+                new vizkit3d::RigidBodyStateVisualization(this);
         frame->setPluginName(QString::fromStdString(segments[i]));
         frame->setPluginEnabled(framesEnabled_);
         frame->resetModel(0.2);

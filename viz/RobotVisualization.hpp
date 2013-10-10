@@ -2,16 +2,16 @@
 #define robot_model_RobotVisualization_H
 
 #include <boost/noncopyable.hpp>
-#include <vizkit/Vizkit3DPlugin.hpp>
+#include <vizkit3d/Vizkit3DPlugin.hpp>
 #include <base/samples/Joints.hpp>
 #include "RobotModel.h"
 
-namespace vizkit
+namespace vizkit3d
 {
     class RigidBodyStateVisualization;
 
 class RobotVisualization
-        : public vizkit::Vizkit3DPlugin<base::samples::Joints>, public RobotModel
+        : public vizkit3d::Vizkit3DPlugin<base::samples::Joints>, public RobotModel
         , boost::noncopyable
 {
     Q_OBJECT
@@ -26,7 +26,7 @@ public:
     QString modelFile() const;
 
     Q_INVOKABLE void updateData(base::samples::Joints const &sample)
-    {vizkit::Vizkit3DPlugin<base::samples::Joints>::updateData(sample);}
+    {vizkit3d::Vizkit3DPlugin<base::samples::Joints>::updateData(sample);}
 
 public slots:
     bool areFramesEnabled() const;
