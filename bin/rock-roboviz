@@ -3,6 +3,22 @@
 require 'vizkit'
 require 'optparse'
 
+def try_to_get_task(task_name, retry_on_error=true)
+    task = nil
+    begin
+        task = Orocos.name_service.get task_name
+    rescue Exception => e
+        if retry_on_error
+            puts "Did not find task context '#{task_name}'. Will retry in a second."
+            sleep(1)
+            return try_to_get_task(task_name)
+        else
+            return nil
+        end
+    end
+    return task
+end
+
 use_test_gui = true
 hostname = nil
 options = OptionParser.new do |opt|
@@ -45,7 +61,7 @@ vis_gui = Vizkit.default_loader.RobotVisualization
 vis_gui.modelFile = model_file.dup
 
 if task_context_name
-    control = Orocos::Async.name_service.get task_context_name
+    control = try_to_get_task(task_context_name, true)
     #find joint state port
     matching_ports = control.ports.find_all {|p| p.is_a? Orocos::OutputPort and p.type == Types::Base::Samples::Joints}
     if matching_ports.size > 1
