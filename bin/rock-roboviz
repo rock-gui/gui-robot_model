@@ -83,11 +83,14 @@ elsif use_test_gui
     layout.add_widget(view3d)
 
     ctrl_gui = Vizkit.default_loader.ControlUi
-    ctrl_gui.initModel(model_file.dup)
-    ctrl_gui.connect(SIGNAL('newVal(QString, double)')) do |name, val|
-        sample = Types::Base::Samples::Joints.new
-        sample.names = [name]
-        sample.elements = [Types::Base::JointState.new(:position => val)]
+    override_vel_limits=0
+    only_positive=true
+    no_effort=true
+    no_velocity=true
+    ctrl_gui.configureUi(override_vel_limits, only_positive, no_effort, no_velocity)
+    ctrl_gui.initFromURDF(model_file.dup)
+    ctrl_gui.connect(SIGNAL('sendSignal()')) do 
+        sample = ctrl_gui.getJoints()
         vis_gui.updateData(sample)
     end
     layout.add_widget(ctrl_gui)
