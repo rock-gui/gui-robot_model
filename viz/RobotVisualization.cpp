@@ -19,6 +19,7 @@ struct RobotVisualization::Data {
 RobotVisualization::RobotVisualization()
     : p(new Data)
     , framesEnabled_(false)
+    , joints_size(0.1)
 {
 }
 
@@ -51,11 +52,11 @@ void RobotVisualization::setModelFile(QString modelFile)
                 new vizkit3d::RigidBodyStateVisualization(this);
         frame->setPluginName(QString::fromStdString(segments[i]));
         frame->setPluginEnabled(framesEnabled_);
-        frame->resetModel(0.2);
+        frame->resetModel(joints_size);
         segment->getGroup()->addChild(frame->getRootNode());
         _frameVisualizers[segments[i]] = frame;
     }
-    
+
     emit childrenChanged();
 }
 
@@ -96,6 +97,20 @@ void RobotVisualization::updateMainNode ( osg::Node* node )
 {
     //osg::Geode* geode = static_cast<osg::Geode*>(node);
     // Update the main node using the data in p->data
+}
+
+
+double RobotVisualization::getJointsSize() const
+{
+    return joints_size;
+}
+
+
+void RobotVisualization::setJointsSize(double size)
+{
+    joints_size = size;
+    for (map<string, RigidBodyStateVisualization*>::iterator it = _frameVisualizers.begin(); it != _frameVisualizers.end(); ++it)
+        it->second->resetModel(joints_size);
 }
 
 void RobotVisualization::updateDataIntern(base::samples::Joints const& value)

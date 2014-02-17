@@ -59,6 +59,7 @@ view3d = Vizkit.vizkit3d_widget
 view3d.show
 vis_gui = Vizkit.default_loader.RobotVisualization
 vis_gui.modelFile = model_file.dup
+vis_gui.jointsSize = 0.02
 
 if task_context_name
     control = try_to_get_task(task_context_name, true)
