@@ -18,9 +18,9 @@ struct RobotVisualization::Data {
 
 RobotVisualization::RobotVisualization()
     : p(new Data)
-    , framesEnabled_(false)
-    , joints_size(0.1)
 {
+    this->framesEnabled_ = false;
+    this->joints_size = 0.1;
 }
 
 RobotVisualization::~RobotVisualization()

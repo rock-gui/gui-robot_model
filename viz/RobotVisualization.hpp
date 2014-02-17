@@ -51,10 +51,10 @@ protected:
 
 private:
     struct Data;
+    bool framesEnabled_;
     double joints_size;
     Data* p;
     QString _modelFile;
-    bool framesEnabled_;
     std::map<std::string, RigidBodyStateVisualization*> _frameVisualizers;
 };
 }
