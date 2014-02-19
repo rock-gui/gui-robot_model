@@ -19,7 +19,7 @@ struct RobotVisualization::Data {
 RobotVisualization::RobotVisualization()
     : p(new Data)
 {
-    this->framesEnabled_ = false;
+    this->framesEnabled_ = true;
     this->joints_size = 0.1;
 }
 
@@ -77,8 +77,13 @@ bool RobotVisualization::areFramesEnabled() const
 void RobotVisualization::setFramesEnabled(bool value)
 {
     framesEnabled_ = value;
-    for (map<string, RigidBodyStateVisualization*>::iterator it = _frameVisualizers.begin(); it != _frameVisualizers.end(); ++it)
-        it->second->setPluginEnabled(value);
+    for (map<string, RigidBodyStateVisualization*>::iterator it = _frameVisualizers.begin(); it != _frameVisualizers.end(); ++it){
+        RigidBodyStateVisualization* rbsv = it->second;
+        if(value)
+            rbsv->setSize(joints_size);
+        else
+            rbsv->setSize(0);
+    }
 }
 
 QString RobotVisualization::modelFile() const{
