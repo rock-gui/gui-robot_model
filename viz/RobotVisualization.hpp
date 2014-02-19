@@ -17,6 +17,8 @@ class RobotVisualization
     Q_OBJECT
     Q_PROPERTY(QString modelFile READ modelFile WRITE setModelFile)
     Q_PROPERTY(bool framesEnabled READ areFramesEnabled WRITE setFramesEnabled)
+    Q_PROPERTY(double jointsSize READ getJointsSize WRITE setJointsSize)
+
 
 public:
     RobotVisualization();
@@ -31,6 +33,14 @@ public:
 public slots:
     bool areFramesEnabled() const;
     void setFramesEnabled(bool value);
+    /** Joints Frame using RigidBodyStateVisualization
+    * The default is 0.1
+    */
+    double getJointsSize() const;
+    /** Joints Frame using RigidBodyStateVisualization
+    */
+    void setJointsSize(double size);
+
 
 protected:
     virtual osg::ref_ptr<osg::Node> createMainNode();
@@ -41,9 +51,10 @@ protected:
 
 private:
     struct Data;
+    bool framesEnabled_;
+    double joints_size;
     Data* p;
     QString _modelFile;
-    bool framesEnabled_;
     std::map<std::string, RigidBodyStateVisualization*> _frameVisualizers;
 };
 }
