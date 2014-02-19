@@ -36,7 +36,9 @@ void RobotVisualization::setModelFile(QString modelFile)
     QString ext = tokens.back();
 
     LOG_INFO("loading %s", modelFile.toLatin1().data());
-    if(!load(modelFile))
+    bool st;
+    st = load(modelFile);
+    if(!st)
         QMessageBox::critical(NULL, "vizkit3d::RobotVisualization", "cannot load " + modelFile + ", it either does not exist or is not a proper robot model file");
     else
         _modelFile = modelFile;

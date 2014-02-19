@@ -198,6 +198,7 @@ RobotModel::RobotModel(){
     //Root is the entry point to the scene graph
     osg::Group* root = new osg::Group();
     root_ = root;
+    loadEmptyScene();
 }
 
 osg::Node* RobotModel::loadEmptyScene(){
@@ -247,6 +248,10 @@ osg::Node* RobotModel::makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_mod
         urdf_link = link_buffer.back();
         link_buffer.pop_back();
 
+        //FIXME: This is hacky solution to prevent from links being added twice. There should be a better one
+        if(std::find (segmentNames_.begin(), segmentNames_.end(), urdf_link->name) != segmentNames_.end())
+            continue;
+
         //expand node
         link_buffer.reserve(link_buffer.size() + std::distance(urdf_link->child_links.begin(), urdf_link->child_links.end()));
         link_buffer.insert(link_buffer.end(), urdf_link->child_links.begin(), urdf_link->child_links.end());
@@ -272,7 +277,7 @@ osg::Node* RobotModel::makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_mod
 
 osg::Node* RobotModel::load(QString path){
 
-    root_ = loadEmptyScene()->asGroup();
+    loadEmptyScene();
 
     std::ifstream t( path.toStdString().c_str() );
     std::string xml_str((std::istreambuf_iterator<char>(t)),
