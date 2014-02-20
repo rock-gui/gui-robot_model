@@ -19,11 +19,13 @@ def try_to_get_task(task_name, retry_on_error=true)
     return task
 end
 
+@state_task_name = nil
+@state_port_name = nil
 use_test_gui = true
 hostname = nil
 options = OptionParser.new do |opt|
     opt.banner = <<-EOD
-rock-roboviz [options] /path/to/model/file [task context for joint data]
+rock-roboviz [options] /path/to/model/file
   If no task context is given, a UI window is started to allow changing
   the joint values. Use --no-joint-gui to disable
     EOD
@@ -33,6 +35,15 @@ rock-roboviz [options] /path/to/model/file [task context for joint data]
     opt.on '--host=HOSTNAME', String, 'the host we should contact to find RTT tasks' do |host|
         hostname = host
     end
+    opt.on '--joint_state_port=TASK_CONTEXT_NAME:PORT_NAME', '-s=TASK_CONTEXT_NAME:PORT_NAME' , "Use joint state port of task TASK_CONTEXT_NAME to read data from" do |val|
+        puts "Will take port '#{val}' for reading state from"
+        splitted = val.split(':')
+        if splitted.size != 2
+            raise("Definition of command port must follow the pattern 'TASK_CONTEXT_NAME:PORT_NAME'. Example: --joint_command_port=my_task:the_port")
+        end
+        @state_task_name = splitted[0]
+        @state_port_name = splitted[1]
+    end
     opt.on '--help', 'this help message' do
         puts opt
     end
@@ -40,7 +51,6 @@ end
 
 args = options.parse(ARGV)
 model_file = args.shift
-task_context_name = args.shift
 
 if !model_file
     puts "missing model file argument"
@@ -48,7 +58,7 @@ if !model_file
     exit 1
 end
 
-if task_context_name
+if @state_task_name
     if hostname
         Orocos::CORBA.name_service.ip = hostname
     end
@@ -61,20 +71,28 @@ vis_gui = Vizkit.default_loader.RobotVisualization
 vis_gui.modelFile = model_file.dup
 vis_gui.jointsSize = 0.02
 
-if task_context_name
-    control = try_to_get_task(task_context_name, true)
-    #find joint state port
-    matching_ports = control.ports.find_all {|p| p.is_a? Orocos::OutputPort and p.type == Types::Base::Samples::Joints}
-    if matching_ports.size > 1
-      puts "Multiple joint state producer ports. Don't know which to use."
-      matching_ports.each do |p| puts p.name end
-      exit 1
-    end
-    if matching_ports.size < 1 
-      puts "No joint state producer port available."
-      exit 1
-    end
-    matching_ports[0].connect_to do |data|
+if @state_task_name
+    control = try_to_get_task(@state_task_name, true)
+
+    port = nil
+    if @state_port_name 
+       port = control.port(@state_port_name )
+    else
+       #find joint state port
+       matching_ports = control.ports.find_all {|p| p.is_a? Orocos::OutputPort and p.type == Types::Base::Samples::Joints}
+       if matching_ports.size > 1
+         puts "Multiple joint state producer ports. Don't know which to use."
+         matching_ports.each do |p| puts p.name end
+         exit 1
+       end
+       if matching_ports.size < 1 
+         puts "No joint state producer port available."
+         exit 1
+       end
+       port = matching_ports[0]
+    end 
+    
+    port.connect_to do |data|
         vis_gui.updateData(data)
     end
 
