@@ -19,8 +19,8 @@ def try_to_get_task(task_name, retry_on_error=true)
     return task
 end
 
-@state_task_name = nil
-@state_port_name = nil
+@state_task_name = Array.new
+@state_port_name = Array.new
 use_test_gui = true
 hostname = nil
 options = OptionParser.new do |opt|
@@ -41,8 +41,8 @@ rock-roboviz [options] /path/to/model/file
         if splitted.size != 2
             raise("Definition of command port must follow the pattern 'TASK_CONTEXT_NAME:PORT_NAME'. Example: --joint_command_port=my_task:the_port")
         end
-        @state_task_name = splitted[0]
-        @state_port_name = splitted[1]
+        @state_task_name.push( splitted[0] )
+        @state_port_name.push( splitted[1] )
     end
     opt.on '--help', 'this help message' do
         puts opt
@@ -58,7 +58,7 @@ if !model_file
     exit 1
 end
 
-if @state_task_name
+if not @state_task_name.empty?
     if hostname
         Orocos::CORBA.name_service.ip = hostname
     end
@@ -71,29 +71,31 @@ vis_gui = Vizkit.default_loader.RobotVisualization
 vis_gui.modelFile = model_file.dup
 vis_gui.jointsSize = 0.02
 
-if @state_task_name
-    control = try_to_get_task(@state_task_name, true)
+if not @state_task_name.empty?
+    @state_task_name.each_with_index do | task_name, index | 
+        control = try_to_get_task(task_name, true)
 
-    port = nil
-    if @state_port_name 
-       port = control.port(@state_port_name )
-    else
-       #find joint state port
-       matching_ports = control.ports.find_all {|p| p.is_a? Orocos::OutputPort and p.type == Types::Base::Samples::Joints}
-       if matching_ports.size > 1
-         puts "Multiple joint state producer ports. Don't know which to use."
-         matching_ports.each do |p| puts p.name end
-         exit 1
-       end
-       if matching_ports.size < 1 
-         puts "No joint state producer port available."
-         exit 1
-       end
-       port = matching_ports[0]
-    end 
-    
-    port.connect_to do |data|
-        vis_gui.updateData(data)
+        port = nil
+        if @state_port_name[index]
+            port = control.port(@state_port_name[index] )
+        else
+            #find joint state port
+            matching_ports = control.ports.find_all {|p| p.is_a? Orocos::OutputPort and p.type == Types::Base::Samples::Joints}
+            if matching_ports.size > 1
+                puts "Multiple joint state producer ports. Don't know which to use."
+                matching_ports.each do |p| puts p.name end
+                exit 1
+            end
+            if matching_ports.size < 1 
+                puts "No joint state producer port available."
+                exit 1
+            end
+            port = matching_ports[0]
+        end 
+
+        port.connect_to do |data|
+            vis_gui.updateData(data)
+        end
     end
 
 elsif use_test_gui
