@@ -13,6 +13,7 @@ struct RobotVisualization::Data {
     //
     // Making a copy is required because of how OSG works
     base::samples::Joints data;
+    base::samples::RigidBodyState pos;
 };
 
 
@@ -21,6 +22,7 @@ RobotVisualization::RobotVisualization()
 {
     this->framesEnabled_ = false;
     this->joints_size = 0.1;
+    this->modelPos = new osg::PositionAttitudeTransform();
 }
 
 RobotVisualization::~RobotVisualization()
@@ -85,18 +87,31 @@ QString RobotVisualization::modelFile() const{
 
 osg::ref_ptr<osg::Node> RobotVisualization::createMainNode()
 {
-    if(root_)
-        return root_;
-    else{
+
+
+
+    if(!root_){
         loadEmptyScene();
-        return root_;
     }
+
+    modelPos->addChild(root_);
+
+    return modelPos;
+
 }
 
 void RobotVisualization::updateMainNode ( osg::Node* node )
 {
-    //osg::Geode* geode = static_cast<osg::Geode*>(node);
-    // Update the main node using the data in p->data
+    osg::Geode* geode = static_cast<osg::Geode*>(node);
+
+
+    // Update the main node using the data in p->pos
+    osg::Vec3d position(p->pos.position.x(), p->pos.position.y(), p->pos.position.z());
+    modelPos->setPosition(position);
+
+    osg::Quat orientation(p->pos.orientation.x(), p->pos.orientation.y(), p->pos.orientation.z(),p->pos.orientation.w());
+    modelPos->setAttitude(orientation);
+
 }
 
 
@@ -136,6 +151,10 @@ void RobotVisualization::updateDataIntern(base::samples::Joints const& value)
             setJointState(names[i], value[i].position);
         }
     }
+}
+
+void RobotVisualization::updateDataIntern(base::samples::RigidBodyState const& pos){
+	p->pos = pos;
 }
 
 //Macro that makes this plugin loadable in ruby, this is optional.
