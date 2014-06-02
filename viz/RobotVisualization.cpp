@@ -104,13 +104,17 @@ void RobotVisualization::updateMainNode ( osg::Node* node )
 {
     osg::Geode* geode = static_cast<osg::Geode*>(node);
 
-
     // Update the main node using the data in p->pos
-    osg::Vec3d position(p->pos.position.x(), p->pos.position.y(), p->pos.position.z());
-    modelPos->setPosition(position);
 
-    osg::Quat orientation(p->pos.orientation.x(), p->pos.orientation.y(), p->pos.orientation.z(),p->pos.orientation.w());
-    modelPos->setAttitude(orientation);
+    if (p->pos.hasValidPosition()){
+		osg::Vec3d position(p->pos.position.x(), p->pos.position.y(), p->pos.position.z());
+		modelPos->setPosition(position);
+    }
+
+    if (p->pos.hasValidOrientation()){
+		osg::Quat orientation(p->pos.orientation.x(), p->pos.orientation.y(), p->pos.orientation.z(),p->pos.orientation.w());
+		modelPos->setAttitude(orientation);
+    }
 
 }
 
