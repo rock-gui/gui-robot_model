@@ -1,6 +1,7 @@
 #include <iostream>
 #include "RobotVisualization.hpp"
 #include <vizkit3d/RigidBodyStateVisualization.hpp>
+#include <vizkit3d/Vizkit3DWidget.hpp>
 #include <QMessageBox>
 #include <base/Logging.hpp>
 #include <osg/Geode>
@@ -23,6 +24,7 @@ RobotVisualization::RobotVisualization()
     this->framesEnabled_ = false;
     this->joints_size = 0.1;
     this->modelPos = new osg::PositionAttitudeTransform();
+    this->followModelWithCamera = false;
 }
 
 RobotVisualization::~RobotVisualization()
@@ -81,6 +83,13 @@ void RobotVisualization::setFramesEnabled(bool value)
         it->second->setPluginEnabled(value);
 }
 
+bool RobotVisualization::getFollowModelWithCamera() const{
+	return followModelWithCamera;
+}
+bool RobotVisualization::setFollowModelWithCamera(bool value){
+	followModelWithCamera = value;
+}
+
 QString RobotVisualization::modelFile() const{
     return _modelFile;
 }
@@ -109,6 +118,16 @@ void RobotVisualization::updateMainNode ( osg::Node* node )
     if (p->pos.hasValidPosition()){
 		osg::Vec3d position(p->pos.position.x(), p->pos.position.y(), p->pos.position.z());
 		modelPos->setPosition(position);
+
+		if (followModelWithCamera){
+			Vizkit3DWidget * widget = dynamic_cast<Vizkit3DWidget *>(this->parent());
+
+			QVector3D lookAtPos, eyePos, upVector;
+			widget->getCameraView(lookAtPos, eyePos, upVector);
+			widget->setCameraEye(eyePos.x(),eyePos.y(),eyePos.z());
+			widget->setCameraLookAt(p->pos.position.x(), p->pos.position.y(), p->pos.position.z());
+			widget->setCameraUp(upVector.x(),upVector.y(),upVector.z());
+		}
     }
 
     if (p->pos.hasValidOrientation()){

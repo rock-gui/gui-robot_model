@@ -21,7 +21,7 @@ class RobotVisualization
     Q_PROPERTY(QString modelFile READ modelFile WRITE setModelFile)
     Q_PROPERTY(bool framesEnabled READ areFramesEnabled WRITE setFramesEnabled)
     Q_PROPERTY(double jointsSize READ getJointsSize WRITE setJointsSize)
-
+    Q_PROPERTY(bool followModelWithCamera READ getFollowModelWithCamera WRITE setFollowModelWithCamera)
 
 public:
     RobotVisualization();
@@ -47,6 +47,12 @@ public slots:
     */
     void setJointsSize(double size);
 
+    /**
+     * camera rotation center follows the robot
+     */
+    bool getFollowModelWithCamera() const;
+    bool setFollowModelWithCamera(bool value);
+
 
 protected:
     virtual osg::ref_ptr<osg::Node> createMainNode();
@@ -59,6 +65,7 @@ protected:
 private:
     struct Data;
     bool framesEnabled_;
+    bool followModelWithCamera;
     double joints_size;
     Data* p;
     QString _modelFile;
