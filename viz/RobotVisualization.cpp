@@ -86,7 +86,7 @@ void RobotVisualization::setFramesEnabled(bool value)
 bool RobotVisualization::getFollowModelWithCamera() const{
 	return followModelWithCamera;
 }
-bool RobotVisualization::setFollowModelWithCamera(bool value){
+void RobotVisualization::setFollowModelWithCamera(bool value){
 	followModelWithCamera = value;
 }
 

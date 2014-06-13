@@ -51,7 +51,7 @@ public slots:
      * camera rotation center follows the robot
      */
     bool getFollowModelWithCamera() const;
-    bool setFollowModelWithCamera(bool value);
+    void setFollowModelWithCamera(bool value);
 
 
 protected:
