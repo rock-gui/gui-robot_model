@@ -40,6 +40,18 @@ void OSGSegment::updateJoint(){
     kdl_to_osg(toTipKdl_, *toTipOsg_);
 }
 
+void OSGSegment::attachVisuals(std::vector<boost::shared_ptr<urdf::Visual> > &visual_array, QDir prefix)
+{
+    std::vector<boost::shared_ptr<urdf::Visual> >::iterator itr = visual_array.begin();
+    std::vector<boost::shared_ptr<urdf::Visual> >::iterator itr_end = visual_array.end();
+
+    for(itr = visual_array.begin(); itr != itr_end; ++itr)
+    {
+        boost::shared_ptr<urdf::Visual> visual = *itr;
+        attachVisual(visual, prefix);
+    }
+}
+
 void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir baseDir)
 {
     osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
@@ -216,9 +228,19 @@ osg::Node* RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg:
 
     root->addChild(joint_forward);
 
-    //Attach visual to joint
-    boost::shared_ptr<urdf::Visual> visual = urdf_link.visual;
-    seg->attachVisual(visual, rootPrefix);
+    //Attach one visual to joint
+    if (urdf_link.visual_array.size() == 0)
+    {
+        boost::shared_ptr<urdf::Visual> visual = urdf_link.visual;
+        seg->attachVisual(visual, rootPrefix);
+    }
+    //Attach several visuals to joint
+    else
+    {
+         std::vector<boost::shared_ptr<urdf::Visual> > visual_array = urdf_link.visual_array;
+         seg->attachVisuals(visual_array, rootPrefix);
+    }
+
     return joint_forward;
 }
 
