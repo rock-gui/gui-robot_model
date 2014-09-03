@@ -95,6 +95,15 @@ protected:
     */
    void attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir prefix = QDir());
 
+   /**
+   * @brieg Create nodes with visual meshes
+   * 
+   * Should only be called during initial construction of the robot model
+   *
+   * @param visual_array: Parsed URDF tag (using urdf_parser) of the visual.
+   */
+   void attachVisuals(std::vector<boost::shared_ptr<urdf::Visual> > &visual_array, QDir prefix = QDir());
+
 private:
     KDL::Segment seg_; /**< KDKL representation of the segment */
     KDL::Frame toTipKdl_; /**< Temp storage for the current joint pose */
