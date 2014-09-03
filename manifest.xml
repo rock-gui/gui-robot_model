@@ -4,6 +4,7 @@
   <author>Malte Wirkus/malte.wirkus@dfki.de</author>
   <license>LGPLv2 or later</license>
 
+  <depend package="gui/control_ui" />
   <depend package="base/types" />
   <depend package="control/kdl_parser" />
   <depend package="control/urdfdom" />
