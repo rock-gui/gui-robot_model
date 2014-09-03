@@ -1,6 +1,7 @@
 #include <iostream>
 #include "RobotVisualization.hpp"
 #include <vizkit3d/RigidBodyStateVisualization.hpp>
+#include <vizkit3d/Vizkit3DWidget.hpp>
 #include <QMessageBox>
 #include <base/Logging.hpp>
 #include <osg/Geode>
@@ -13,6 +14,7 @@ struct RobotVisualization::Data {
     //
     // Making a copy is required because of how OSG works
     base::samples::Joints data;
+    base::samples::RigidBodyState pos;
 };
 
 
@@ -21,6 +23,8 @@ RobotVisualization::RobotVisualization()
 {
     this->framesEnabled_ = true;
     this->joints_size = 0.1;
+    this->modelPos = new osg::PositionAttitudeTransform();
+    this->followModelWithCamera = false;
 }
 
 RobotVisualization::~RobotVisualization()
@@ -86,24 +90,58 @@ void RobotVisualization::setFramesEnabled(bool value)
     }
 }
 
+bool RobotVisualization::getFollowModelWithCamera() const{
+	return followModelWithCamera;
+}
+void RobotVisualization::setFollowModelWithCamera(bool value){
+	followModelWithCamera = value;
+}
+
 QString RobotVisualization::modelFile() const{
     return _modelFile;
 }
 
 osg::ref_ptr<osg::Node> RobotVisualization::createMainNode()
 {
-    if(root_)
-        return root_;
-    else{
+
+
+
+    if(!root_){
         loadEmptyScene();
-        return root_;
     }
+
+    modelPos->addChild(root_);
+
+    return modelPos;
+
 }
 
 void RobotVisualization::updateMainNode ( osg::Node* node )
 {
-    //osg::Geode* geode = static_cast<osg::Geode*>(node);
-    // Update the main node using the data in p->data
+    osg::Geode* geode = static_cast<osg::Geode*>(node);
+
+    // Update the main node using the data in p->pos
+
+    if (p->pos.hasValidPosition()){
+		osg::Vec3d position(p->pos.position.x(), p->pos.position.y(), p->pos.position.z());
+		modelPos->setPosition(position);
+
+		if (followModelWithCamera){
+			Vizkit3DWidget * widget = dynamic_cast<Vizkit3DWidget *>(this->parent());
+
+			QVector3D lookAtPos, eyePos, upVector;
+			widget->getCameraView(lookAtPos, eyePos, upVector);
+			widget->setCameraEye(eyePos.x(),eyePos.y(),eyePos.z());
+			widget->setCameraLookAt(p->pos.position.x(), p->pos.position.y(), p->pos.position.z());
+			widget->setCameraUp(upVector.x(),upVector.y(),upVector.z());
+		}
+    }
+
+    if (p->pos.hasValidOrientation()){
+		osg::Quat orientation(p->pos.orientation.x(), p->pos.orientation.y(), p->pos.orientation.z(),p->pos.orientation.w());
+		modelPos->setAttitude(orientation);
+    }
+
 }
 
 
@@ -143,6 +181,10 @@ void RobotVisualization::updateDataIntern(base::samples::Joints const& value)
             setJointState(names[i], value[i].position);
         }
     }
+}
+
+void RobotVisualization::updateDataIntern(base::samples::RigidBodyState const& pos){
+	p->pos = pos;
 }
 
 //Macro that makes this plugin loadable in ruby, this is optional.
