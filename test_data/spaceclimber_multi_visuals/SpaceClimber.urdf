@@ -1,0 +1,1444 @@
+<?xml version="1.0"?>
+  <robot name="SpaceClimber">
+
+    <link name="leg2/2">
+      <inertial>
+        <origin xyz="0.138646 2.3e-05 -0.002846" rpy="0 0 0"/>
+        <mass value="0.98"/>
+        <inertia ixx="0.002039" ixy="-7e-06" ixz="0.000187" iyy="0.00835" iyz="0" izz="0.00834"/>
+      </inertial>
+      <visual name="visual_leg2_motor2_ab">
+        <origin xyz="0 0 0" rpy="-2e-06 0 0"/>
+        <geometry>
+          <mesh filename="visual_leg2_motor2_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg2_upper_link">
+        <origin xyz="0.094516 -0.000465 0.002427" rpy="1.570796 0 1.570796"/>
+        <geometry>
+          <mesh filename="visual_leg2_upper_link.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg2_motor3_an">
+        <origin xyz="0.195726 0.000234 -0.01239" rpy="-1.570798 0 0"/>
+        <geometry>
+          <mesh filename="visual_leg2_motor3_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg2_motor3_an">
+        <origin xyz="0.1955 0 0.002816" rpy="-1.570798 0 0"/>
+        <geometry>
+          <box size="0.071513 0.098674 0.060898"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg2/3">
+      <inertial>
+        <origin xyz="0.071527 0 0.003527" rpy="0 0 0"/>
+        <mass value="0.9146"/>
+        <inertia ixx="0.002902" ixy="0" ixz="-7.9e-05" iyy="0.003314" iyz="0" izz="0.005685"/>
+      </inertial>
+      <visual name="visual_leg2_motor3_ab">
+        <origin xyz="0 0 0" rpy="-2e-06 1e-06 1e-06"/>
+        <geometry>
+          <mesh filename="visual_leg2_motor3_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg2_lower_link0">
+        <origin xyz="0.077942 0 0.004433" rpy="1.570796 -1e-06 -1.570796"/>
+        <geometry>
+          <mesh filename="visual_leg2_lower_link0.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg2_lower_link0">
+        <origin xyz="0.112339 0 0.004949" rpy="-1.59841 1e-06 -1e-06"/>
+        <geometry>
+          <box size="0.189322 0.034502 0.032196"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg2/0">
+      <inertial>
+        <origin xyz="0.011961 -8.7e-05 -0.040059" rpy="0 0 0"/>
+        <mass value="0.867"/>
+        <inertia ixx="0.001587" ixy="0" ixz="0.000148" iyy="0.002121" iyz="-1e-06" izz="0.001562"/>
+      </inertial>
+      <visual name="visual_leg2_motor1_an">
+        <origin xyz="0.023806 -0.000235 -0.054381" rpy="0 1.570796 0"/>
+        <geometry>
+          <mesh filename="visual_leg2_motor1_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg2_motor0_ab">
+        <origin xyz="0 0 0" rpy="0 -1e-06 0"/>
+        <geometry>
+          <mesh filename="visual_leg2_motor0_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg2_motor1_an">
+        <origin xyz="0.0086 0 -0.054154" rpy="0 1.570796 0"/>
+        <geometry>
+          <box size="0.073 0.064 0.0952"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg2/1">
+      <inertial>
+        <origin xyz="-8.4e-05 0.004569 0.040008" rpy="0 0 0"/>
+        <mass value="0.867"/>
+        <inertia ixx="0.002083" ixy="0" ixz="1e-06" iyy="0.001586" iyz="-5.7e-05" izz="0.001524"/>
+      </inertial>
+      <visual name="visual_leg2_motor1_ab">
+        <origin xyz="0 0 0" rpy="1e-06 0 0"/>
+        <geometry>
+          <mesh filename="visual_leg2_motor1_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg2_motor2_an">
+        <origin xyz="-0.000227 0.013779 0.0543" rpy="-1e-06 -3.141591 0"/>
+        <geometry>
+          <mesh filename="visual_leg2_motor2_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg2_motor2_an">
+        <origin xyz="0 -0.0014 0.054097" rpy="-1e-06 -3.141591 0"/>
+        <geometry>
+          <box size="0.064 0.0952 0.073"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg2/4">
+      <inertial>
+        <origin xyz="6e-06 -1.3e-05 0.108663" rpy="0 0 0"/>
+        <mass value="0.45"/>
+        <inertia ixx="0.00074" ixy="0" ixz="0" iyy="0.000737" iyz="0" izz="0.000265"/>
+      </inertial>
+      <visual name="visual_leg2_lower_link1">
+        <origin xyz="0 0 0.078599" rpy="0 -1.570796 0"/>
+        <geometry>
+          <mesh filename="visual_leg2_lower_link1.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg2_foot">
+        <origin xyz="1.7e-05 -4e-05 0.121634" rpy="0 -1.570796 0"/>
+        <geometry>
+          <mesh filename="visual_leg2_foot.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="schwarz"/>
+      </visual>
+      <collision name="collision_leg2_foot">
+        <origin xyz="0 0 0.125756" rpy="0 -1.570796 0"/>
+        <geometry>
+          <sphere radius="0.025893"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg5/1">
+      <inertial>
+        <origin xyz="8.6e-05 -0.004579 -0.040002" rpy="0 0 0"/>
+        <mass value="0.867"/>
+        <inertia ixx="0.002083" ixy="0" ixz="1e-06" iyy="0.001586" iyz="-5.7e-05" izz="0.001524"/>
+      </inertial>
+      <visual name="visual_leg5_motor2_an">
+        <origin xyz="0.000234 -0.013805 -0.054304" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="visual_leg5_motor2_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg5_motor1_ab">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="visual_leg5_motor1_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg5_motor2_an">
+        <origin xyz="0 0.0014 -0.054077" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.064 0.0952 0.073"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg5/0">
+      <inertial>
+        <origin xyz="0.006348 0 0.039946" rpy="0 0 0"/>
+        <mass value="0.867"/>
+        <inertia ixx="0.001584" ixy="0" ixz="-7.8e-05" iyy="0.00205" iyz="0" izz="0.001493"/>
+      </inertial>
+      <visual name="visual_leg5_motor0_ab">
+        <origin xyz="0 0 0" rpy="2e-06 -1e-06 0"/>
+        <geometry>
+          <mesh filename="visual_leg5_motor0_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg5_motor1_an">
+        <origin xyz="0.0086 0 0.054114" rpy="0.745713 1.570794 0.745713"/>
+        <geometry>
+          <mesh filename="visual_leg5_motor1_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg5_motor1_an">
+        <origin xyz="0.0086 0 0.054114" rpy="0.741729 1.570794 0.741728"/>
+        <geometry>
+          <box size="0.073 0.064 0.0952"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg5/3">
+      <inertial>
+        <origin xyz="0.100059 0 0.004065" rpy="0 0 0"/>
+        <mass value="1.0646"/>
+        <inertia ixx="0.002967" ixy="0" ixz="-0.000162" iyy="0.008567" iyz="0" izz="0.010936"/>
+      </inertial>
+      <visual name="visual_leg5_lower_link1">
+        <origin xyz="0.269325 0 0.006798" rpy="-1.570791 -3.141592 -2e-06"/>
+        <geometry>
+          <mesh filename="visual_leg5_lower_link1.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg5_lower_link0">
+        <origin xyz="0.079995 0 0.004573" rpy="1.570796 -1e-06 -1.570797"/>
+        <geometry>
+          <mesh filename="visual_leg5_lower_link0.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg5_motor3_ab">
+        <origin xyz="0 0 0" rpy="6e-06 -2e-06 3.141592"/>
+        <geometry>
+          <mesh filename="visual_leg5_motor3_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg5_lower_link0">
+        <origin xyz="0.112339 0 0.005049" rpy="-1.570791 3.141593 -2e-06"/>
+        <geometry>
+          <box size="0.189322 0.034489 0.032174"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg5/2">
+      <inertial>
+        <origin xyz="0.152851 -1.3e-05 -0.002882" rpy="0 0 0"/>
+        <mass value="0.98"/>
+        <inertia ixx="0.002184" ixy="8e-06" ixz="0.000207" iyy="0.009779" iyz="-1e-06" izz="0.009914"/>
+      </inertial>
+      <visual name="visual_leg5_motor3_an">
+        <origin xyz="0.215727 -0.000235 -0.01243" rpy="-1.570794 -3.141593 1e-06"/>
+        <geometry>
+          <mesh filename="visual_leg5_motor3_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg5_upper_link">
+        <origin xyz="0.104433 0.000551 0.002346" rpy="1.570796 0 1.570797"/>
+        <geometry>
+          <mesh filename="visual_leg5_upper_link.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg5_motor2_ab">
+        <origin xyz="0 0 0" rpy="1e-06 0 3.14159"/>
+        <geometry>
+          <mesh filename="visual_leg5_motor2_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg5_motor3_an">
+        <origin xyz="0.2155 0 0.002776" rpy="-1.570794 -3.141593 0"/>
+        <geometry>
+          <box size="0.071513 0.098674 0.060898"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg5/ft">
+    </link>
+
+    <link name="leg5/4">
+      <inertial>
+        <origin xyz="0 0 0.102716" rpy="0 0 0"/>
+        <mass value="0.3"/>
+        <inertia ixx="0.000178" ixy="0" ixz="0" iyy="0.00018" iyz="0" izz="0.000201"/>
+      </inertial>
+      <visual name="visual_leg5_foot">
+        <origin xyz="0 0 0.100675" rpy="0 1.570795 0"/>
+        <geometry>
+          <mesh filename="visual_leg5_foot.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="schwarz"/>
+      </visual>
+      <collision name="collision_leg5_foot">
+        <origin xyz="0 0 0.104757" rpy="0 1.570795 0"/>
+        <geometry>
+          <sphere radius="0.025981"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="root">
+      <inertial>
+        <origin xyz="-0.115962 0.000452 0.029097" rpy="0 0 0"/>
+        <mass value="13.061"/>
+        <inertia ixx="0.138618" ixy="0.00011" ixz="-0.01179" iyy="0.348245" iyz="1.1e-05" izz="0.405486"/>
+      </inertial>
+      <visual name="visual_main_body">
+        <origin xyz="-0.091 0 0.0318" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="visual_main_body.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="schwarz"/>
+      </visual>
+      <visual name="visual_leg5_motor0_an">
+        <origin xyz="-0.327319 -0.06358 0.003902" rpy="0 0 -1.570795"/>
+        <geometry>
+          <mesh filename="visual_leg5_motor0_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg2_motor0_an">
+        <origin xyz="-0.06712 0.14111 0.048401" rpy="0 0 1.570796"/>
+        <geometry>
+          <mesh filename="visual_leg2_motor0_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg3_ft">
+        <origin xyz="-0.067035 -0.090507 0.04503" rpy="0 0 1.570796"/>
+        <geometry>
+          <mesh filename="visual_leg3_ft.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="silber"/>
+      </visual>
+      <visual name="visual_leg4_motor0_an">
+        <origin xyz="-0.327319 0.065027 0.003902" rpy="0 0 1.570796"/>
+        <geometry>
+          <mesh filename="visual_leg4_motor0_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg5_ft">
+        <origin xyz="-0.326921 -0.017447 0.001987" rpy="0 0 1.570796"/>
+        <geometry>
+          <mesh filename="visual_leg5_ft.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="silber"/>
+      </visual>
+      <visual name="visual_leg4_ft">
+        <origin xyz="-0.326921 0.018895 0.001987" rpy="0 0 1.570796"/>
+        <geometry>
+          <mesh filename="visual_leg4_ft.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="silber"/>
+      </visual>
+      <visual name="visual_body_motor_an">
+        <origin xyz="-0.246425 0.000989 -0.005403" rpy="0 0 1.570796"/>
+        <geometry>
+          <mesh filename="visual_body_motor_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg3_motor0_an">
+        <origin xyz="-0.06712 -0.139662 0.048401" rpy="0 0 -1.570795"/>
+        <geometry>
+          <mesh filename="visual_leg3_motor0_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg2_ft">
+        <origin xyz="-0.067035 0.091955 0.04503" rpy="0 0 1.570796"/>
+        <geometry>
+          <mesh filename="visual_leg2_ft.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="silber"/>
+      </visual>
+      <collision name="collision_leg2_motor0_an">
+        <origin xyz="-0.066721 0.147307 0.047555" rpy="0 0 1.570796"/>
+        <geometry>
+          <box size="0.099 0.067882 0.069866"/>
+        </geometry>
+      </collision>
+      <collision name="collision_leg4_motor0_an">
+        <origin xyz="-0.326921 0.071224 0.003055" rpy="0 0 1.570796"/>
+        <geometry>
+          <box size="0.099 0.067882 0.069866"/>
+        </geometry>
+      </collision>
+      <collision name="collision_leg3_motor0_an">
+        <origin xyz="-0.066721 -0.145859 0.047555" rpy="0 0 -1.570795"/>
+        <geometry>
+          <box size="0.099 0.067882 0.069866"/>
+        </geometry>
+      </collision>
+      <collision name="collision_main_body">
+        <origin xyz="-0.090933 0.000724 0.028612" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.349394 0.197589 0.138298"/>
+        </geometry>
+      </collision>
+      <collision name="collision_leg5_motor0_an">
+        <origin xyz="-0.326921 -0.069776 0.003055" rpy="0 0 -1.570795"/>
+        <geometry>
+          <box size="0.099 0.067882 0.069866"/>
+        </geometry>
+      </collision>
+      <collision name="imu">
+        <origin xyz="0.208997 0 0.053925" rpy="-0.02618 -2.879794 0"/>
+        <geometry>
+          <box size="0.05 0.05 0.02"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg4/ft">
+    </link>
+
+    <link name="leg1/ft">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.2"/>
+        <inertia ixx="9e-05" ixy="0" ixz="0" iyy="9e-05" iyz="0" izz="0.00016"/>
+      </inertial>
+      <visual name="visual_leg1_ft">
+        <origin xyz="0 0 0" rpy="0 1.570796 0"/>
+        <geometry>
+          <mesh filename="visual_leg1_ft.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="silber"/>
+      </visual>
+    </link>
+
+    <link name="leg3/ft">
+    </link>
+
+    <link name="leg0/ft">
+    </link>
+
+    <link name="leg1/0">
+      <inertial>
+        <origin xyz="0.011961 -8.6e-05 0.040048" rpy="0 0 0"/>
+        <mass value="0.867"/>
+        <inertia ixx="0.001587" ixy="0" ixz="-0.000148" iyy="0.002121" iyz="1e-06" izz="0.001562"/>
+      </inertial>
+      <visual name="visual_leg1_motor0_ab">
+        <origin xyz="0 0 0" rpy="2e-06 -1e-06 0"/>
+        <geometry>
+          <mesh filename="visual_leg1_motor0_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg1_motor1_an">
+        <origin xyz="0.023806 -0.000233 0.054367" rpy="0.71305 1.570794 0.713049"/>
+        <geometry>
+          <mesh filename="visual_leg1_motor1_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg1_motor1_an">
+        <origin xyz="0.0086 0 0.054139" rpy="0.699764 1.570794 0.699763"/>
+        <geometry>
+          <box size="0.073 0.064 0.0952"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg1/4">
+      <inertial>
+        <origin xyz="0.000924 -0.000757 0.088322" rpy="0 0 0"/>
+        <mass value="0.451"/>
+        <inertia ixx="0.000564" ixy="0" ixz="1.1e-05" iyy="0.000564" iyz="-9e-06" izz="0.00028"/>
+      </inertial>
+      <visual name="visual_leg1_foot">
+        <origin xyz="0 0 0.099075" rpy="0 1.570796 0"/>
+        <geometry>
+          <mesh filename="visual_leg1_foot.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="schwarz"/>
+      </visual>
+      <visual name="visual_leg1_lower_link1">
+        <origin xyz="0.002778 -0.002275 0.062853" rpy="0 1.570796 0"/>
+        <geometry>
+          <mesh filename="visual_leg1_lower_link1.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg1_gripper">
+        <origin xyz="1e-06 2e-06 0.070504" rpy="0 1.570796 0"/>
+        <geometry>
+          <mesh filename="visual_leg1_gripper.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="schwarz"/>
+      </visual>
+      <collision name="collision_leg1_foot">
+        <origin xyz="0 0 0.103156" rpy="-0.018575 1.570796 0"/>
+        <geometry>
+          <sphere radius="0.025958"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg2/ft">
+    </link>
+
+    <link name="leg1/1">
+      <inertial>
+        <origin xyz="-8.7e-05 0.004579 -0.0401" rpy="0 0 0"/>
+        <mass value="0.867"/>
+        <inertia ixx="0.002085" ixy="0" ixz="-1e-06" iyy="0.001588" iyz="5.7e-05" izz="0.001524"/>
+      </inertial>
+      <visual name="visual_leg1_motor2_an">
+        <origin xyz="-0.000235 0.013806 -0.054436" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="visual_leg1_motor2_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg1_motor1_ab">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="visual_leg1_motor1_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg1_motor2_an">
+        <origin xyz="0 -0.0014 -0.054209" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.064 0.0952 0.073"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="head">
+      <inertial>
+        <origin xyz="0.019695 -0.006596 -0.001108" rpy="0 0 0"/>
+        <mass value="2.042"/>
+        <inertia ixx="0.005821" ixy="0.000383" ixz="7.2e-05" iyy="0.003808" iyz="-7.4e-05" izz="0.006495"/>
+      </inertial>
+      <visual name="visual_laserscanner">
+        <origin xyz="0.01475 -0.002799 8.4e-05" rpy="1.570794 0 0"/>
+        <geometry>
+          <mesh filename="visual_laserscanner.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="schwarz"/>
+      </visual>
+      <visual name="visual_camera">
+        <origin xyz="0.052033 -0.040236 -0.007338" rpy="3.141591 0 0"/>
+        <geometry>
+          <mesh filename="visual_camera.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="schwarz"/>
+      </visual>
+      <visual name="visual_head">
+        <origin xyz="0 0 0" rpy="3.141591 0 0"/>
+        <geometry>
+          <mesh filename="visual_head.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="schwarz"/>
+      </visual>
+      <collision name="collision_head">
+        <origin xyz="0.02775 0 -0.000166" rpy="3.141591 0 0"/>
+        <geometry>
+          <box size="0.0875 0.1444 0.085"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg1/3">
+      <inertial>
+        <origin xyz="-0.071527 0 -0.003554" rpy="0 0 0"/>
+        <mass value="0.9146"/>
+        <inertia ixx="0.002902" ixy="0" ixz="-8e-05" iyy="0.003314" iyz="0" izz="0.005685"/>
+      </inertial>
+      <visual name="visual_leg1_motor3_ab">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="visual_leg1_motor3_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg1_lower_link0">
+        <origin xyz="-0.077941 0 -0.00447" rpy="-1.570796 0 -1.570797"/>
+        <geometry>
+          <mesh filename="visual_leg1_lower_link0.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg1_lower_link0">
+        <origin xyz="-0.112339 0 -0.004986" rpy="1.564214 2e-06 0"/>
+        <geometry>
+          <box size="0.189322 0.034489 0.032175"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg1/2">
+      <inertial>
+        <origin xyz="-0.152852 0.000125 0.002786" rpy="0.015927 0 0"/>
+        <mass value="0.98"/>
+        <inertia ixx="0.002182" ixy="-2.8e-05" ixz="0.000203" iyy="0.009779" iyz="2.1e-05" izz="0.009914"/>
+      </inertial>
+      <visual name="visual_leg1_motor2_ab">
+        <origin xyz="0 0 0" rpy="-0.050413 0 -4e-06"/>
+        <geometry>
+          <mesh filename="visual_leg1_motor2_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg1_motor3_an">
+        <origin xyz="-0.215727 0.000387 0.012298" rpy="1.520384 -2e-06 -2e-06"/>
+        <geometry>
+          <mesh filename="visual_leg1_motor3_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg1_upper_link">
+        <origin xyz="-0.104448 0.000402 -0.002484" rpy="-1.570797 0.050412 1.570794"/>
+        <geometry>
+          <mesh filename="visual_leg1_upper_link.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg1_motor3_an">
+        <origin xyz="-0.2155 -0.000145 -0.002888" rpy="1.520384 0 -5e-06"/>
+        <geometry>
+          <box size="0.071513 0.098674 0.060898"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg0/4">
+      <inertial>
+        <origin xyz="-0.000924 -0.000757 0.088322" rpy="0 0 0"/>
+        <mass value="0.451"/>
+        <inertia ixx="0.000564" ixy="0" ixz="-1.1e-05" iyy="0.000564" iyz="-1.2e-05" izz="0.00028"/>
+      </inertial>
+      <visual name="visual_leg0_foot">
+        <origin xyz="0 0 0.099075" rpy="0 -1.570796 0"/>
+        <geometry>
+          <mesh filename="visual_leg0_foot.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="schwarz"/>
+      </visual>
+      <visual name="visual_leg0_lower_link1">
+        <origin xyz="-0.002778 -0.002276 0.062853" rpy="0 -1.570796 0"/>
+        <geometry>
+          <mesh filename="visual_leg0_lower_link1.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg0_gripper">
+        <origin xyz="-1e-06 2e-06 0.070504" rpy="0 -1.570796 0"/>
+        <geometry>
+          <mesh filename="visual_leg0_gripper.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="schwarz"/>
+      </visual>
+      <collision name="collision_leg0_foot">
+        <origin xyz="0 0 0.103157" rpy="-0.002907 -1.570796 0"/>
+        <geometry>
+          <sphere radius="0.025958"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg0/0">
+      <inertial>
+        <origin xyz="0.011961 -8.6e-05 -0.040048" rpy="0 0 0"/>
+        <mass value="0.867"/>
+        <inertia ixx="0.001587" ixy="0" ixz="0.000148" iyy="0.002121" iyz="-1e-06" izz="0.001562"/>
+      </inertial>
+      <visual name="visual_leg0_motor1_an">
+        <origin xyz="0.023806 -0.000234 -0.054367" rpy="0 1.570795 0"/>
+        <geometry>
+          <mesh filename="visual_leg0_motor1_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg0_motor0_ab">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="visual_leg0_motor0_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg0_motor1_an">
+        <origin xyz="0.0086 0 -0.054139" rpy="0 1.570795 0"/>
+        <geometry>
+          <box size="0.073 0.064 0.0952"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg0/1">
+      <inertial>
+        <origin xyz="-8.6e-05 0.004579 0.0401" rpy="0 0 0"/>
+        <mass value="0.867"/>
+        <inertia ixx="0.002085" ixy="0" ixz="1e-06" iyy="0.001588" iyz="-5.7e-05" izz="0.001524"/>
+      </inertial>
+      <visual name="visual_leg0_motor1_ab">
+        <origin xyz="0 0 0" rpy="-1e-06 1e-06 0"/>
+        <geometry>
+          <mesh filename="visual_leg0_motor1_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg0_motor2_an">
+        <origin xyz="-0.000234 0.013806 0.054436" rpy="1e-06 3.141592 1e-06"/>
+        <geometry>
+          <mesh filename="visual_leg0_motor2_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg0_motor2_an">
+        <origin xyz="0 -0.0014 0.054209" rpy="1e-06 3.141592 1e-06"/>
+        <geometry>
+          <box size="0.064 0.0952 0.073"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg0/2">
+      <inertial>
+        <origin xyz="0.152852 0.00014 -0.00279" rpy="0 0 0"/>
+        <mass value="0.98"/>
+        <inertia ixx="0.002183" ixy="-2e-06" ixz="0.000203" iyy="0.009778" iyz="0" izz="0.009913"/>
+      </inertial>
+      <visual name="visual_leg0_motor3_an">
+        <origin xyz="0.215727 0.000233 -0.012303" rpy="-1.570796 0 0"/>
+        <geometry>
+          <mesh filename="visual_leg0_motor3_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg0_motor2_ab">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="visual_leg0_motor2_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg0_upper_link">
+        <origin xyz="0.104448 0.000555 0.00246" rpy="1.570796 -1e-06 1.570796"/>
+        <geometry>
+          <mesh filename="visual_leg0_upper_link.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg0_motor3_an">
+        <origin xyz="0.2155 0 0.002891" rpy="-1.570796 0 0"/>
+        <geometry>
+          <box size="0.071513 0.098674 0.060898"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg0/3">
+      <inertial>
+        <origin xyz="0.071527 0 0.003554" rpy="0 0 0"/>
+        <mass value="0.9146"/>
+        <inertia ixx="0.002902" ixy="0" ixz="-8e-05" iyy="0.003314" iyz="0" izz="0.005685"/>
+      </inertial>
+      <visual name="visual_leg0_motor3_ab">
+        <origin xyz="0 0 0" rpy="0 2e-06 0"/>
+        <geometry>
+          <mesh filename="visual_leg0_motor3_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg0_lower_link0">
+        <origin xyz="0.077941 0 0.00447" rpy="1.570796 0 -1.570795"/>
+        <geometry>
+          <mesh filename="visual_leg0_lower_link0.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg0_lower_link0">
+        <origin xyz="0.112339 0 0.004986" rpy="-1.523198 0 -1e-06"/>
+        <geometry>
+          <box size="0.189322 0.034489 0.032175"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg4/0">
+      <inertial>
+        <origin xyz="0.011961 -8.7e-05 -0.04003" rpy="0 0 0"/>
+        <mass value="0.867"/>
+        <inertia ixx="0.001587" ixy="0" ixz="0.000148" iyy="0.002121" iyz="-1e-06" izz="0.001562"/>
+      </inertial>
+      <visual name="visual_leg4_motor0_ab">
+        <origin xyz="0 0 0" rpy="0 -1e-06 1e-06"/>
+        <geometry>
+          <mesh filename="visual_leg4_motor0_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg4_motor1_an">
+        <origin xyz="0.023807 -0.000235 -0.054342" rpy="0 1.570796 0"/>
+        <geometry>
+          <mesh filename="visual_leg4_motor1_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg4_motor1_an">
+        <origin xyz="0.0086 0 -0.054114" rpy="0 1.570796 0"/>
+        <geometry>
+          <box size="0.073 0.064 0.0952"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg4/1">
+      <inertial>
+        <origin xyz="8.6e-05 -0.004579 0.040002" rpy="0 0 0"/>
+        <mass value="0.867"/>
+        <inertia ixx="0.002083" ixy="0" ixz="-1e-06" iyy="0.001586" iyz="5.7e-05" izz="0.001524"/>
+      </inertial>
+      <visual name="visual_leg4_motor1_ab">
+        <origin xyz="0 0 0" rpy="-2e-06 -2e-06 0"/>
+        <geometry>
+          <mesh filename="visual_leg4_motor1_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg4_motor2_an">
+        <origin xyz="0.000234 -0.013805 0.054304" rpy="3.141592 0 0"/>
+        <geometry>
+          <mesh filename="visual_leg4_motor2_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg4_motor2_an">
+        <origin xyz="0 0.0014 0.054077" rpy="3.141592 0 0"/>
+        <geometry>
+          <box size="0.064 0.0952 0.073"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg4/2">
+      <inertial>
+        <origin xyz="0.152844 -0.003508 0.002259" rpy="0 0 0"/>
+        <mass value="0.98"/>
+        <inertia ixx="0.002188" ixy="3e-06" ixz="-0.0003" iyy="0.00978" iyz="0" izz="0.00991"/>
+      </inertial>
+      <visual name="visual_leg4_upper_link">
+        <origin xyz="0.104416 -0.003906 -0.002347" rpy="-1.570796 -5e-06 -1.570795"/>
+        <geometry>
+          <mesh filename="visual_leg4_upper_link.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg4_motor3_an">
+        <origin xyz="0.21571 -0.003612 0.01243" rpy="1.570792 0 2e-06"/>
+        <geometry>
+          <mesh filename="visual_leg4_motor3_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg4_motor2_ab">
+        <origin xyz="3e-05 -0.003347 -0.002686" rpy="-5e-06 0 0"/>
+        <geometry>
+          <mesh filename="visual_leg4_motor2_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg4_motor3_an">
+        <origin xyz="0.215482 -0.003377 -0.002776" rpy="1.570793 0 0"/>
+        <geometry>
+          <box size="0.071513 0.098674 0.060898"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="body">
+      <inertial>
+        <origin xyz="-0.009017 -0.172845 -0.009098" rpy="0 0 0"/>
+        <mass value="5.481"/>
+        <inertia ixx="0.078097" ixy="-0.000978" ixz="-1.7e-05" iyy="0.028457" iyz="-0.000287" izz="0.072082"/>
+      </inertial>
+      <visual name="visual_front_body">
+        <origin xyz="-0.01184 -0.220073 -0.009579" rpy="0 1.570796 0"/>
+        <geometry>
+          <mesh filename="visual_front_body.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="schwarz"/>
+      </visual>
+      <visual name="visual_leg1_motor0_an">
+        <origin xyz="-0.009847 -0.216102 0.05635" rpy="-3.141592 -1.570795 0"/>
+        <geometry>
+          <mesh filename="visual_leg1_motor0_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg0_ft">
+        <origin xyz="-0.011672 -0.216595 -0.023101" rpy="0 1.570796 0"/>
+        <geometry>
+          <mesh filename="visual_leg0_ft.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="silber"/>
+      </visual>
+      <visual name="visual_body_motor_ab">
+        <origin xyz="0 0 0" rpy="0 0 1e-06"/>
+        <geometry>
+          <mesh filename="visual_body_motor_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg0_motor0_an">
+        <origin xyz="-0.009847 -0.216102 -0.072257" rpy="0 1.570796 0"/>
+        <geometry>
+          <mesh filename="visual_leg0_motor0_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_front_body">
+        <origin xyz="-0.005131 -0.093517 -0.007954" rpy="0 1.570796 0"/>
+        <geometry>
+          <box size="0.13 0.135058 0.121198"/>
+        </geometry>
+      </collision>
+      <collision name="collision_leg0_motor0_an">
+        <origin xyz="-0.010689 -0.2165 -0.078454" rpy="0 1.570796 0"/>
+        <geometry>
+          <box size="0.099 0.067882 0.069866"/>
+        </geometry>
+      </collision>
+      <collision name="collision_leg1_motor0_an">
+        <origin xyz="-0.010689 -0.2165 0.062546" rpy="-3.141592 -1.570795 0"/>
+        <geometry>
+          <box size="0.099 0.067882 0.069866"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg4/4">
+      <inertial>
+        <origin xyz="0 0 0.089252" rpy="0 0 0"/>
+        <mass value="0.45"/>
+        <inertia ixx="0.00058" ixy="0" ixz="0" iyy="0.000581" iyz="0" izz="0.000265"/>
+      </inertial>
+      <visual name="visual_leg4_lower_link1">
+        <origin xyz="0 0 0.062325" rpy="0 -1.570796 0"/>
+        <geometry>
+          <mesh filename="visual_leg4_lower_link1.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg4_foot">
+        <origin xyz="0 0 0.100675" rpy="0 -1.570796 0"/>
+        <geometry>
+          <mesh filename="visual_leg4_foot.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="schwarz"/>
+      </visual>
+      <collision name="collision_leg4_foot">
+        <origin xyz="0 0 0.104757" rpy="-0.025481 -1.570796 0"/>
+        <geometry>
+          <sphere radius="0.025981"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg3/3">
+      <inertial>
+        <origin xyz="0.071527 0 -0.003526" rpy="0 0 0"/>
+        <mass value="0.9146"/>
+        <inertia ixx="0.002902" ixy="0" ixz="7.9e-05" iyy="0.003314" iyz="-3e-06" izz="0.005685"/>
+      </inertial>
+      <visual name="visual_leg3_motor3_ab">
+        <origin xyz="0 0 0" rpy="0 2e-06 -3.141589"/>
+        <geometry>
+          <mesh filename="visual_leg3_motor3_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg3_lower_link0">
+        <origin xyz="0.077942 0 -0.004432" rpy="-1.570796 -1e-06 1.570797"/>
+        <geometry>
+          <mesh filename="visual_leg3_lower_link0.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg3_lower_link0">
+        <origin xyz="0.112339 0 -0.004949" rpy="1.556148 2e-06 -3.141588"/>
+        <geometry>
+          <box size="0.189322 0.034491 0.032178"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg3/2">
+      <inertial>
+        <origin xyz="-0.073655 -6.9e-05 0.01987" rpy="0 0 0"/>
+        <mass value="1.901"/>
+        <inertia ixx="0.003348" ixy="-1e-05" ixz="-0.002051" iyy="0.01849" iyz="-3e-06" izz="0.017988"/>
+      </inertial>
+      <visual name="visual_leg3_motor2_ab">
+        <origin xyz="0 0 0" rpy="0 0 4e-06"/>
+        <geometry>
+          <mesh filename="visual_leg3_motor2_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg3_motor3_an">
+        <origin xyz="-0.195726 -0.000234 0.01239" rpy="1.570797 -1e-06 3e-06"/>
+        <geometry>
+          <mesh filename="visual_leg3_motor3_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg3_upper_link">
+        <origin xyz="-0.094516 -0.00049 -0.002427" rpy="-1.570796 -1e-06 1.570797"/>
+        <geometry>
+          <mesh filename="visual_leg3_upper_link.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg3_motor3_an">
+        <origin xyz="-0.1955 0 -0.002816" rpy="1.588357 -1e-06 3e-06"/>
+        <geometry>
+          <box size="0.071513 0.098671 0.0609"/>
+        </geometry>
+      </collision>
+      <collision name="collision_leg3_motor2_an">
+        <origin xyz="-0.0045 0 0.037984" rpy="1.570798 0 -1.570794"/>
+        <geometry>
+          <box size="0.064 0.0952 0.073"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg3/1">
+      <inertial>
+        <origin xyz="-0.000182 0.011054 -0.043563" rpy="0 0 0"/>
+        <mass value="1.148"/>
+        <inertia ixx="0.003465" ixy="0" ixz="-2e-06" iyy="0.002512" iyz="0.000136" izz="0.002746"/>
+      </inertial>
+      <visual name="visual_leg3_motor1_ab">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="visual_leg3_motor1_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg3_motor2_an">
+        <origin xyz="-0.000227 0.013779 -0.0543" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="visual_leg3_motor2_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+    </link>
+
+    <link name="leg3/0">
+      <inertial>
+        <origin xyz="0.011961 -8.7e-05 0.040059" rpy="0 0 0"/>
+        <mass value="0.867"/>
+        <inertia ixx="0.001587" ixy="0" ixz="-0.000148" iyy="0.002121" iyz="1e-06" izz="0.001562"/>
+      </inertial>
+      <visual name="visual_leg3_motor0_ab">
+        <origin xyz="0 0 0" rpy="2e-06 -1e-06 0"/>
+        <geometry>
+          <mesh filename="visual_leg3_motor0_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg3_motor1_an">
+        <origin xyz="0.023806 -0.000235 0.054381" rpy="0.758934 1.570794 0.758933"/>
+        <geometry>
+          <mesh filename="visual_leg3_motor1_an.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg3_motor1_an">
+        <origin xyz="0.0086 0 0.054154" rpy="0.748821 1.570794 0.74882"/>
+        <geometry>
+          <box size="0.073 0.064 0.0952"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg4/3">
+      <inertial>
+        <origin xyz="0.072299 0 -0.003616" rpy="0 0 0"/>
+        <mass value="0.9146"/>
+        <inertia ixx="0.002902" ixy="0" ixz="8.2e-05" iyy="0.003324" iyz="0" izz="0.005695"/>
+      </inertial>
+      <visual name="visual_leg4_motor3_ab">
+        <origin xyz="0 0 0" rpy="1.2e-05 -3e-06 -9e-06"/>
+        <geometry>
+          <mesh filename="visual_leg4_motor3_ab.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <visual name="visual_leg4_lower_link0">
+        <origin xyz="0.079995 0 -0.004572" rpy="-1.570796 -6e-06 1.570795"/>
+        <geometry>
+          <mesh filename="visual_leg4_lower_link0.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg4_lower_link0">
+        <origin xyz="0.112339 0 -0.005048" rpy="-1.584563 -4e-06 -7e-06"/>
+        <geometry>
+          <box size="0.189322 0.034491 0.032178"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="leg3/4">
+      <inertial>
+        <origin xyz="-6e-06 -1.4e-05 0.108663" rpy="0 0 0"/>
+        <mass value="0.45"/>
+        <inertia ixx="0.00074" ixy="0" ixz="0" iyy="0.000737" iyz="0" izz="0.000265"/>
+      </inertial>
+      <visual name="visual_leg3_foot">
+        <origin xyz="-1.7e-05 -4.1e-05 0.121634" rpy="0 1.570795 0"/>
+        <geometry>
+          <mesh filename="visual_leg3_foot.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="schwarz"/>
+      </visual>
+      <visual name="visual_leg3_lower_link1">
+        <origin xyz="0 0 0.078599" rpy="0 1.570795 0"/>
+        <geometry>
+          <mesh filename="visual_leg3_lower_link1.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+      <collision name="collision_leg3_foot">
+        <origin xyz="0 0 0.125756" rpy="-0.011638 1.570795 0"/>
+        <geometry>
+          <sphere radius="0.025893"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="leg2/joint2" type="revolute">
+      <origin xyz="0 -0.039384 0.058597" rpy="1.570796 1.570795 0"/>
+      <parent link="leg2/1"/>
+      <child link="leg2/2"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg2/joint3" type="revolute">
+      <origin xyz="0.2 0 0.040867" rpy="0 0 3.141592"/>
+      <parent link="leg2/2"/>
+      <child link="leg2/3"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg2/joint0" type="revolute">
+      <origin xyz="-0.001457 -0.000314 0.094706" rpy="0 -3.141593 0"/>
+      <parent link="leg2/ft"/>
+      <child link="leg2/0"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg2/joint1" type="revolute">
+      <origin xyz="-0.029403 0 -0.058655" rpy="1.570795 0 -1.570795"/>
+      <parent link="leg2/0"/>
+      <child link="leg2/1"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-2.356194" upper="2.356194" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg2/joint4" type="prismatic">
+      <origin xyz="0.207 0 0.006699" rpy="-1.570797 -2e-06 -1.570796"/>
+      <parent link="leg2/3"/>
+      <child link="leg2/4"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="0" upper="0" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg5/joint1" type="revolute">
+      <origin xyz="-0.029423 0 0.058614" rpy="1.570795 -2e-06 1.570796"/>
+      <parent link="leg5/0"/>
+      <child link="leg5/1"/>
+      <axis xyz="0 0 -1.0"/>
+      <limit lower="-2.356194" upper="2.356194" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg5/joint0" type="revolute">
+      <origin xyz="0 0 -0.092215" rpy="0 -3.141593 1e-06"/>
+      <parent link="leg5/ft"/>
+      <child link="leg5/0"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg5/joint3" type="revolute">
+      <origin xyz="0.22 0 0.040727" rpy="2e-06 0 -3.141591"/>
+      <parent link="leg5/2"/>
+      <child link="leg5/3"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg5/joint2" type="revolute">
+      <origin xyz="0 0.039424 -0.058577" rpy="-1.570798 -1.570795 0"/>
+      <parent link="leg5/1"/>
+      <child link="leg5/2"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg5/ft" type="fixed">
+      <origin xyz="-0.326921 -0.017447 0.001987" rpy="-1.570796 1.570796 0"/>
+      <parent link="root"/>
+      <child link="leg5/ft"/>
+    </joint>
+
+    <joint name="leg5/joint4" type="prismatic">
+      <origin xyz="0.207 0 0.006799" rpy="1.570797 5e-06 1.570794"/>
+      <parent link="leg5/3"/>
+      <child link="leg5/4"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="0" upper="0" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg4/ft" type="fixed">
+      <origin xyz="-0.326921 0.018895 0.001987" rpy="-1.570796 1.570796 0"/>
+      <parent link="root"/>
+      <child link="leg4/ft"/>
+    </joint>
+
+    <joint name="leg1/ft" type="fixed">
+      <origin xyz="-0.011672 -0.216595 0.007194" rpy="0 0 0"/>
+      <parent link="body"/>
+      <child link="leg1/ft"/>
+    </joint>
+
+    <joint name="leg3/ft" type="fixed">
+      <origin xyz="-0.067035 -0.090507 0.04503" rpy="-1.570796 1.570796 0"/>
+      <parent link="root"/>
+      <child link="leg3/ft"/>
+    </joint>
+
+    <joint name="leg0/ft" type="fixed">
+      <origin xyz="-0.011672 -0.216595 -0.023101" rpy="0 3.141593 0"/>
+      <parent link="body"/>
+      <child link="leg0/ft"/>
+    </joint>
+
+    <joint name="leg1/joint0" type="revolute">
+      <origin xyz="-8.4e-05 9.5e-05 0.095213" rpy="0 0 0"/>
+      <parent link="leg1/ft"/>
+      <child link="leg1/0"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg1/joint4" type="prismatic">
+      <origin xyz="-0.207 0 -0.006736" rpy="1.570795 1e-06 -1.570795"/>
+      <parent link="leg1/3"/>
+      <child link="leg1/4"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="0" upper="0" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg2/ft" type="fixed">
+      <origin xyz="-0.067035 0.091955 0.04503" rpy="-1.570796 1.570796 0"/>
+      <parent link="root"/>
+      <child link="leg2/ft"/>
+    </joint>
+
+    <joint name="leg1/joint1" type="revolute">
+      <origin xyz="-0.029291 0 0.058639" rpy="-1.570795 0 -1.570797"/>
+      <parent link="leg1/0"/>
+      <child link="leg1/1"/>
+      <axis xyz="0 0 -1.0"/>
+      <limit lower="-2.356194" upper="2.356194" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="head" type="revolute">
+      <origin xyz="-0.016812 -0.3085 -0.007955" rpy="1.570798 0 -1.570796"/>
+      <parent link="body"/>
+      <child link="head"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-0.698132" upper="0.698132" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg1/joint3" type="revolute">
+      <origin xyz="-0.22 -0.002061 -0.040854" rpy="0.050412 0 3.141591"/>
+      <parent link="leg1/2"/>
+      <child link="leg1/3"/>
+      <axis xyz="0 0 -1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg1/joint2" type="revolute">
+      <origin xyz="0 -0.039309 -0.058709" rpy="-0.693484 1.570799 0.8269"/>
+      <parent link="leg1/1"/>
+      <child link="leg1/2"/>
+      <axis xyz="0 0 -1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg0/joint4" type="prismatic">
+      <origin xyz="0.207 0 0.006736" rpy="-1.570797 0 -1.570798"/>
+      <parent link="leg0/3"/>
+      <child link="leg0/4"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="0" upper="0" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg0/joint0" type="revolute">
+      <origin xyz="8.4e-05 9.5e-05 0.095213" rpy="0 -3.141593 0"/>
+      <parent link="leg0/ft"/>
+      <child link="leg0/0"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg0/joint1" type="revolute">
+      <origin xyz="-0.029291 0 -0.058639" rpy="1.570798 0 -1.570796"/>
+      <parent link="leg0/0"/>
+      <child link="leg0/1"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-2.356194" upper="2.356194" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg0/joint2" type="revolute">
+      <origin xyz="0 -0.039309 0.058709" rpy="1.570794 1.570795 0"/>
+      <parent link="leg0/1"/>
+      <child link="leg0/2"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg0/joint3" type="revolute">
+      <origin xyz="0.22 0 0.040905" rpy="-1e-06 0 3.141591"/>
+      <parent link="leg0/2"/>
+      <child link="leg0/3"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg4/joint0" type="revolute">
+      <origin xyz="0 0 0.092215" rpy="0 -3.141593 0"/>
+      <parent link="leg4/ft"/>
+      <child link="leg4/0"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg4/joint1" type="revolute">
+      <origin xyz="-0.029423 0 -0.058614" rpy="-1.570795 0 1.570795"/>
+      <parent link="leg4/0"/>
+      <child link="leg4/1"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-2.356194" upper="2.356194" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg4/joint2" type="revolute">
+      <origin xyz="0 0.039425 0.058577" rpy="1.570802 1.570795 0"/>
+      <parent link="leg4/1"/>
+      <child link="leg4/2"/>
+      <axis xyz="0 0 -1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="body" type="revolute">
+      <origin xyz="0.1108 -0.00723 0.013744" rpy="1.570796 -1.570796 0"/>
+      <parent link="root"/>
+      <child link="body"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-0.785398" upper="0.785398" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg4/joint4" type="prismatic">
+      <origin xyz="0.207 -1e-06 -0.006798" rpy="-1.570792 1e-05 -1.570804"/>
+      <parent link="leg4/3"/>
+      <child link="leg4/4"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="0" upper="0" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg3/joint3" type="revolute">
+      <origin xyz="-0.2 0 -0.040867" rpy="0 0 0"/>
+      <parent link="leg3/2"/>
+      <child link="leg3/3"/>
+      <axis xyz="0 0 -1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg3/joint2" type="revolute">
+      <origin xyz="0 -0.039384 -0.058597" rpy="-2.185547 1.570794 -0.61475"/>
+      <parent link="leg3/1"/>
+      <child link="leg3/2"/>
+      <axis xyz="0 0 -1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg3/joint1" type="revolute">
+      <origin xyz="-0.029403 0 0.058654" rpy="-1.570795 1e-06 -1.570797"/>
+      <parent link="leg3/0"/>
+      <child link="leg3/1"/>
+      <axis xyz="0 0 -1.0"/>
+      <limit lower="-2.356194" upper="2.356194" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg3/joint0" type="revolute">
+      <origin xyz="-0.001457 -0.000314 -0.094544" rpy="0 -3.141593 1e-06"/>
+      <parent link="leg3/ft"/>
+      <child link="leg3/0"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg4/joint3" type="revolute">
+      <origin xyz="0.219982 -0.003377 -0.040727" rpy="0 0 -3.14159"/>
+      <parent link="leg4/2"/>
+      <child link="leg4/3"/>
+      <axis xyz="0 0 -1.0"/>
+      <limit lower="-3.141593" upper="3.141593" velocity="6.28" effort="100"/>
+    </joint>
+
+    <joint name="leg3/joint4" type="prismatic">
+      <origin xyz="0.207 0 -0.006699" rpy="1.570794 0 1.5708"/>
+      <parent link="leg3/3"/>
+      <child link="leg3/4"/>
+      <axis xyz="0 0 1.0"/>
+      <limit lower="0" upper="0" velocity="6.28" effort="100"/>
+    </joint>
+
+    <material name="schwarz">
+      <color rgba="0 0 0 1"/>
+    </material>
+
+    <material name="silber">
+      <color rgba="0.422167 0.422167 0.422167 1.0"/>
+    </material>
+
+    <material name="green">
+      <color rgba="1.0 0.674626 0.241873 1.0"/>
+    </material>
+
+  </robot>

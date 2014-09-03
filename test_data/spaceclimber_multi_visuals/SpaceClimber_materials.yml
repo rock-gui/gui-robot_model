@@ -1,0 +1,53 @@
+#materials definition SMURF file for "SpaceClimber", 20140819_13:03
+
+materials:
+- ambientFront:
+    b: 0
+    g: 0
+    r: 0
+  diffuseFront:
+    b: 0
+    g: 0
+    r: 0
+  emissionFront:
+    b: 0.156
+    g: 0.156
+    r: 0.156
+  name: schwarz
+  shininess: 25.0
+  specularFront:
+    b: 0.5
+    g: 0.5
+    r: 0.5
+  transparency: 0
+  users: 13
+- ambientFront:
+    b: 0.422167
+    g: 0.422167
+    r: 0.422167
+  diffuseFront:
+    b: 0.422167
+    g: 0.422167
+    r: 0.422167
+  name: silber
+  shininess: 100.0
+  specularFront:
+    b: 0.709677
+    g: 0.709677
+    r: 0.709677
+  users: 6
+- ambientFront:
+    b: 0.048375
+    g: 0.134925
+    r: 0.2
+  diffuseFront:
+    b: 0.241873
+    g: 0.674626
+    r: 1.0
+  name: green
+  shininess: 50.0
+  specularFront:
+    b: 0.042875
+    g: 0.340977
+    r: 1.0
+  users: 68

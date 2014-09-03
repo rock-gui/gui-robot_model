@@ -1,0 +1,10 @@
+#main SMURF file of model "SpaceClimber"
+
+modelname: SpaceClimber
+date: '20140819_13:03'
+files:
+- SpaceClimber.urdf
+- SpaceClimber_simulation.yml
+- SpaceClimber_sensors.yml
+- SpaceClimber_materials.yml
+- SpaceClimber_motors.yml

@@ -1,0 +1,2528 @@
+#simulation definition SMURF file for "SpaceClimber", 20140819_13:03
+
+
+visual:
+- density: 100.0
+  geometry:
+    filename: visual_leg2_motor2_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 19
+  id: 44
+  mass: 0.227
+  material: green
+  name: visual_leg2_motor2_ab
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0]
+    - [0, 1.0, 2.0e-06, 0]
+    - [0, -2.0e-06, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-2.0e-06, 0, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+  use: leg0_motor2_ab
+- density: 100.0
+  geometry:
+    filename: visual_leg5_motor1_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.073, 0.064, 0.0952]
+  geometryType: mesh
+  group: 35
+  id: 80
+  mass: 0.32
+  material: green
+  name: visual_leg5_motor1_an
+  pose:
+    matrix:
+    - [2.0e-06, 0, 1.0, 0.0086]
+    - [1.0e-06, 1.0, 0, 0]
+    - [-1.0, 1.0e-06, 2.0e-06, 0.054114]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0.745713, 1.570794, 0.745713]
+    rotation_quaternion: [0.707107, 0, 0.707106, 0]
+    translation: [0.0086, 0, 0.054114]
+  sizeScaleX: 0.6
+  sizeScaleY: 0.6
+  use: leg1_motor1_an
+- density: 100.0
+  geometry:
+    filename: visual_leg5_motor1_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056, 0.056555, 0.0462]
+  geometryType: mesh
+  group: 36
+  id: 81
+  mass: 0.227
+  material: green
+  name: visual_leg5_motor1_ab
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0]
+    - [0, 1.0, 0, 0]
+    - [0, 0, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+- density: 100.0
+  geometry:
+    filename: visual_leg0_lower_link0.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.04361, 0.0432, 0.189323]
+  geometryType: mesh
+  group: 8
+  id: 20
+  mass: 0.3438
+  material: green
+  name: visual_leg0_lower_link0
+  pose:
+    matrix:
+    - [1.0e-06, 0, -1.0, 0.077941]
+    - [-1.0, 0, -1.0e-06, 0]
+    - [0, 1.0, 0, 0.00447]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.570796, 0, -1.570795]
+    rotation_quaternion: [0.5, 0.5, -0.5, -0.5]
+    translation: [0.077941, 0, 0.00447]
+  sizeScaleY: 0.7
+  sizeScaleZ: 0.7
+- density: 100.0
+  geometry:
+    filename: visual_leg2_motor2_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.064, 0.0952, 0.073]
+  geometryType: mesh
+  group: 18
+  id: 43
+  mass: 0.32
+  material: green
+  name: visual_leg2_motor2_an
+  pose:
+    matrix:
+    - [-1.0, 0, -2.0e-06, -0.000227]
+    - [0, 1.0, 1.0e-06, 0.013779]
+    - [2.0e-06, 1.0e-06, -1.0, 0.0543]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.0e-06, -3.141591, 0]
+    rotation_quaternion: [0, 0, 1.0, 0]
+    translation: [-0.000227, 0.013779, 0.0543]
+  use: leg0_motor2_an
+- density: 100.0
+  geometry:
+    filename: visual_leg1_foot.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.043513, 0.051916, 0.051664]
+  geometryType: mesh
+  group: 15
+  id: 36
+  mass: 0.15
+  material: schwarz
+  name: visual_leg1_foot
+  physicMode: sphere
+  pose:
+    matrix:
+    - [0, 0, 1.0, 0]
+    - [0, 1.0, 0, 0]
+    - [-1.0, 0, 0, 0.099075]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570796, 0]
+    rotation_quaternion: [0.707107, 0, 0.707107, 0]
+    translation: [0, 0, 0.099075]
+  radius: 0.022
+- density: 100.0
+  geometry:
+    filename: visual_leg5_motor2_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 37
+  id: 83
+  mass: 0.227
+  material: green
+  name: visual_leg5_motor2_ab
+  pose:
+    matrix:
+    - [-1.0, -3.0e-06, 0, 0]
+    - [3.0e-06, -1.0, 1.0e-06, 0]
+    - [0, 1.0e-06, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.0e-06, 0, 3.14159]
+    rotation_quaternion: [1.0e-06, 0, 0, 1.0]
+    translation: [0, 0, 0]
+- density: 100.0
+  geometry:
+    filename: visual_leg2_foot.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.043513, 0.051785, 0.051759]
+  geometryType: mesh
+  group: 21
+  id: 50
+  mass: 0.15
+  material: schwarz
+  name: visual_leg2_foot
+  physicMode: sphere
+  pose:
+    matrix:
+    - [0, 0, -1.0, 1.7e-05]
+    - [0, 1.0, 0, -4.0e-05]
+    - [1.0, 0, 0, 0.121634]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, -1.570796, 0]
+    rotation_quaternion: [0.707107, 0, -0.707107, 0]
+    translation: [1.7e-05, -4.0e-05, 0.121634]
+  radius: 0.022
+- density: 100.0
+  geometry:
+    filename: visual_leg4_upper_link.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.043841, 0.0432, 0.170322]
+  geometryType: mesh
+  group: 13
+  id: 31
+  mass: 0.113
+  material: green
+  name: visual_leg4_upper_link
+  pose:
+    matrix:
+    - [1.0e-06, 0, 1.0, 0.104416]
+    - [-1.0, -5.0e-06, 1.0e-06, -0.003906]
+    - [5.0e-06, -1.0, 0, -0.002347]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.570796, -5.0e-06, -1.570795]
+    rotation_quaternion: [0.499999, -0.500002, 0.499998, -0.500001]
+    translation: [0.104416, -0.003906, -0.002347]
+  sizeScaleY: 0.5
+  sizeScaleZ: 0.5
+- density: 100.0
+  geometry:
+    filename: visual_leg5_motor2_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.064, 0.0952, 0.073]
+  geometryType: mesh
+  group: 36
+  id: 82
+  mass: 0.32
+  material: green
+  name: visual_leg5_motor2_an
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0.000234]
+    - [0, 1.0, 0, -0.013805]
+    - [0, 0, 1.0, -0.054304]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0.000234, -0.013805, -0.054304]
+- density: 100.0
+  geometry:
+    filename: visual_leg1_ft.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.015704, 0.044776, 0.044776]
+  geometryType: mesh
+  group: 10
+  id: 24
+  mass: 0.2
+  material: silber
+  name: visual_leg1_ft
+  pose:
+    matrix:
+    - [0, 0, 1.0, 0]
+    - [0, 1.0, 0, 0]
+    - [-1.0, 0, 0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570796, 0]
+    rotation_quaternion: [0.707107, 0, 0.707107, 0]
+    translation: [0, 0, 0]
+- coll_bitmask: 0
+  density: 100.0
+  geometry:
+    filename: visual_laserscanner.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.045284, 0.041997, 0.028]
+  geometryType: mesh
+  group: 3
+  id: 9
+  mass: 0.5
+  material: schwarz
+  name: visual_laserscanner
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0.01475]
+    - [0, 2.0e-06, -1.0, -0.002799]
+    - [0, 1.0, 2.0e-06, 8.4e-05]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.570794, 0, 0]
+    rotation_quaternion: [0.707108, 0.707106, 0, 0]
+    translation: [0.01475, -0.002799, 8.4e-05]
+- density: 100.0
+  geometry:
+    filename: visual_leg1_motor1_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.073, 0.064, 0.0952]
+  geometryType: mesh
+  group: 11
+  id: 27
+  mass: 0.32
+  material: green
+  name: visual_leg1_motor1_an
+  pose:
+    matrix:
+    - [2.0e-06, 0, 1.0, 0.023806]
+    - [1.0e-06, 1.0, 0, -0.000233]
+    - [-1.0, 1.0e-06, 2.0e-06, 0.054367]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0.71305, 1.570794, 0.713049]
+    rotation_quaternion: [0.707107, 0, 0.707106, 0]
+    translation: [0.023806, -0.000233, 0.054367]
+  sizeScaleX: 0.6
+  sizeScaleY: 0.6
+- density: 100.0
+  geometry:
+    filename: visual_leg0_motor2_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.064, 0.0952, 0.073]
+  geometryType: mesh
+  group: 6
+  id: 15
+  mass: 0.32
+  material: green
+  name: visual_leg0_motor2_an
+  pose:
+    matrix:
+    - [-1.0, -1.0e-06, 1.0e-06, -0.000234]
+    - [-1.0e-06, 1.0, -1.0e-06, 0.013806]
+    - [-1.0e-06, -1.0e-06, -1.0, 0.054436]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.0e-06, 3.141592, 1.0e-06]
+    rotation_quaternion: [0, 0, 1.0, 0]
+    translation: [-0.000234, 0.013806, 0.054436]
+- density: 100.0
+  geometry:
+    filename: visual_leg0_motor2_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 7
+  id: 16
+  mass: 0.227
+  material: green
+  name: visual_leg0_motor2_ab
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0]
+    - [0, 1.0, 0, 0]
+    - [0, 0, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+- density: 100.0
+  geometry:
+    filename: visual_leg1_motor1_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056, 0.056555, 0.0462]
+  geometryType: mesh
+  group: 12
+  id: 28
+  mass: 0.227
+  material: green
+  name: visual_leg1_motor1_ab
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0]
+    - [0, 1.0, 0, 0]
+    - [0, 0, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+- density: 100.0
+  geometry:
+    filename: visual_leg3_ft.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.015704, 0.044776, 0.044776]
+  geometryType: mesh
+  group: 22
+  id: 51
+  mass: 0.2
+  material: silber
+  name: visual_leg3_ft
+  pose:
+    matrix:
+    - [0, -1.0, 0, -0.067035]
+    - [1.0, 0, 0, -0.090507]
+    - [0, 0, 1.0, 0.04503]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 1.570796]
+    rotation_quaternion: [0.707107, 0, 0, 0.707107]
+    translation: [-0.067035, -0.090507, 0.04503]
+- density: 100.0
+  geometry:
+    filename: visual_leg4_motor0_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.099, 0.067882, 0.069866]
+  geometryType: mesh
+  group: 28
+  id: 65
+  mass: 0.32
+  material: green
+  name: visual_leg4_motor0_an
+  pose:
+    matrix:
+    - [0, -1.0, 0, -0.327319]
+    - [1.0, 0, 0, 0.065027]
+    - [0, 0, 1.0, 0.003902]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 1.570796]
+    rotation_quaternion: [0.707107, 0, 0, 0.707107]
+    translation: [-0.327319, 0.065027, 0.003902]
+  sizeScaleY: 0.6
+  sizeScaleZ: 0.6
+  use: leg0_motor0_an
+- density: 100.0
+  geometry:
+    filename: visual_leg0_motor1_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056, 0.056555, 0.0462]
+  geometryType: mesh
+  group: 6
+  id: 14
+  mass: 0.227
+  material: green
+  name: visual_leg0_motor1_ab
+  pose:
+    matrix:
+    - [1.0, 0, 1.0e-06, 0]
+    - [0, 1.0, 1.0e-06, 0]
+    - [-1.0e-06, -1.0e-06, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.0e-06, 1.0e-06, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+- density: 100.0
+  geometry:
+    filename: visual_leg4_motor0_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 29
+  id: 66
+  mass: 0.227
+  material: green
+  name: visual_leg4_motor0_ab
+  pose:
+    matrix:
+    - [1.0, -1.0e-06, -1.0e-06, 0]
+    - [1.0e-06, 1.0, 0, 0]
+    - [1.0e-06, 0, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, -1.0e-06, 1.0e-06]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+  sizeScaleX: 0.7
+  sizeScaleY: 0.7
+  use: leg0_motor0_ab
+- density: 100.0
+  geometry:
+    filename: visual_leg0_motor1_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.073, 0.064, 0.0952]
+  geometryType: mesh
+  group: 5
+  id: 13
+  mass: 0.32
+  material: green
+  name: visual_leg0_motor1_an
+  pose:
+    matrix:
+    - [2.0e-06, 0, 1.0, 0.023806]
+    - [0, 1.0, 0, -0.000234]
+    - [-1.0, 0, 2.0e-06, -0.054367]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570795, 0]
+    rotation_quaternion: [0.707107, 0, 0.707106, 0]
+    translation: [0.023806, -0.000234, -0.054367]
+  sizeScaleX: 0.6
+  sizeScaleY: 0.6
+- density: 100.0
+  geometry:
+    filename: visual_leg0_ft.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.015704, 0.044776, 0.044776]
+  geometryType: mesh
+  group: 4
+  id: 10
+  mass: 0.2
+  material: silber
+  name: visual_leg0_ft
+  pose:
+    matrix:
+    - [0, 0, 1.0, -0.011672]
+    - [0, 1.0, 0, -0.216595]
+    - [-1.0, 0, 0, -0.023101]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570796, 0]
+    rotation_quaternion: [0.707107, 0, 0.707107, 0]
+    translation: [-0.011672, -0.216595, -0.023101]
+- density: 100.0
+  geometry:
+    filename: visual_leg4_ft.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.009895, 0.044776, 0.044776]
+  geometryType: mesh
+  group: 28
+  id: 64
+  mass: 0.2
+  material: silber
+  name: visual_leg4_ft
+  pose:
+    matrix:
+    - [0, -1.0, 0, -0.326921]
+    - [1.0, 0, 0, 0.018895]
+    - [0, 0, 1.0, 0.001987]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 1.570796]
+    rotation_quaternion: [0.707107, 0, 0, 0.707107]
+    translation: [-0.326921, 0.018895, 0.001987]
+- density: 100.0
+  geometry:
+    filename: visual_leg1_upper_link.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.043841, 0.0432, 0.170322]
+  geometryType: mesh
+  group: 13
+  id: 31
+  mass: 0.113
+  material: green
+  name: visual_leg1_upper_link
+  pose:
+    matrix:
+    - [3.0e-06, 0, -1.0, -0.104448]
+    - [0.99873, -0.050391, 3.0e-06, 0.000402]
+    - [-0.050391, -0.998729, 0, -0.002484]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.570797, 0.050412, 1.570794]
+    rotation_quaternion: [0.48724, -0.512444, -0.487239, 0.512442]
+    translation: [-0.104448, 0.000402, -0.002484]
+  sizeScaleY: 0.5
+  sizeScaleZ: 0.5
+- density: 100.0
+  geometry:
+    filename: visual_leg0_lower_link1.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.0814, 0.035745, 0.03585]
+  geometryType: mesh
+  group: 9
+  id: 21
+  mass: 0.15
+  material: green
+  name: visual_leg0_lower_link1
+  pose:
+    matrix:
+    - [0, 0, -1.0, -0.002778]
+    - [0, 1.0, 0, -0.002276]
+    - [1.0, 0, 0, 0.062853]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, -1.570796, 0]
+    rotation_quaternion: [0.707107, 0, -0.707107, 0]
+    translation: [-0.002778, -0.002276, 0.062853]
+- density: 100.0
+  geometry:
+    filename: visual_leg5_lower_link1.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.083, 0.032564, 0.032564]
+  geometryType: mesh
+  group: 39
+  id: 88
+  mass: 0.15
+  material: green
+  name: visual_leg5_lower_link1
+  pose:
+    matrix:
+    - [-1.0, 0, 2.0e-06, 0.269325]
+    - [2.0e-06, 6.0e-06, 1.0, 0]
+    - [0, 1.0, -6.0e-06, 0.006798]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.570791, -3.141592, -2.0e-06]
+    rotation_quaternion: [0, 0, 0.707109, 0.707105]
+    translation: [0.269325, 0, 0.006798]
+- density: 100.0
+  geometry:
+    filename: visual_leg0_motor0_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.099, 0.067882, 0.069866]
+  geometryType: mesh
+  group: 4
+  id: 11
+  mass: 0.32
+  material: green
+  name: visual_leg0_motor0_an
+  pose:
+    matrix:
+    - [0, 0, 1.0, -0.009847]
+    - [0, 1.0, 0, -0.216102]
+    - [-1.0, 0, 0, -0.072257]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570796, 0]
+    rotation_quaternion: [0.707107, 0, 0.707107, 0]
+    translation: [-0.009847, -0.216102, -0.072257]
+  sizeScaleY: 0.6
+  sizeScaleZ: 0.6
+- density: 100.0
+  geometry:
+    filename: visual_leg0_motor0_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 5
+  id: 12
+  mass: 0.227
+  material: green
+  name: visual_leg0_motor0_ab
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0]
+    - [0, 1.0, 0, 0]
+    - [0, 0, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+  sizeScaleX: 0.7
+  sizeScaleY: 0.7
+- density: 100.0
+  geometry:
+    filename: visual_leg0_foot.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.043513, 0.051916, 0.051664]
+  geometryType: mesh
+  group: 9
+  id: 22
+  mass: 0.15
+  material: schwarz
+  name: visual_leg0_foot
+  physicMode: sphere
+  pose:
+    matrix:
+    - [0, 0, -1.0, 0]
+    - [0, 1.0, 0, 0]
+    - [1.0, 0, 0, 0.099075]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, -1.570796, 0]
+    rotation_quaternion: [0.707107, 0, -0.707107, 0]
+    translation: [0, 0, 0.099075]
+  radius: 0.022
+- density: 100.0
+  geometry:
+    filename: visual_leg0_upper_link.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.043841, 0.0432, 0.170322]
+  geometryType: mesh
+  group: 13
+  id: 31
+  mass: 0.113
+  material: green
+  name: visual_leg0_upper_link
+  pose:
+    matrix:
+    - [0, 0, 1.0, 0.104448]
+    - [1.0, -1.0e-06, 0, 0.000555]
+    - [1.0e-06, 1.0, 0, 0.00246]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.570796, -1.0e-06, 1.570796]
+    rotation_quaternion: [0.5, 0.5, 0.499999, 0.5]
+    translation: [0.104448, 0.000555, 0.00246]
+  sizeScaleY: 0.5
+  sizeScaleZ: 0.5
+- density: 100.0
+  geometry:
+    filename: visual_leg5_ft.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.009895, 0.044776, 0.044776]
+  geometryType: mesh
+  group: 34
+  id: 77
+  mass: 0.2
+  material: silber
+  name: visual_leg5_ft
+  pose:
+    matrix:
+    - [0, -1.0, 0, -0.326921]
+    - [1.0, 0, 0, -0.017447]
+    - [0, 0, 1.0, 0.001987]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 1.570796]
+    rotation_quaternion: [0.707107, 0, 0, 0.707107]
+    translation: [-0.326921, -0.017447, 0.001987]
+- density: 100.0
+  geometry:
+    filename: visual_leg0_gripper.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.014662, 0.046853, 0.045441]
+  geometryType: mesh
+  group: 9
+  id: 23
+  mass: 0.001
+  material: schwarz
+  name: visual_leg0_gripper
+  pose:
+    matrix:
+    - [0, 0, -1.0, -1.0e-06]
+    - [0, 1.0, 0, 2.0e-06]
+    - [1.0, 0, 0, 0.070504]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, -1.570796, 0]
+    rotation_quaternion: [0.707107, 0, -0.707107, 0]
+    translation: [-1.0e-06, 2.0e-06, 0.070504]
+- density: 100.0
+  geometry:
+    filename: visual_leg3_motor0_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 23
+  id: 53
+  mass: 0.227
+  material: green
+  name: visual_leg3_motor0_ab
+  pose:
+    matrix:
+    - [1.0, 0, -1.0e-06, 0]
+    - [0, 1.0, -2.0e-06, 0]
+    - [1.0e-06, 2.0e-06, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [2.0e-06, -1.0e-06, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+  sizeScaleX: 0.7
+  sizeScaleY: 0.7
+  use: leg1_motor0_ab
+- density: 100.0
+  geometry:
+    filename: visual_leg3_motor2_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.064, 0.0952, 0.073]
+  geometryType: mesh
+  group: 24
+  id: 56
+  mass: 0.921
+  material: green
+  name: visual_leg3_motor2_an
+  pose:
+    matrix:
+    - [1.0, 0, 0, -0.000227]
+    - [0, 1.0, 0, 0.013779]
+    - [0, 0, 1.0, -0.0543]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [-0.000227, 0.013779, -0.0543]
+  use: leg1_motor2_an
+- density: 100.0
+  geometry:
+    filename: visual_leg4_foot.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.043513, 0.051585, 0.051962]
+  geometryType: mesh
+  group: 33
+  id: 76
+  mass: 0.15
+  material: schwarz
+  name: visual_leg4_foot
+  physicMode: sphere
+  pose:
+    matrix:
+    - [0, 0, -1.0, 0]
+    - [0, 1.0, 0, 0]
+    - [1.0, 0, 0, 0.100675]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, -1.570796, 0]
+    rotation_quaternion: [0.707107, 0, -0.707107, 0]
+    translation: [0, 0, 0.100675]
+  radius: 0.022
+- density: 100.0
+  geometry:
+    filename: visual_leg5_upper_link.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.043856, 0.043213, 0.170339]
+  geometryType: mesh
+  group: 13
+  id: 31
+  mass: 0.113
+  material: green
+  name: visual_leg5_upper_link
+  pose:
+    matrix:
+    - [0, 0, 1.0, 0.104433]
+    - [1.0, 0, 0, 0.000551]
+    - [0, 1.0, 0, 0.002346]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.570796, 0, 1.570797]
+    rotation_quaternion: [0.5, 0.5, 0.5, 0.5]
+    translation: [0.104433, 0.000551, 0.002346]
+  sizeScaleY: 0.5
+  sizeScaleZ: 0.5
+- density: 100.0
+  geometry:
+    filename: visual_leg3_motor2_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 25
+  id: 57
+  mass: 0.227
+  material: green
+  name: visual_leg3_motor2_ab
+  pose:
+    matrix:
+    - [1.0, -4.0e-06, 0, 0]
+    - [4.0e-06, 1.0, 0, 0]
+    - [0, 0, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 4.0e-06]
+    rotation_quaternion: [1.0, 0, 0, 2.0e-06]
+    translation: [0, 0, 0]
+  use: leg1_motor2_ab
+- density: 100.0
+  geometry:
+    filename: visual_leg3_motor0_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.099, 0.067882, 0.069866]
+  geometryType: mesh
+  group: 22
+  id: 52
+  mass: 0.32
+  material: green
+  name: visual_leg3_motor0_an
+  pose:
+    matrix:
+    - [1.0e-06, 1.0, 0, -0.06712]
+    - [-1.0, 1.0e-06, 0, -0.139662]
+    - [0, 0, 1.0, 0.048401]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, -1.570795]
+    rotation_quaternion: [0.707107, 0, 0, -0.707106]
+    translation: [-0.06712, -0.139662, 0.048401]
+  sizeScaleY: 0.6
+  sizeScaleZ: 0.6
+  use: leg0_motor0_an
+- density: 100.0
+  geometry:
+    filename: visual_leg1_motor0_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 11
+  id: 26
+  mass: 0.227
+  material: green
+  name: visual_leg1_motor0_ab
+  pose:
+    matrix:
+    - [1.0, 0, -1.0e-06, 0]
+    - [0, 1.0, -2.0e-06, 0]
+    - [1.0e-06, 2.0e-06, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [2.0e-06, -1.0e-06, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+  sizeScaleX: 0.7
+  sizeScaleY: 0.7
+- density: 100.0
+  geometry:
+    filename: visual_leg1_motor0_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.099, 0.067882, 0.069866]
+  geometryType: mesh
+  group: 10
+  id: 25
+  mass: 0.32
+  material: green
+  name: visual_leg1_motor0_an
+  pose:
+    matrix:
+    - [0, 0, 1.0, -0.009847]
+    - [-1.0e-06, -1.0, 0, -0.216102]
+    - [1.0, -1.0e-06, 0, 0.05635]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-3.141592, -1.570795, 0]
+    rotation_quaternion: [0, 0.707107, 0, 0.707107]
+    translation: [-0.009847, -0.216102, 0.05635]
+  sizeScaleY: 0.6
+  sizeScaleZ: 0.6
+  use: leg0_motor0_an
+- density: 100.0
+  geometry:
+    filename: visual_leg2_lower_link0.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.04361, 0.0432, 0.189322]
+  geometryType: mesh
+  group: 20
+  id: 48
+  mass: 0.3438
+  material: green
+  name: visual_leg2_lower_link0
+  pose:
+    matrix:
+    - [0, 0, -1.0, 0.077942]
+    - [-1.0, 1.0e-06, 0, 0]
+    - [1.0e-06, 1.0, 0, 0.004433]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.570796, -1.0e-06, -1.570796]
+    rotation_quaternion: [0.5, 0.5, -0.5, -0.499999]
+    translation: [0.077942, 0, 0.004433]
+  sizeScaleY: 0.7
+  sizeScaleZ: 0.7
+  use: leg0_lower_link0
+- density: 100.0
+  geometry:
+    filename: visual_leg2_lower_link1.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.104, 0.033471, 0.031744]
+  geometryType: mesh
+  group: 21
+  id: 49
+  mass: 0.15
+  material: green
+  name: visual_leg2_lower_link1
+  pose:
+    matrix:
+    - [0, 0, -1.0, 0]
+    - [0, 1.0, 0, 0]
+    - [1.0, 0, 0, 0.078599]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, -1.570796, 0]
+    rotation_quaternion: [0.707107, 0, -0.707107, 0]
+    translation: [0, 0, 0.078599]
+- density: 100.0
+  geometry:
+    filename: visual_leg4_motor1_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056, 0.056555, 0.0462]
+  geometryType: mesh
+  group: 30
+  id: 68
+  mass: 0.227
+  material: green
+  name: visual_leg4_motor1_ab
+  pose:
+    matrix:
+    - [1.0, 0, -2.0e-06, 0]
+    - [0, 1.0, 2.0e-06, 0]
+    - [2.0e-06, -2.0e-06, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-2.0e-06, -2.0e-06, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+  use: leg0_motor1_ab
+- density: 100.0
+  geometry:
+    filename: visual_leg4_motor3_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.073, 0.0952, 0.064]
+  geometryType: mesh
+  group: 31
+  id: 72
+  mass: 0.32
+  material: green
+  name: visual_leg4_motor3_an
+  pose:
+    matrix:
+    - [1.0, 0, 2.0e-06, 0.21571]
+    - [2.0e-06, 4.0e-06, -1.0, -0.003612]
+    - [0, 1.0, 4.0e-06, 0.01243]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.570792, 0, 2.0e-06]
+    rotation_quaternion: [0.707108, 0.707105, 0, 0]
+    translation: [0.21571, -0.003612, 0.01243]
+  use: leg0_motor3_an
+- density: 100.0
+  geometry:
+    filename: visual_leg3_motor1_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.073, 0.064, 0.0952]
+  geometryType: mesh
+  group: 23
+  id: 54
+  mass: 0.32
+  material: green
+  name: visual_leg3_motor1_an
+  pose:
+    matrix:
+    - [2.0e-06, 0, 1.0, 0.023806]
+    - [1.0e-06, 1.0, 0, -0.000235]
+    - [-1.0, 1.0e-06, 2.0e-06, 0.054381]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0.758934, 1.570794, 0.758933]
+    rotation_quaternion: [0.707107, 0, 0.707106, 0]
+    translation: [0.023806, -0.000235, 0.054381]
+  sizeScaleX: 0.6
+  sizeScaleY: 0.6
+  use: leg1_motor1_an
+- density: 100.0
+  geometry:
+    filename: visual_leg4_motor3_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 32
+  id: 73
+  mass: 0.227
+  material: green
+  name: visual_leg4_motor3_ab
+  pose:
+    matrix:
+    - [1.0, 9.0e-06, -3.0e-06, 0]
+    - [-9.0e-06, 1.0, -1.2e-05, 0]
+    - [3.0e-06, 1.2e-05, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.2e-05, -3.0e-06, -9.0e-06]
+    rotation_quaternion: [1.0, 6.0e-06, -1.0e-06, -4.0e-06]
+    translation: [0, 0, 0]
+- density: 100.0
+  geometry:
+    filename: visual_leg3_motor1_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056, 0.056555, 0.0462]
+  geometryType: mesh
+  group: 24
+  id: 55
+  mass: 0.227
+  material: green
+  name: visual_leg3_motor1_ab
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0]
+    - [0, 1.0, 0, 0]
+    - [0, 0, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+- density: 100.0
+  geometry:
+    filename: visual_leg4_motor1_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.073, 0.064, 0.0952]
+  geometryType: mesh
+  group: 29
+  id: 67
+  mass: 0.32
+  material: green
+  name: visual_leg4_motor1_an
+  pose:
+    matrix:
+    - [0, 0, 1.0, 0.023807]
+    - [0, 1.0, 0, -0.000235]
+    - [-1.0, 0, 0, -0.054342]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570796, 0]
+    rotation_quaternion: [0.707107, 0, 0.707107, 0]
+    translation: [0.023807, -0.000235, -0.054342]
+  sizeScaleX: 0.6
+  sizeScaleY: 0.6
+  use: leg0_motor1_an
+- density: 100.0
+  geometry:
+    filename: visual_leg2_motor1_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056, 0.056555, 0.0462]
+  geometryType: mesh
+  group: 18
+  id: 42
+  mass: 0.227
+  material: green
+  name: visual_leg2_motor1_ab
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0]
+    - [0, 1.0, -1.0e-06, 0]
+    - [0, 1.0e-06, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.0e-06, 0, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+  use: leg0_motor1_ab
+- density: 100.0
+  geometry:
+    filename: visual_leg2_upper_link.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.043841, 0.0432, 0.150322]
+  geometryType: mesh
+  group: 19
+  id: 45
+  mass: 0.113
+  material: green
+  name: visual_leg2_upper_link
+  pose:
+    matrix:
+    - [0, 0, 1.0, 0.094516]
+    - [1.0, 0, 0, -0.000465]
+    - [0, 1.0, 0, 0.002427]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.570796, 0, 1.570796]
+    rotation_quaternion: [0.5, 0.5, 0.5, 0.5]
+    translation: [0.094516, -0.000465, 0.002427]
+  sizeScaleY: 0.5
+  sizeScaleZ: 0.5
+- density: 100.0
+  geometry:
+    filename: visual_leg5_foot.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.043513, 0.051585, 0.051962]
+  geometryType: mesh
+  group: 39
+  id: 89
+  mass: 0.15
+  material: schwarz
+  name: visual_leg5_foot
+  physicMode: sphere
+  pose:
+    matrix:
+    - [0, 0, 1.0, 0]
+    - [0, 1.0, 0, 0]
+    - [-1.0, 0, 0, 0.100675]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570795, 0]
+    rotation_quaternion: [0.707106, 0, 0.707107, 0]
+    translation: [0, 0, 0.100675]
+  radius: 0.022
+- density: 100.0
+  geometry:
+    filename: visual_leg3_motor3_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 26
+  id: 60
+  mass: 0.227
+  material: green
+  name: visual_leg3_motor3_ab
+  pose:
+    matrix:
+    - [-1.0, 4.0e-06, -1.0e-06, 0]
+    - [-3.0e-06, -1.0, 0, 0]
+    - [-2.0e-06, 0, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 2.0e-06, -3.141589]
+    rotation_quaternion: [-2.0e-06, 0, 0, 1.0]
+    translation: [0, 0, 0]
+  use: leg1_motor3_ab
+- density: 100.0
+  geometry:
+    filename: visual_leg3_motor3_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.073, 0.0952, 0.064]
+  geometryType: mesh
+  group: 25
+  id: 59
+  mass: 0.32
+  material: green
+  name: visual_leg3_motor3_an
+  pose:
+    matrix:
+    - [1.0, -1.0e-06, 3.0e-06, -0.195726]
+    - [3.0e-06, -1.0e-06, -1.0, -0.000234]
+    - [1.0e-06, 1.0, -1.0e-06, 0.01239]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.570797, -1.0e-06, 3.0e-06]
+    rotation_quaternion: [0.707106, 0.707107, 0, 2.0e-06]
+    translation: [-0.195726, -0.000234, 0.01239]
+  use: leg1_motor3_an
+- density: 100.0
+  geometry:
+    filename: visual_leg2_motor1_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.073, 0.064, 0.0952]
+  geometryType: mesh
+  group: 17
+  id: 41
+  mass: 0.32
+  material: green
+  name: visual_leg2_motor1_an
+  pose:
+    matrix:
+    - [0, 0, 1.0, 0.023806]
+    - [0, 1.0, 0, -0.000235]
+    - [-1.0, 0, 0, -0.054381]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570796, 0]
+    rotation_quaternion: [0.707107, 0, 0.707107, 0]
+    translation: [0.023806, -0.000235, -0.054381]
+  sizeScaleX: 0.6
+  sizeScaleY: 0.6
+  use: leg0_motor1_an
+- coll_bitmask: 2
+  geometry:
+    filename: visual_head.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.0875, 0.1444, 0.085]
+  geometryType: mesh
+  group: 3
+  highStop: 0.7854
+  id: 7
+  lowStop: -0.7854
+  mass: 0.621
+  material: schwarz
+  name: visual_head
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0]
+    - [0, -1.0, -1.0e-06, 0]
+    - [0, 1.0e-06, -1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [3.141591, 0, 0]
+    rotation_quaternion: [0, 1.0, 0, 0]
+    translation: [0, 0, 0]
+- geometry:
+    filename: visual_main_body.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.40975, 0.211766, 0.17425]
+  geometryType: mesh
+  group: 1
+  id: 1
+  mass: 4.8
+  material: schwarz
+  modelname: spaceclimber
+  name: visual_main_body
+  pose:
+    matrix:
+    - [1.0, 0, 0, -0.091]
+    - [0, 1.0, 0, 0]
+    - [0, 0, 1.0, 0.0318]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [-0.091, 0, 0.0318]
+- density: 100.0
+  geometry:
+    filename: visual_leg5_motor3_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.073, 0.0952, 0.064]
+  geometryType: mesh
+  group: 37
+  id: 85
+  mass: 0.32
+  material: green
+  name: visual_leg5_motor3_an
+  pose:
+    matrix:
+    - [-1.0, 0, -1.0e-06, 0.215727]
+    - [-1.0e-06, 2.0e-06, 1.0, -0.000235]
+    - [0, 1.0, -2.0e-06, -0.01243]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.570794, -3.141593, 1.0e-06]
+    rotation_quaternion: [0, 0, 0.707108, 0.707106]
+    translation: [0.215727, -0.000235, -0.01243]
+- density: 100.0
+  geometry:
+    filename: visual_leg1_motor2_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.064, 0.0952, 0.073]
+  geometryType: mesh
+  group: 12
+  id: 29
+  mass: 0.32
+  material: green
+  name: visual_leg1_motor2_an
+  pose:
+    matrix:
+    - [1.0, 0, 0, -0.000235]
+    - [0, 1.0, 0, 0.013806]
+    - [0, 0, 1.0, -0.054436]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [-0.000235, 0.013806, -0.054436]
+- coll_bitmask: 0
+  density: 100.0
+  geometry:
+    filename: visual_camera.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.03685, 0.042, 0.042]
+  geometryType: mesh
+  group: 3
+  id: 8
+  mass: 0.3
+  material: schwarz
+  name: visual_camera
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0.052033]
+    - [0, -1.0, -1.0e-06, -0.040236]
+    - [0, 1.0e-06, -1.0, -0.007338]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [3.141591, 0, 0]
+    rotation_quaternion: [0, 1.0, 0, 0]
+    translation: [0.052033, -0.040236, -0.007338]
+- density: 100.0
+  geometry:
+    filename: visual_leg1_motor2_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 13
+  id: 30
+  mass: 0.227
+  material: green
+  name: visual_leg1_motor2_ab
+  pose:
+    matrix:
+    - [1.0, 4.0e-06, 0, 0]
+    - [-4.0e-06, 0.99873, 0.050392, 0]
+    - [0, -0.050392, 0.998729, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-0.050413, 0, -4.0e-06]
+    rotation_quaternion: [0.999682, -0.025204, 0, -2.0e-06]
+    translation: [0, 0, 0]
+- density: 100.0
+  geometry:
+    filename: visual_leg5_motor3_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 38
+  id: 86
+  mass: 0.227
+  material: green
+  name: visual_leg5_motor3_ab
+  pose:
+    matrix:
+    - [-1.0, 0, 2.0e-06, 0]
+    - [0, -1.0, 6.0e-06, 0]
+    - [2.0e-06, 6.0e-06, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [6.0e-06, -2.0e-06, 3.141592]
+    rotation_quaternion: [0, 0, 3.0e-06, 1.0]
+    translation: [0, 0, 0]
+- coll_bitmask: 1
+  geometry:
+    filename: visual_front_body.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.13, 0.30425, 0.13925]
+  geometryType: mesh
+  group: 2
+  id: 4
+  mass: 2.0
+  material: schwarz
+  name: visual_front_body
+  pose:
+    matrix:
+    - [0, 0, 1.0, -0.01184]
+    - [0, 1.0, 0, -0.220073]
+    - [-1.0, 0, 0, -0.009579]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570796, 0]
+    rotation_quaternion: [0.707107, 0, 0.707107, 0]
+    translation: [-0.01184, -0.220073, -0.009579]
+- density: 100.0
+  geometry:
+    filename: visual_leg2_motor0_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.099, 0.067882, 0.069866]
+  geometryType: mesh
+  group: 16
+  id: 39
+  mass: 0.32
+  material: green
+  name: visual_leg2_motor0_an
+  pose:
+    matrix:
+    - [0, -1.0, 0, -0.06712]
+    - [1.0, 0, 0, 0.14111]
+    - [0, 0, 1.0, 0.048401]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 1.570796]
+    rotation_quaternion: [0.707107, 0, 0, 0.707107]
+    translation: [-0.06712, 0.14111, 0.048401]
+  sizeScaleY: 0.6
+  sizeScaleZ: 0.6
+  use: leg0_motor0_an
+- density: 100.0
+  geometry:
+    filename: visual_leg3_lower_link1.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.104, 0.033471, 0.031744]
+  geometryType: mesh
+  group: 27
+  id: 62
+  mass: 0.15
+  material: green
+  name: visual_leg3_lower_link1
+  pose:
+    matrix:
+    - [0, 0, 1.0, 0]
+    - [0, 1.0, 0, 0]
+    - [-1.0, 0, 0, 0.078599]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570795, 0]
+    rotation_quaternion: [0.707106, 0, 0.707107, 0]
+    translation: [0, 0, 0.078599]
+- density: 100.0
+  geometry:
+    filename: visual_leg4_motor2_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 31
+  id: 70
+  mass: 0.227
+  material: green
+  name: visual_leg4_motor2_ab
+  pose:
+    matrix:
+    - [1.0, 0, 0, 3.0e-05]
+    - [0, 1.0, 5.0e-06, -0.003347]
+    - [0, -5.0e-06, 1.0, -0.002686]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-5.0e-06, 0, 0]
+    rotation_quaternion: [1.0, -2.0e-06, 0, 0]
+    translation: [3.0e-05, -0.003347, -0.002686]
+- density: 100.0
+  geometry:
+    filename: visual_leg4_lower_link0.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.04361, 0.0432, 0.189323]
+  geometryType: mesh
+  group: 32
+  id: 74
+  mass: 0.3438
+  material: green
+  name: visual_leg4_lower_link0
+  pose:
+    matrix:
+    - [2.0e-06, 0, -1.0, 0.079995]
+    - [1.0, 6.0e-06, 2.0e-06, 0]
+    - [6.0e-06, -1.0, 0, -0.004572]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.570796, -6.0e-06, 1.570795]
+    rotation_quaternion: [0.500002, -0.499999, -0.500001, 0.499998]
+    translation: [0.079995, 0, -0.004572]
+  sizeScaleY: 0.7
+  sizeScaleZ: 0.7
+- density: 100.0
+  geometry:
+    filename: visual_leg4_lower_link1.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.083, 0.032564, 0.032564]
+  geometryType: mesh
+  group: 33
+  id: 75
+  mass: 0.15
+  material: green
+  name: visual_leg4_lower_link1
+  pose:
+    matrix:
+    - [0, 0, -1.0, 0]
+    - [0, 1.0, 0, 0]
+    - [1.0, 0, 0, 0.062325]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, -1.570796, 0]
+    rotation_quaternion: [0.707107, 0, -0.707107, 0]
+    translation: [0, 0, 0.062325]
+- density: 100.0
+  geometry:
+    filename: visual_leg4_motor2_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.064, 0.0952, 0.073]
+  geometryType: mesh
+  group: 30
+  id: 69
+  mass: 0.32
+  material: green
+  name: visual_leg4_motor2_an
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0.000234]
+    - [0, -1.0, 0, -0.013805]
+    - [0, 0, -1.0, 0.054304]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [3.141592, 0, 0]
+    rotation_quaternion: [0, 1.0, 0, 0]
+    translation: [0.000234, -0.013805, 0.054304]
+  use: leg0_motor2_an
+- density: 100.0
+  geometry:
+    filename: visual_leg2_motor0_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 17
+  id: 40
+  mass: 0.227
+  material: green
+  name: visual_leg2_motor0_ab
+  pose:
+    matrix:
+    - [1.0, 0, -1.0e-06, 0]
+    - [0, 1.0, 0, 0]
+    - [1.0e-06, 0, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, -1.0e-06, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+  sizeScaleX: 0.7
+  sizeScaleY: 0.7
+  use: leg0_motor0_ab
+- density: 100.0
+  geometry:
+    filename: visual_leg5_motor0_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.099, 0.067882, 0.069866]
+  geometryType: mesh
+  group: 34
+  id: 78
+  mass: 0.32
+  material: green
+  name: visual_leg5_motor0_an
+  pose:
+    matrix:
+    - [1.0e-06, 1.0, 0, -0.327319]
+    - [-1.0, 1.0e-06, 0, -0.06358]
+    - [0, 0, 1.0, 0.003902]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, -1.570795]
+    rotation_quaternion: [0.707107, 0, 0, -0.707106]
+    translation: [-0.327319, -0.06358, 0.003902]
+  sizeScaleY: 0.6
+  sizeScaleZ: 0.6
+  use: leg0_motor0_an
+- density: 100.0
+  geometry:
+    filename: visual_leg1_lower_link1.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.0814, 0.035745, 0.03585]
+  geometryType: mesh
+  group: 15
+  id: 35
+  mass: 0.15
+  material: green
+  name: visual_leg1_lower_link1
+  pose:
+    matrix:
+    - [0, 0, 1.0, 0.002778]
+    - [0, 1.0, 0, -0.002275]
+    - [-1.0, 0, 0, 0.062853]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570796, 0]
+    rotation_quaternion: [0.707107, 0, 0.707107, 0]
+    translation: [0.002778, -0.002275, 0.062853]
+- density: 100.0
+  geometry:
+    filename: visual_leg1_lower_link0.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.04361, 0.0432, 0.189322]
+  geometryType: mesh
+  group: 14
+  id: 34
+  mass: 0.3438
+  material: green
+  name: visual_leg1_lower_link0
+  pose:
+    matrix:
+    - [-1.0e-06, 0, 1.0, -0.077941]
+    - [-1.0, 0, -1.0e-06, 0]
+    - [0, -1.0, 0, -0.00447]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.570796, 0, -1.570797]
+    rotation_quaternion: [0.5, -0.5, 0.5, -0.5]
+    translation: [-0.077941, 0, -0.00447]
+  sizeScaleY: 0.7
+  sizeScaleZ: 0.7
+- density: 100.0
+  geometry:
+    filename: visual_leg2_motor3_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.073, 0.0952, 0.064]
+  geometryType: mesh
+  group: 19
+  id: 46
+  mass: 0.32
+  material: green
+  name: visual_leg2_motor3_an
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0.195726]
+    - [0, -2.0e-06, 1.0, 0.000234]
+    - [0, -1.0, -2.0e-06, -0.01239]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.570798, 0, 0]
+    rotation_quaternion: [0.707106, -0.707107, 0, 0]
+    translation: [0.195726, 0.000234, -0.01239]
+  use: leg0_motor3_an
+- density: 100.0
+  geometry:
+    filename: visual_leg2_motor3_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 20
+  id: 47
+  invertAxis: 1.0
+  mass: 0.227
+  material: green
+  name: visual_leg2_motor3_ab
+  pose:
+    matrix:
+    - [1.0, 0, 2.0e-06, 0]
+    - [1.0e-06, 1.0, 1.0e-06, 0]
+    - [-1.0e-06, -2.0e-06, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-2.0e-06, 1.0e-06, 1.0e-06]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+  use: leg0_motor3_ab
+- density: 100.0
+  geometry:
+    filename: visual_leg5_motor0_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 35
+  id: 79
+  mass: 0.227
+  material: green
+  name: visual_leg5_motor0_ab
+  pose:
+    matrix:
+    - [1.0, 0, -1.0e-06, 0]
+    - [0, 1.0, -2.0e-06, 0]
+    - [1.0e-06, 2.0e-06, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [2.0e-06, -1.0e-06, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+  sizeScaleX: 0.7
+  sizeScaleY: 0.7
+  use: leg1_motor0_ab
+- density: 100.0
+  geometry:
+    filename: visual_leg1_motor3_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 14
+  id: 33
+  mass: 0.227
+  material: green
+  name: visual_leg1_motor3_ab
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0]
+    - [0, 1.0, 0, 0]
+    - [0, 0, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+- density: 100.0
+  geometry:
+    filename: visual_body_motor_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.073, 0.0735, 0.0785]
+  geometryType: mesh
+  group: 2
+  id: 3
+  mass: 0.001
+  material: green
+  name: visual_body_motor_ab
+  pose:
+    matrix:
+    - [1.0, -1.0e-06, 0, 0]
+    - [1.0e-06, 1.0, 0, 0]
+    - [0, 0, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 1.0e-06]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+- density: 100.0
+  geometry:
+    filename: visual_leg5_lower_link0.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.04361, 0.0432, 0.189322]
+  geometryType: mesh
+  group: 38
+  id: 87
+  mass: 0.3438
+  material: green
+  name: visual_leg5_lower_link0
+  pose:
+    matrix:
+    - [0, 0, -1.0, 0.079995]
+    - [-1.0, 1.0e-06, 0, 0]
+    - [1.0e-06, 1.0, 0, 0.004573]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.570796, -1.0e-06, -1.570797]
+    rotation_quaternion: [0.5, 0.5, -0.500001, -0.5]
+    translation: [0.079995, 0, 0.004573]
+  sizeScaleY: 0.7
+  sizeScaleZ: 0.7
+- density: 100.0
+  geometry:
+    filename: visual_leg3_foot.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.043513, 0.051785, 0.051759]
+  geometryType: mesh
+  group: 27
+  id: 63
+  mass: 0.15
+  material: schwarz
+  name: visual_leg3_foot
+  physicMode: sphere
+  pose:
+    matrix:
+    - [0, 0, 1.0, -1.7e-05]
+    - [0, 1.0, 0, -4.1e-05]
+    - [-1.0, 0, 0, 0.121634]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570795, 0]
+    rotation_quaternion: [0.707106, 0, 0.707107, 0]
+    translation: [-1.7e-05, -4.1e-05, 0.121634]
+  radius: 0.022
+- density: 100.0
+  geometry:
+    filename: visual_body_motor_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.139786, 0.5015, 0.116944]
+  geometryType: mesh
+  group: 1
+  id: 2
+  mass: 0.001
+  material: green
+  name: visual_body_motor_an
+  pose:
+    matrix:
+    - [0, -1.0, 0, -0.246425]
+    - [1.0, 0, 0, 0.000989]
+    - [0, 0, 1.0, -0.005403]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 1.570796]
+    rotation_quaternion: [0.707107, 0, 0, 0.707107]
+    translation: [-0.246425, 0.000989, -0.005403]
+- density: 100.0
+  geometry:
+    filename: visual_leg1_motor3_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.073, 0.0952, 0.064]
+  geometryType: mesh
+  group: 13
+  id: 32
+  mass: 0.32
+  material: green
+  name: visual_leg1_motor3_an
+  pose:
+    matrix:
+    - [1.0, -2.0e-06, -2.0e-06, -0.215727]
+    - [-2.0e-06, 0.050391, -0.99873, 0.000387]
+    - [2.0e-06, 0.99873, 0.050391, 0.012298]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.520384, -2.0e-06, -2.0e-06]
+    rotation_quaternion: [0.724704, 0.689061, -1.0e-06, 0]
+    translation: [-0.215727, 0.000387, 0.012298]
+- density: 100.0
+  geometry:
+    filename: visual_leg2_ft.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.015704, 0.044776, 0.044776]
+  geometryType: mesh
+  group: 16
+  id: 38
+  mass: 0.2
+  material: silber
+  name: visual_leg2_ft
+  pose:
+    matrix:
+    - [0, -1.0, 0, -0.067035]
+    - [1.0, 0, 0, 0.091955]
+    - [0, 0, 1.0, 0.04503]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 1.570796]
+    rotation_quaternion: [0.707107, 0, 0, 0.707107]
+    translation: [-0.067035, 0.091955, 0.04503]
+- density: 100.0
+  geometry:
+    filename: visual_leg0_motor3_an.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.073, 0.0952, 0.064]
+  geometryType: mesh
+  group: 7
+  id: 18
+  mass: 0.32
+  material: green
+  name: visual_leg0_motor3_an
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0.215727]
+    - [0, 0, 1.0, 0.000233]
+    - [0, -1.0, 0, -0.012303]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.570796, 0, 0]
+    rotation_quaternion: [0.707107, -0.707107, 0, 0]
+    translation: [0.215727, 0.000233, -0.012303]
+- density: 100.0
+  geometry:
+    filename: visual_leg1_gripper.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.014662, 0.046853, 0.045441]
+  geometryType: mesh
+  group: 15
+  id: 37
+  mass: 0.001
+  material: schwarz
+  name: visual_leg1_gripper
+  pose:
+    matrix:
+    - [0, 0, 1.0, 1.0e-06]
+    - [0, 1.0, 0, 2.0e-06]
+    - [-1.0, 0, 0, 0.070504]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570796, 0]
+    rotation_quaternion: [0.707107, 0, 0.707107, 0]
+    translation: [1.0e-06, 2.0e-06, 0.070504]
+- density: 100.0
+  geometry:
+    filename: visual_leg3_lower_link0.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.04361, 0.0432, 0.189322]
+  geometryType: mesh
+  group: 26
+  id: 61
+  mass: 0.3438
+  material: green
+  name: visual_leg3_lower_link0
+  pose:
+    matrix:
+    - [0, 0, -1.0, 0.077942]
+    - [1.0, 1.0e-06, 0, 0]
+    - [1.0e-06, -1.0, 0, -0.004432]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.570796, -1.0e-06, 1.570797]
+    rotation_quaternion: [0.5, -0.5, -0.5, 0.5]
+    translation: [0.077942, 0, -0.004432]
+  sizeScaleY: 0.7
+  sizeScaleZ: 0.7
+  use: leg1_lower_link0
+- density: 100.0
+  geometry:
+    filename: visual_leg0_motor3_ab.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.056555, 0.056, 0.0462]
+  geometryType: mesh
+  group: 8
+  id: 19
+  mass: 0.227
+  material: green
+  name: visual_leg0_motor3_ab
+  pose:
+    matrix:
+    - [1.0, 0, 2.0e-06, 0]
+    - [0, 1.0, 0, 0]
+    - [-2.0e-06, 0, 1.0, 0]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 2.0e-06, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0, 0]
+- density: 100.0
+  geometry:
+    filename: visual_leg3_upper_link.obj
+    geometryType: mesh
+    scale: [1.0, 1.0, 1.0]
+    size: [0.043841, 0.0432, 0.150322]
+  geometryType: mesh
+  group: 19
+  id: 45
+  mass: 0.113
+  material: green
+  name: visual_leg3_upper_link
+  pose:
+    matrix:
+    - [-1.0e-06, 0, -1.0, -0.094516]
+    - [1.0, 1.0e-06, -1.0e-06, -0.00049]
+    - [1.0e-06, -1.0, 0, -0.002427]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.570796, -1.0e-06, 1.570797]
+    rotation_quaternion: [0.5, -0.499999, -0.500001, 0.5]
+    translation: [-0.094516, -0.00049, -0.002427]
+  sizeScaleY: 0.5
+  sizeScaleZ: 0.5
+
+collision:
+- geometry:
+    geometryType: box
+    size: [0.073, 0.064, 0.0952]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg1_motor1_an
+  pose:
+    matrix:
+    - [2.0e-06, 0, 1.0, 0.0086]
+    - [1.0e-06, 1.0, 0, 0]
+    - [-1.0, 1.0e-06, 2.0e-06, 0.054139]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0.699764, 1.570794, 0.699763]
+    rotation_quaternion: [0.707107, 0, 0.707106, 0]
+    translation: [0.0086, 0, 0.054139]
+- geometry:
+    geometryType: box
+    size: [0.0875, 0.1444, 0.085]
+  geometryType: box
+  mass: 0.621
+  name: collision_head
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0.02775]
+    - [0, -1.0, -1.0e-06, 0]
+    - [0, 1.0e-06, -1.0, -0.000166]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [3.141591, 0, 0]
+    rotation_quaternion: [0, 1.0, 0, 0]
+    translation: [0.02775, 0, -0.000166]
+- geometry:
+    geometryType: box
+    size: [0.064, 0.0952, 0.073]
+  geometryType: box
+  mass: 0.921
+  name: collision_leg3_motor2_an
+  pose:
+    matrix:
+    - [2.0e-06, -1.0e-06, -1.0, -0.0045]
+    - [-1.0, 0, -2.0e-06, 0]
+    - [0, 1.0, -1.0e-06, 0.037984]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.570798, 0, -1.570794]
+    rotation_quaternion: [0.5, 0.500001, -0.5, -0.499999]
+    translation: [-0.0045, 0, 0.037984]
+- geometry:
+    geometryType: box
+    size: [0.099, 0.067882, 0.069866]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg3_motor0_an
+  pose:
+    matrix:
+    - [1.0e-06, 1.0, 0, -0.066721]
+    - [-1.0, 1.0e-06, 0, -0.145859]
+    - [0, 0, 1.0, 0.047555]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, -1.570795]
+    rotation_quaternion: [0.707107, 0, 0, -0.707106]
+    translation: [-0.066721, -0.145859, 0.047555]
+- geometry:
+    geometryType: box
+    size: [0.13, 0.135058, 0.121198]
+  geometryType: box
+  mass: 2.0
+  name: collision_front_body
+  pose:
+    matrix:
+    - [0, 0, 1.0, -0.005131]
+    - [0, 1.0, 0, -0.093517]
+    - [-1.0, 0, 0, -0.007954]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570796, 0]
+    rotation_quaternion: [0.707107, 0, 0.707107, 0]
+    translation: [-0.005131, -0.093517, -0.007954]
+- geometry:
+    geometryType: box
+    size: [0.073, 0.064, 0.0952]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg0_motor1_an
+  pose:
+    matrix:
+    - [2.0e-06, 0, 1.0, 0.0086]
+    - [0, 1.0, 0, 0]
+    - [-1.0, 0, 2.0e-06, -0.054139]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570795, 0]
+    rotation_quaternion: [0.707107, 0, 0.707106, 0]
+    translation: [0.0086, 0, -0.054139]
+- geometry: {geometryType: sphere, radius: 0.025958}
+  geometryType: sphere
+  mass: 0.15
+  name: collision_leg1_foot
+  pose:
+    matrix:
+    - [0, -0.018574, 0.999828, 0]
+    - [0, 0.999828, 0.018574, 0]
+    - [-1.0, 0, 0, 0.103156]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-0.018575, 1.570796, 0]
+    rotation_quaternion: [0.707077, -0.006567, 0.707076, 0.006567]
+    translation: [0, 0, 0.103156]
+- geometry:
+    geometryType: box
+    size: [0.073, 0.064, 0.0952]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg4_motor1_an
+  pose:
+    matrix:
+    - [0, 0, 1.0, 0.0086]
+    - [0, 1.0, 0, 0]
+    - [-1.0, 0, 0, -0.054114]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570796, 0]
+    rotation_quaternion: [0.707107, 0, 0.707107, 0]
+    translation: [0.0086, 0, -0.054114]
+- geometry:
+    geometryType: box
+    size: [0.064, 0.0952, 0.073]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg1_motor2_an
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0]
+    - [0, 1.0, 0, -0.0014]
+    - [0, 0, 1.0, -0.054209]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, -0.0014, -0.054209]
+- geometry:
+    geometryType: box
+    size: [0.071513, 0.098674, 0.060898]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg0_motor3_an
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0.2155]
+    - [0, 0, 1.0, 0]
+    - [0, -1.0, 0, 0.002891]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.570796, 0, 0]
+    rotation_quaternion: [0.707107, -0.707107, 0, 0]
+    translation: [0.2155, 0, 0.002891]
+- geometry:
+    geometryType: box
+    size: [0.099, 0.067882, 0.069866]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg1_motor0_an
+  pose:
+    matrix:
+    - [0, 0, 1.0, -0.010689]
+    - [-1.0e-06, -1.0, 0, -0.2165]
+    - [1.0, -1.0e-06, 0, 0.062546]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-3.141592, -1.570795, 0]
+    rotation_quaternion: [0, 0.707107, 0, 0.707107]
+    translation: [-0.010689, -0.2165, 0.062546]
+- geometry:
+    geometryType: box
+    size: [0.064, 0.0952, 0.073]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg2_motor2_an
+  pose:
+    matrix:
+    - [-1.0, 0, -2.0e-06, 0]
+    - [0, 1.0, 1.0e-06, -0.0014]
+    - [2.0e-06, 1.0e-06, -1.0, 0.054097]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.0e-06, -3.141591, 0]
+    rotation_quaternion: [0, 0, 1.0, 0]
+    translation: [0, -0.0014, 0.054097]
+- geometry:
+    geometryType: box
+    size: [0.071513, 0.098674, 0.060898]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg4_motor3_an
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0.215482]
+    - [0, 4.0e-06, -1.0, -0.003377]
+    - [0, 1.0, 4.0e-06, -0.002776]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.570793, 0, 0]
+    rotation_quaternion: [0.707108, 0.707105, 0, 0]
+    translation: [0.215482, -0.003377, -0.002776]
+- geometry:
+    geometryType: box
+    size: [0.349394, 0.197589, 0.138298]
+  geometryType: box
+  mass: 4.8
+  name: collision_main_body
+  pose:
+    matrix:
+    - [1.0, 0, 0, -0.090933]
+    - [0, 1.0, 0, 0.000724]
+    - [0, 0, 1.0, 0.028612]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [-0.090933, 0.000724, 0.028612]
+- geometry:
+    geometryType: box
+    size: [0.071513, 0.098674, 0.060898]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg5_motor3_an
+  pose:
+    matrix:
+    - [-1.0, 0, 0, 0.2155]
+    - [0, 2.0e-06, 1.0, 0]
+    - [0, 1.0, -2.0e-06, 0.002776]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.570794, -3.141593, 0]
+    rotation_quaternion: [0, 0, 0.707108, 0.707106]
+    translation: [0.2155, 0, 0.002776]
+- geometry:
+    geometryType: box
+    size: [0.189322, 0.034502, 0.032196]
+  geometryType: box
+  mass: 0.3438
+  name: collision_leg2_lower_link0
+  pose:
+    matrix:
+    - [1.0, -1.0e-06, 1.0e-06, 0.112339]
+    - [-1.0e-06, -0.02761, 0.999619, 0]
+    - [-1.0e-06, -0.999619, -0.02761, 0.004949]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.59841, 1.0e-06, -1.0e-06]
+    rotation_quaternion: [0.697277, -0.716802, 0, 0]
+    translation: [0.112339, 0, 0.004949]
+- geometry:
+    geometryType: box
+    size: [0.189322, 0.034489, 0.032175]
+  geometryType: box
+  mass: 0.3438
+  name: collision_leg0_lower_link0
+  pose:
+    matrix:
+    - [1.0, 0, 1.0e-06, 0.112339]
+    - [-1.0e-06, 0.04758, 0.998867, 0]
+    - [0, -0.998867, 0.04758, 0.004986]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.523198, 0, -1.0e-06]
+    rotation_quaternion: [0.723733, -0.69008, 0, 0]
+    translation: [0.112339, 0, 0.004986]
+- geometry: {geometryType: sphere, radius: 0.025958}
+  geometryType: sphere
+  mass: 0.15
+  name: collision_leg0_foot
+  pose:
+    matrix:
+    - [0, 0.002907, -0.999996, 0]
+    - [0, 0.999996, 0.002907, 0]
+    - [1.0, 0, 0, 0.103157]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-0.002907, -1.570796, 0]
+    rotation_quaternion: [0.707106, -0.001028, -0.707106, -0.001028]
+    translation: [0, 0, 0.103157]
+- geometry:
+    geometryType: box
+    size: [0.189322, 0.034489, 0.032175]
+  geometryType: box
+  mass: 0.3438
+  name: collision_leg1_lower_link0
+  pose:
+    matrix:
+    - [1.0, 2.0e-06, 0, -0.112339]
+    - [0, 0.006583, -0.999978, 0]
+    - [-2.0e-06, 0.999978, 0.006583, -0.004986]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.564214, 2.0e-06, 0]
+    rotation_quaternion: [0.70943, 0.704776, 0, 0]
+    translation: [-0.112339, 0, -0.004986]
+- geometry: {geometryType: sphere, radius: 0.025893}
+  geometryType: sphere
+  mass: 0.15
+  name: collision_leg2_foot
+  pose:
+    matrix:
+    - [0, 0, -1.0, 0]
+    - [0, 1.0, 0, 0]
+    - [1.0, 0, 0, 0.125756]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, -1.570796, 0]
+    rotation_quaternion: [0.707107, 0, -0.707107, 0]
+    translation: [0, 0, 0.125756]
+- geometry:
+    geometryType: box
+    size: [0.099, 0.067882, 0.069866]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg0_motor0_an
+  pose:
+    matrix:
+    - [0, 0, 1.0, -0.010689]
+    - [0, 1.0, 0, -0.2165]
+    - [-1.0, 0, 0, -0.078454]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570796, 0]
+    rotation_quaternion: [0.707107, 0, 0.707107, 0]
+    translation: [-0.010689, -0.2165, -0.078454]
+- geometry:
+    geometryType: box
+    size: [0.099, 0.067882, 0.069866]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg2_motor0_an
+  pose:
+    matrix:
+    - [0, -1.0, 0, -0.066721]
+    - [1.0, 0, 0, 0.147307]
+    - [0, 0, 1.0, 0.047555]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 1.570796]
+    rotation_quaternion: [0.707107, 0, 0, 0.707107]
+    translation: [-0.066721, 0.147307, 0.047555]
+- geometry:
+    geometryType: box
+    size: [0.073, 0.064, 0.0952]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg5_motor1_an
+  pose:
+    matrix:
+    - [2.0e-06, 0, 1.0, 0.0086]
+    - [1.0e-06, 1.0, 0, 0]
+    - [-1.0, 1.0e-06, 2.0e-06, 0.054114]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0.741729, 1.570794, 0.741728]
+    rotation_quaternion: [0.707107, 0, 0.707106, 0]
+    translation: [0.0086, 0, 0.054114]
+- coll_bitmask: 0
+  geometry:
+    geometryType: box
+    size: [0.05, 0.05, 0.02]
+  geometryType: box
+  group: 2
+  id: 5
+  mass: 0.1
+  name: imu
+  pose:
+    matrix:
+    - [-0.965926, 0.006775, -0.258729, 0.208997]
+    - [0, 0.999657, 0.026177, 0]
+    - [0.258818, 0.025285, -0.965595, 0.053925]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-0.02618, -2.879794, 0]
+    rotation_quaternion: [0.130514, -0.001709, -0.99136, -0.012978]
+    translation: [0.208997, 0, 0.053925]
+- geometry:
+    geometryType: box
+    size: [0.189322, 0.034491, 0.032178]
+  geometryType: box
+  mass: 0.3438
+  name: collision_leg4_lower_link0
+  pose:
+    matrix:
+    - [1.0, 4.0e-06, 8.0e-06, 0.112339]
+    - [-7.0e-06, -0.013766, 0.999905, 0]
+    - [4.0e-06, -0.999905, -0.013766, -0.005048]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.584563, -4.0e-06, -7.0e-06]
+    rotation_quaternion: [0.702223, -0.711957, 1.0e-06, -4.0e-06]
+    translation: [0.112339, 0, -0.005048]
+- geometry: {geometryType: sphere, radius: 0.025981}
+  geometryType: sphere
+  mass: 0.15
+  name: collision_leg4_foot
+  pose:
+    matrix:
+    - [0, 0.025478, -0.999675, 0]
+    - [0, 0.999675, 0.025478, 0]
+    - [1.0, 0, 0, 0.104757]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-0.025481, -1.570796, 0]
+    rotation_quaternion: [0.70705, -0.009009, -0.707049, -0.009009]
+    translation: [0, 0, 0.104757]
+- geometry:
+    geometryType: box
+    size: [0.071513, 0.098674, 0.060898]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg1_motor3_an
+  pose:
+    matrix:
+    - [1.0, 0, -5.0e-06, -0.2155]
+    - [-5.0e-06, 0.050391, -0.99873, -0.000145]
+    - [0, 0.99873, 0.050391, -0.002888]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.520384, 0, -5.0e-06]
+    rotation_quaternion: [0.724704, 0.689061, -2.0e-06, -2.0e-06]
+    translation: [-0.2155, -0.000145, -0.002888]
+- geometry:
+    geometryType: box
+    size: [0.073, 0.064, 0.0952]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg3_motor1_an
+  pose:
+    matrix:
+    - [2.0e-06, 0, 1.0, 0.0086]
+    - [1.0e-06, 1.0, 0, 0]
+    - [-1.0, 1.0e-06, 2.0e-06, 0.054154]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0.748821, 1.570794, 0.74882]
+    rotation_quaternion: [0.707107, 0, 0.707106, 0]
+    translation: [0.0086, 0, 0.054154]
+- geometry: {geometryType: sphere, radius: 0.025981}
+  geometryType: sphere
+  mass: 0.15
+  name: collision_leg5_foot
+  pose:
+    matrix:
+    - [0, 0, 1.0, 0]
+    - [0, 1.0, 0, 0]
+    - [-1.0, 0, 0, 0.104757]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570795, 0]
+    rotation_quaternion: [0.707107, 0, 0.707107, 0]
+    translation: [0, 0, 0.104757]
+- geometry:
+    geometryType: box
+    size: [0.071513, 0.098674, 0.060898]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg2_motor3_an
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0.1955]
+    - [0, -2.0e-06, 1.0, 0]
+    - [0, -1.0, -2.0e-06, 0.002816]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.570798, 0, 0]
+    rotation_quaternion: [0.707106, -0.707107, 0, 0]
+    translation: [0.1955, 0, 0.002816]
+- geometry:
+    geometryType: box
+    size: [0.189322, 0.034489, 0.032174]
+  geometryType: box
+  mass: 0.3438
+  name: collision_leg5_lower_link0
+  pose:
+    matrix:
+    - [-1.0, 0, 2.0e-06, 0.112339]
+    - [2.0e-06, 5.0e-06, 1.0, 0]
+    - [0, 1.0, -5.0e-06, 0.005049]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-1.570791, 3.141593, -2.0e-06]
+    rotation_quaternion: [0, 0, 0.707109, 0.707105]
+    translation: [0.112339, 0, 0.005049]
+- geometry:
+    geometryType: box
+    size: [0.064, 0.0952, 0.073]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg5_motor2_an
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0]
+    - [0, 1.0, 0, 0.0014]
+    - [0, 0, 1.0, -0.054077]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 0]
+    rotation_quaternion: [1.0, 0, 0, 0]
+    translation: [0, 0.0014, -0.054077]
+- geometry:
+    geometryType: box
+    size: [0.099, 0.067882, 0.069866]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg4_motor0_an
+  pose:
+    matrix:
+    - [0, -1.0, 0, -0.326921]
+    - [1.0, 0, 0, 0.071224]
+    - [0, 0, 1.0, 0.003055]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, 1.570796]
+    rotation_quaternion: [0.707107, 0, 0, 0.707107]
+    translation: [-0.326921, 0.071224, 0.003055]
+- geometry:
+    geometryType: box
+    size: [0.073, 0.064, 0.0952]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg2_motor1_an
+  pose:
+    matrix:
+    - [0, 0, 1.0, 0.0086]
+    - [0, 1.0, 0, 0]
+    - [-1.0, 0, 0, -0.054154]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 1.570796, 0]
+    rotation_quaternion: [0.707107, 0, 0.707107, 0]
+    translation: [0.0086, 0, -0.054154]
+- geometry:
+    geometryType: box
+    size: [0.189322, 0.034491, 0.032178]
+  geometryType: box
+  mass: 0.3438
+  name: collision_leg3_lower_link0
+  pose:
+    matrix:
+    - [-1.0, -2.0e-06, -4.0e-06, 0.112339]
+    - [-4.0e-06, -0.014648, 0.999893, 0]
+    - [-2.0e-06, 0.999893, 0.014648, -0.004949]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.556148, 2.0e-06, -3.141588]
+    rotation_quaternion: [0, -2.0e-06, 0.701909, 0.712267]
+    translation: [0.112339, 0, -0.004949]
+- geometry:
+    geometryType: box
+    size: [0.099, 0.067882, 0.069866]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg5_motor0_an
+  pose:
+    matrix:
+    - [1.0e-06, 1.0, 0, -0.326921]
+    - [-1.0, 1.0e-06, 0, -0.069776]
+    - [0, 0, 1.0, 0.003055]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [0, 0, -1.570795]
+    rotation_quaternion: [0.707107, 0, 0, -0.707106]
+    translation: [-0.326921, -0.069776, 0.003055]
+- geometry:
+    geometryType: box
+    size: [0.071513, 0.098671, 0.0609]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg3_motor3_an
+  pose:
+    matrix:
+    - [1.0, -1.0e-06, 3.0e-06, -0.1955]
+    - [3.0e-06, -0.01756, -0.999846, 0]
+    - [1.0e-06, 0.999846, -0.01756, -0.002816]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.588357, -1.0e-06, 3.0e-06]
+    rotation_quaternion: [0.700871, 0.713288, 0, 2.0e-06]
+    translation: [-0.1955, 0, -0.002816]
+- geometry: {geometryType: sphere, radius: 0.025893}
+  geometryType: sphere
+  mass: 0.15
+  name: collision_leg3_foot
+  pose:
+    matrix:
+    - [0, -0.011637, 0.999932, 0]
+    - [0, 0.999932, 0.011637, 0]
+    - [-1.0, 0, 0, 0.125756]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [-0.011638, 1.570795, 0]
+    rotation_quaternion: [0.707095, -0.004115, 0.707095, 0.004114]
+    translation: [0, 0, 0.125756]
+- geometry:
+    geometryType: box
+    size: [0.064, 0.0952, 0.073]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg0_motor2_an
+  pose:
+    matrix:
+    - [-1.0, -1.0e-06, 1.0e-06, 0]
+    - [-1.0e-06, 1.0, -1.0e-06, -0.0014]
+    - [-1.0e-06, -1.0e-06, -1.0, 0.054209]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [1.0e-06, 3.141592, 1.0e-06]
+    rotation_quaternion: [0, 0, 1.0, 0]
+    translation: [0, -0.0014, 0.054209]
+- geometry:
+    geometryType: box
+    size: [0.064, 0.0952, 0.073]
+  geometryType: box
+  mass: 0.32
+  name: collision_leg4_motor2_an
+  pose:
+    matrix:
+    - [1.0, 0, 0, 0]
+    - [0, -1.0, 0, 0.0014]
+    - [0, 0, -1.0, 0.054077]
+    - [0, 0, 0, 1.0]
+    rotation_euler: [3.141592, 0, 0]
+    rotation_quaternion: [0, 1.0, 0, 0]
+    translation: [0, 0.0014, 0.054077]
