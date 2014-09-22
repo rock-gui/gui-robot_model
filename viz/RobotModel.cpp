@@ -11,6 +11,7 @@
 #include "osg/Geometry"
 #include "osg/Image"
 #include "osg/Material"
+#include "osg/ShapeDrawable"
 //#include <resource_retriever/retriever.h>
 //#include "ros/ros.h"
 #include "OSGHelpers.hpp"
@@ -87,7 +88,34 @@ void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir baseD
             LOG_ERROR("Unecpected error loading mesh file %s", mesh->filename.c_str());
             throw(std::runtime_error("Couldn't load mesh file."));
         }
+    }
+    else if(visual && visual->geometry->type == urdf::Geometry::BOX){
+        urdf::Box* box = dynamic_cast<urdf::Box*>(visual->geometry.get());
+        osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3d(0,0,0), box->dim.x, box->dim.y, box->dim.z));
+        osg_visual = new osg::Geode;
+        osg_visual->asGeode()->addDrawable(drawable);
+    }
+    else if(visual && visual->geometry->type == urdf::Geometry::CYLINDER){
+        urdf::Cylinder* cylinder = dynamic_cast<urdf::Cylinder*>(visual->geometry.get());
+        osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Cylinder(osg::Vec3d(0,0,0), cylinder->radius, cylinder->length));
 
+        osg_visual = new osg::Geode;
+        osg_visual->asGeode()->addDrawable(drawable);
+    }
+    else if(visual && visual->geometry->type == urdf::Geometry::SPHERE){
+        urdf::Sphere* sphere = dynamic_cast<urdf::Sphere*>(visual->geometry.get());
+         osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Sphere(osg::Vec3d(0,0,0), sphere->radius));
+
+        osg_visual = new osg::Geode;
+        osg_visual->asGeode()->addDrawable(drawable);
+    }
+    else
+    {
+        osg_visual = new osg::Geode;
+    }
+
+    //Set material
+    if(visual){
         if(visual->material){
             osg::ref_ptr<osg::StateSet> nodess = osg_visual->getOrCreateStateSet();
             nodess->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
@@ -106,10 +134,6 @@ void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir baseD
             //Attaching the newly defined state set object to the node state set
             nodess->setAttribute(nodematerial.get());
         }
-    }
-    else
-    {
-        osg_visual = new osg::Geode;
     }
 
     to_visual->addChild(osg_visual);
