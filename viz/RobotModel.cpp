@@ -12,6 +12,8 @@
 #include "osg/Image"
 #include "osg/Material"
 #include "osg/ShapeDrawable"
+#include "osg/TextureRectangle"
+#include "osg/TexMat"
 //#include <resource_retriever/retriever.h>
 //#include "ros/ros.h"
 #include "OSGHelpers.hpp"
@@ -121,6 +123,24 @@ void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir baseD
             nodess->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
 
             osg::ref_ptr<osg::Material> nodematerial = new osg::Material;
+
+            std::string filename = visual->material->texture_filename;
+            if(filename != ""){
+                QString qfilename = QString::fromStdString(visual->material->texture_filename);
+                if (QFileInfo(qfilename).isRelative())
+                    filename = baseDir.absoluteFilePath(qfilename).toStdString();
+                osg::ref_ptr<osg::Image> texture_img = osgDB::readImageFile(filename);
+                if(!texture_img){
+                    std::stringstream ss;
+                    ss << "Could not load texture from file '"<<visual->material->texture_filename<<"'.";
+                    throw(std::runtime_error(ss.str()));
+                }
+                osg::ref_ptr<osg::TextureRectangle> texture_rect = osg::ref_ptr<osg::TextureRectangle>(new osg::TextureRectangle(texture_img));
+                osg::ref_ptr<osg::TexMat> texmat = new osg::TexMat;
+                texmat->setScaleByTextureRectangleSize(true);
+                nodess->setTextureAttributeAndModes(0, texture_rect, osg::StateAttribute::ON);
+                nodess->setTextureAttributeAndModes(0, texmat, osg::StateAttribute::ON);
+            }
             //Specifying the colour of the object
             nodematerial->setDiffuse(osg::Material::FRONT,osg::Vec4(visual->material->color.r,
                                                                     visual->material->color.g,
