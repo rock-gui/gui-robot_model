@@ -23,19 +23,27 @@
 #include <fstream>
 #include <streambuf>
 
-OSGSegment::OSGSegment(osg::Node* node, KDL::Segment seg)
+OSGSegment::OSGSegment(KDL::Segment seg)
 {
     isSelected_=false;
     seg_ = seg;
     jointPos_ = 0;
     label_ = 0;
     visual_ = 0;
-    toTipOsg_ = node->asTransform()->asPositionAttitudeTransform();
+    post_transform_ = new osg::Group();
+    toTipOsg_ = new osg::PositionAttitudeTransform();
+    toTipOsg_->addChild(post_transform_);
+    toTipOsg_->setName(seg_.getJoint().getName());
+
+    post_transform_->setUserData( this );
+    post_transform_->setUpdateCallback(new OSGSegmentCallback);
+    toTipOsg_->setUserData(this);
+
     updateJoint();
 }
 
 osg::ref_ptr<osg::Group> OSGSegment::getGroup() const{
-    return toTipOsg_;
+    return post_transform_;
 }
 
 void OSGSegment::updateJoint(){
@@ -60,8 +68,7 @@ void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir baseD
     osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
     if (visual)
         urdf_to_osg(visual->origin, *to_visual);
-    toTipOsg_->addChild(to_visual);
-    toTipOsg_->setName(seg_.getJoint().getName());
+    post_transform_->addChild(to_visual);
 
     osg::Node* osg_visual = 0;
     if(visual && visual->geometry->type == urdf::Geometry::MESH){
@@ -164,7 +171,7 @@ void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir baseD
 
 void OSGSegment::removeLabel(){
     if(label_)
-        toTipOsg_->removeChild(label_);
+        post_transform_->removeChild(label_);
     label_ = 0;
 }
 
@@ -213,7 +220,7 @@ void OSGSegment::attachLabel(std::string name, std::string filepath){
 
     set->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON);
 
-    toTipOsg_->addChild(geode);
+    post_transform_->addChild(geode);
 
     geode->setStateSet(set);
     geode->setName(name);
@@ -254,10 +261,12 @@ RobotModel::RobotModel(){
     //Root is the entry point to the scene graph
     osg::Group* root = new osg::Group();
     root_ = root;
+    original_root_ = new osg::Group();
     loadEmptyScene();
 }
 
 osg::Node* RobotModel::loadEmptyScene(){
+    original_root_->removeChildren(0, original_root_->getNumChildren());
     root_->removeChildren(0, root_->getNumChildren());
     jointNames_.clear();
     segmentNames_.clear();
@@ -265,13 +274,8 @@ osg::Node* RobotModel::loadEmptyScene(){
 }
 
 osg::Node* RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::Group* root){
-    osg::PositionAttitudeTransform* joint_forward = new osg::PositionAttitudeTransform();
-    OSGSegment* seg = new OSGSegment(joint_forward, kdl_seg);
-
-    joint_forward->setUserData( seg );
-    joint_forward->setUpdateCallback(new OSGSegmentCallback);
-
-    root->addChild(joint_forward);
+    OSGSegment* seg = new OSGSegment(kdl_seg);
+    root->addChild(seg->toTipOsg_);
 
     //Attach one visual to joint
     if (urdf_link.visual_array.size() == 0)
@@ -286,7 +290,7 @@ osg::Node* RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg:
          seg->attachVisuals(visual_array, rootPrefix);
     }
 
-    return joint_forward;
+    return seg->getGroup();
 }
 
 osg::Node* RobotModel::makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_model ){
@@ -308,7 +312,8 @@ osg::Node* RobotModel::makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_mod
     //element here corresponds to the hook of the
     //previous depth level in the tree.
     link_buffer.push_back(urdf_model->getRoot()); //Initialize buffers with root
-    hook_buffer.push_back(root_);
+    hook_buffer.push_back(original_root_);
+    original_root_name_ = urdf_model->getRoot()->name;
     while(!link_buffer.empty()){
         //get current node in buffer
         urdf_link = link_buffer.back();
@@ -338,6 +343,8 @@ osg::Node* RobotModel::makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_mod
         for(uint i=0; i<urdf_link->child_links.size(); i++)
             hook_buffer.push_back(new_hook);
     }
+    relocateRoot(urdf_model->getRoot()->name);
+
     return root_;
 }
 
@@ -358,19 +365,42 @@ osg::Node* RobotModel::load(QString path){
 
 OSGSegment* RobotModel::getSegment(std::string name)
 {
-    osg::Node* node = findNamedNode(name, root_);
-    if(!node)
+    osg::Node* node = findNamedNode(name, original_root_);
+    if(!node){
+        std::cerr << "Could not find segment with name: " << name << std::endl;
         return 0;
+    }
 
     OSGSegment* jnt = dynamic_cast<OSGSegment*>(node->getUserData());
-    if(!jnt)
-        return 0;
+    if(!jnt){
+        std::cerr << "Could not retrieve user data from node "<<name<<std::endl;
+    }
+    assert(jnt);
     return jnt;
+}
+
+bool RobotModel::relocateRoot(std::string name){
+    OSGSegment* seg = getSegment(name);
+    if(seg){
+        root_->removeChildren(0, root_->getNumChildren());
+        root_->addChild(seg->post_transform_);
+    }
+    else{
+        std::cerr << "Segment " << name << " is unknown! Could not relocate root!" << std::endl;
+        std::cerr << "Known segments:\n";
+        std::vector<std::string> names = getSegmentNames();
+        for(uint i=0; i<names.size(); i++)
+            std::cerr << "  - "<<names[i]<<"\n";
+        std::cerr<<std::endl;
+        return false;
+    }
+    current_root_name_ = name;
+    return true;
 }
 
 bool RobotModel::setJointState(std::string jointName, double jointVal)
 {
-    osg::Node* node = findNamedNode(jointName, root_);
+    osg::Node* node = findNamedNode(jointName, original_root_);
     if(!node)
         return false;
 
@@ -383,7 +413,7 @@ bool RobotModel::setJointState(const std::map<std::string, double>& jointVals)
 {
     for (std::map<std::string, double>::const_iterator it=jointVals.begin();
          it!=jointVals.end(); ++it){
-        osg::Node* node = findNamedNode( it->first, root_);
+        osg::Node* node = findNamedNode( it->first, original_root_);
         if(!node)
             return false;
 

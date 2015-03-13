@@ -22,6 +22,7 @@ class RobotVisualization
     Q_PROPERTY(bool framesEnabled READ areFramesEnabled WRITE setFramesEnabled)
     Q_PROPERTY(double jointsSize READ getJointsSize WRITE setJointsSize)
     Q_PROPERTY(bool followModelWithCamera READ getFollowModelWithCamera WRITE setFollowModelWithCamera)
+    Q_PROPERTY(QString rootLink READ getRootLink WRITE setRootLink)
 
 public:
     RobotVisualization();
@@ -37,6 +38,16 @@ public:
     {vizkit3d::Vizkit3DPlugin<base::samples::Joints>::updateData(sample);}
 
 public slots:
+    void setRootLink(QString segment_name){
+        bool st= relocateRoot(segment_name.toStdString());
+        if(!st){
+            QMessageBox::critical(NULL, "vizkit3d::RobotVisualization", "Could not set root link to "+segment_name+"."\
+                                 "Does this body part exist?");
+        }
+    }
+    QString getRootLink()
+    {return QString(current_root_name_.c_str());}
+
     bool areFramesEnabled() const;
     void setFramesEnabled(bool value);
     /** Joints Frame using RigidBodyStateVisualization
@@ -52,6 +63,8 @@ public slots:
      */
     bool getFollowModelWithCamera() const;
     void setFollowModelWithCamera(bool value);
+
+    void handlePropertyChanged(QString);
 
 
 protected:

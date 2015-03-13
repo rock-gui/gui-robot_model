@@ -25,12 +25,33 @@ RobotVisualization::RobotVisualization()
     this->joints_size = 0.1;
     this->modelPos = new osg::PositionAttitudeTransform();
     this->followModelWithCamera = false;
+    connect(this, SIGNAL(propertyChanged(QString)), this, SLOT(handlePropertyChanged(QString)));
 }
 
 RobotVisualization::~RobotVisualization()
 {
     delete p;
     deleteFrameVisualizers();
+}
+
+void RobotVisualization::handlePropertyChanged(QString property){
+    if(property == "frame"){
+        std::vector<std::string>::iterator it;
+        it = std::find(segmentNames_.begin(), segmentNames_.end(), getVisualizationFrame().toStdString());
+        if(it != segmentNames_.end()){
+            setRootLink(getVisualizationFrame());
+        }
+        else{
+            if(getVisualizationFrame() != "world_osg"){
+                QMessageBox::information(NULL, "vizkit3d::RobotVisualization", "The visualization frame was changed to "+getVisualizationFrame()+", but "\
+                                         "this is not a known body part. Make sure to set 'rootFrame' to a reasonable body part name.");
+            }
+            else{ //Its world_osg, set to original root if it was determined yet
+                if(original_root_name_ != "")
+                    setRootLink(original_root_name_.c_str());
+            }
+        }
+    }
 }
 
 void RobotVisualization::setModelFile(QString modelFile)
@@ -54,6 +75,7 @@ void RobotVisualization::setModelFile(QString modelFile)
     for (std::size_t i = 0; i != segments.size(); ++i)
     {
         OSGSegment* segment = getSegment(segments[i]);
+        assert(segment);
         vizkit3d::RigidBodyStateVisualization* frame =
                 new vizkit3d::RigidBodyStateVisualization(this);
         frame->setPluginName(QString::fromStdString(segments[i]));
@@ -118,10 +140,7 @@ osg::ref_ptr<osg::Node> RobotVisualization::createMainNode()
 
 void RobotVisualization::updateMainNode ( osg::Node* node )
 {
-    osg::Geode* geode = static_cast<osg::Geode*>(node);
-
     // Update the main node using the data in p->pos
-
     if (p->pos.hasValidPosition()){
 		osg::Vec3d position(p->pos.position.x(), p->pos.position.y(), p->pos.position.z());
 		modelPos->setPosition(position);

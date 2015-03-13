@@ -36,7 +36,7 @@ public:
  * @param node: The Node this OSGSegment is attached to. Should be the joint transform
  * @param seg: KDL segment corresponding to the node.
  */
-    OSGSegment(osg::Node* node, KDL::Segment seg);
+    OSGSegment(KDL::Segment seg);
 
     /**
      * @brief Set position of joint
@@ -108,6 +108,7 @@ private:
     KDL::Segment seg_; /**< KDKL representation of the segment */
     KDL::Frame toTipKdl_; /**< Temp storage for the current joint pose */
     osg::PositionAttitudeTransform* toTipOsg_; /**< The osg node for the joint pose */
+    osg::Group* post_transform_;
     float jointPos_; /**< Current joint position in radians */
     osg::Geode* visual_; /**< OSG node for visual element */
     osg::Geode* label_; /**< OSG node for label */
@@ -208,12 +209,20 @@ public:
      */
     const std::vector<std::string>& getSegmentNames(){return segmentNames_;}
 
+    /**
+     * @brief Relocate the root to a given segment
+     */
+    bool relocateRoot(std::string name);
+
 protected:
     osg::Node* makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::Group* root);
     osg::Node* makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_model );
 
 protected:
     osg::Group* root_; /**< Root of the OSG scene containing the robot */
+    osg::Group* original_root_; /**< The original root always corresponding to the root of the URDF. If relocateRoot was called this get's not affected */
+    std::string current_root_name_;
+    std::string original_root_name_;
     std::vector<std::string> jointNames_; /**< Joint names defined in URDF (joint of type none are NOT included) */
     std::vector<std::string> segmentNames_; /**< Segment names defined in URDF */
     QDir rootPrefix;
