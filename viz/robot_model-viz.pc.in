@@ -5,7 +5,7 @@ includedir=${prefix}/include
 
 Name: robot_model-viz
 Description: vizKit plugin for the robot_model library
-Requires: robot_model @PKGCONFIG_DEPS@
+Requires: @PKGCONFIG_DEPS@ urdfdom kdl_parser
 Version: @PROJECT_VERSION@
 Libs: -L${libdir} -lrobot_model-viz
 Cflags: -I${includedir}
