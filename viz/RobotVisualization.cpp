@@ -54,6 +54,12 @@ void RobotVisualization::handlePropertyChanged(QString property){
     }
 }
 
+void RobotVisualization::highlightSegment(QString link_name){
+    bool highlighted = toggleHighlight(link_name.toStdString());
+    if(!highlighted)
+        toggleHighlight(link_name.toStdString());
+}
+
 void RobotVisualization::setModelFile(QString modelFile)
 {
     //Extact file extension

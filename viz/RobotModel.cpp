@@ -426,8 +426,8 @@ bool RobotModel::setJointState(const std::map<std::string, double>& jointVals)
 bool RobotModel::toggleHighlight(std::string name)
 {
     OSGSegment* seg = getSegment(name);
-    if(!seg)
-        return false;
+    assert(seg);
+
     seg->toggleSelected();
-    return true;
+    return seg->isSelected_;
 }

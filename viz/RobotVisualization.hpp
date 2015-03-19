@@ -58,6 +58,8 @@ public slots:
     */
     void setJointsSize(double size);
 
+    void highlightSegment(QString);
+
     /**
      * camera rotation center follows the robot
      */
