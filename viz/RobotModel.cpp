@@ -17,6 +17,8 @@
 #include "OSGHelpers.hpp"
 #include <base/Logging.hpp>
 #include <QFileInfo>
+#include <osg/ShadeModel>
+#include <osgUtil/SmoothingVisitor>
 
 #include <fstream>
 #include <streambuf>
@@ -161,6 +163,10 @@ void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir baseD
             nodess->setAttribute(nodematerial.get());
         }
     }
+
+    //The smooting visitor calculates surface normals for correct shading
+    osgUtil::SmoothingVisitor sv;
+    osg_visual->accept(sv);
 
     to_visual->addChild(osg_visual);
     osg_visual->setUserData(this);
