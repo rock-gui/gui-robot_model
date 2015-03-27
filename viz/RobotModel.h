@@ -121,13 +121,13 @@ protected:
 private:
     KDL::Segment seg_; /**< KDKL representation of the segment */
     KDL::Frame toTipKdl_; /**< Temp storage for the current joint pose */
-    osg::PositionAttitudeTransform* toTipOsg_; /**< The osg node for the joint pose */
-    osg::Group* post_transform_;
+    osg::ref_ptr<osg::PositionAttitudeTransform> toTipOsg_; /**< The osg node for the joint pose */
+    osg::ref_ptr<osg::Group> post_transform_;
     float jointPos_; /**< Current joint position in radians */
-    osg::Geode* visual_; /**< OSG node for visual element */
-    osg::Geode* label_; /**< OSG node for label */
-    osgText::Text* text_label_;
-    osg::Geode* text_label_geode_;
+    osg::ref_ptr<osg::Geode> visual_; /**< OSG node for visual element */
+    osg::ref_ptr<osg::Geode> label_; /**< OSG node for label */
+    osg::ref_ptr<osgText::Text> text_label_;
+    osg::ref_ptr<osg::Geode> text_label_geode_;
     bool isSelected_; /**< Selection state */
 
     friend class InteractionHandler;
@@ -192,7 +192,7 @@ public:
      * @param path: Path to URDF file.
      * @return osg::Node: Root node of the constructed OSG scene for the robot.
      */
-    osg::Node* load(QString path);
+    osg::ref_ptr<osg::Node> load(QString path);
 
     /**
      * @brief Create an empty scene.
@@ -201,7 +201,7 @@ public:
      *
      * @return osg::Node: Root to the empty scene.
      */
-    osg::Node* loadEmptyScene();
+    osg::ref_ptr<osg::Node> loadEmptyScene();
 
     /**
      * @brief Retrieve an OSG Segment by Joint or Segment name.
@@ -209,7 +209,7 @@ public:
      * @param name: Name of joint or segment (from URDF file)
      * @return OSGSegment
      */
-    OSGSegment* getSegment(std::string name);
+    osg::ref_ptr<OSGSegment> getSegment(std::string name);
 
     /**
      * @brief Retrieve joint names of all joints defined in URDF file which are not of type KDL::Joint::None.
@@ -231,12 +231,12 @@ public:
     bool relocateRoot(std::string name);
 
 protected:
-    osg::Node* makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::Group* root);
-    osg::Node* makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_model );
+    osg::ref_ptr<osg::Node> makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root);
+    osg::ref_ptr<osg::Node> makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_model );
 
 protected:
-    osg::Group* root_; /**< Root of the OSG scene containing the robot */
-    osg::Group* original_root_; /**< The original root always corresponding to the root of the URDF. If relocateRoot was called this get's not affected */
+    osg::ref_ptr<osg::Group> root_; /**< Root of the OSG scene containing the robot */
+    osg::ref_ptr<osg::Group> original_root_; /**< The original root always corresponding to the root of the URDF. If relocateRoot was called this get's not affected */
     std::string current_root_name_;
     std::string original_root_name_;
     std::vector<std::string> jointNames_; /**< Joint names defined in URDF (joint of type none are NOT included) */

@@ -38,8 +38,8 @@ OSGSegment::OSGSegment(KDL::Segment seg)
     post_transform_->setUserData( this );
     post_transform_->setUpdateCallback(new OSGSegmentCallback);
     toTipOsg_->setUserData(this);
-    setupTextLabel();
 
+    setupTextLabel();
     updateJoint();
 }
 
@@ -184,10 +184,10 @@ void OSGSegment::attachLabel(std::string name, std::string filepath){
     if(label_)
         removeLabel();
 
-    osg::Geode *geode = new osg::Geode();
-    osg::Geometry *geometry = new osg::Geometry();
+    osg::ref_ptr<osg::Geode> geode = osg::ref_ptr<osg::Geode>(new osg::Geode());
+    osg::ref_ptr<osg::Geometry> geometry = osg::ref_ptr<osg::Geometry>(new osg::Geometry());
 
-    osg::Vec3Array* vertices = new osg::Vec3Array;
+    osg::ref_ptr<osg::Vec3Array> vertices = osg::ref_ptr<osg::Vec3Array>(new osg::Vec3Array);
     vertices->push_back (osg::Vec3 (0, 0, 0.0));
 
     geometry->setVertexArray (vertices);
@@ -195,14 +195,14 @@ void OSGSegment::attachLabel(std::string name, std::string filepath){
     geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS,0,vertices->size()));
 
     geode->addDrawable(geometry);
-    osg::StateSet *set = new osg::StateSet();
+    osg::ref_ptr<osg::StateSet> set = geode->getOrCreateStateSet();
 
     /// Setup the point sprites
-    osg::PointSprite *sprite = new osg::PointSprite();
+    osg::ref_ptr<osg::PointSprite> sprite = osg::ref_ptr<osg::PointSprite>(new osg::PointSprite());
     set->setTextureAttributeAndModes(0, sprite, osg::StateAttribute::ON);
 
     /// Give some size to the points to be able to see the sprite
-    osg::Point *point = new osg::Point();
+    osg::ref_ptr<osg::Point> point = osg::ref_ptr<osg::Point>(new osg::Point());
     point->setSize(50);
     set->setAttribute(point);
 
@@ -218,8 +218,8 @@ void OSGSegment::attachLabel(std::string name, std::string filepath){
     set->setAttributeAndModes(alpha_transparency_function.get(), osg::StateAttribute::ON );
 
     /// The texture for the sprites
-    osg::Texture2D *tex = new osg::Texture2D();
-    osg::Image* image = osgDB::readImageFile(filepath);
+    osg::ref_ptr<osg::Texture2D> tex = osg::ref_ptr<osg::Texture2D>(new osg::Texture2D());
+    osg::ref_ptr<osg::Image> image = osgDB::readImageFile(filepath);
     image->flipVertical();
     tex->setImage(image);
 
@@ -227,7 +227,6 @@ void OSGSegment::attachLabel(std::string name, std::string filepath){
 
     post_transform_->addChild(geode);
 
-    geode->setStateSet(set);
     geode->setName(name);
     geode->setUserData(this);
 
@@ -235,9 +234,9 @@ void OSGSegment::attachLabel(std::string name, std::string filepath){
 }
 
 void OSGSegment::setupTextLabel(){
-    text_label_ = new osgText::Text();
-    text_label_geode_ = new osg::Geode();
-    osg::StateSet *set = text_label_geode_->getOrCreateStateSet();
+    text_label_ = osg::ref_ptr<osgText::Text>(new osgText::Text());
+    text_label_geode_ = osg::ref_ptr<osg::Geode>(new osg::Geode());
+    osg::ref_ptr<osg::StateSet> set = text_label_geode_->getOrCreateStateSet();
     /// Disable depth test to avoid sort problems and Lighting
     set->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
     set->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
@@ -260,7 +259,6 @@ void OSGSegment::attachTextLabel(std::string text){
     if(text == ""){
         text = seg_.getName();
     }
-
     text_label_->setText(text);
     post_transform_->addChild(text_label_geode_);
 }
@@ -273,10 +271,10 @@ void OSGSegment::removeTextLabel()
 bool OSGSegment::toggleSelected(){
     isSelected_ = !isSelected_;
 
-    osg::Group* parent = visual_->getParent(0);
+    osg::ref_ptr<osg::Group> parent = visual_->getParent(0);
 
     if(isSelected_){
-        osgFX::Outline* scribe = new osgFX::Outline();
+        osg::ref_ptr<osgFX::Outline> scribe = osg::ref_ptr<osgFX::Outline>(new osgFX::Outline());
         scribe->setWidth(1);
         scribe->setColor(osg::Vec4(1,0,0,1));
         scribe->addChild(visual_);
@@ -300,13 +298,12 @@ bool OSGSegment::toggleSelected(){
 
 RobotModel::RobotModel(){
     //Root is the entry point to the scene graph
-    osg::Group* root = new osg::Group();
-    root_ = root;
-    original_root_ = new osg::Group();
+    root_ = osg::ref_ptr<osg::Group>(new osg::Group());
+    original_root_ = osg::ref_ptr<osg::Group>(new osg::Group());
     loadEmptyScene();
 }
 
-osg::Node* RobotModel::loadEmptyScene(){
+osg::ref_ptr<osg::Node> RobotModel::loadEmptyScene(){
     original_root_->removeChildren(0, original_root_->getNumChildren());
     root_->removeChildren(0, root_->getNumChildren());
     jointNames_.clear();
@@ -314,8 +311,8 @@ osg::Node* RobotModel::loadEmptyScene(){
     return root_;
 }
 
-osg::Node* RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::Group* root){
-    OSGSegment* seg = new OSGSegment(kdl_seg);
+osg::ref_ptr<osg::Node> RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root){
+    osg::ref_ptr<OSGSegment> seg = osg::ref_ptr<OSGSegment>(new OSGSegment(kdl_seg));
     root->addChild(seg->toTipOsg_);
 
     //Attach one visual to joint
@@ -334,7 +331,7 @@ osg::Node* RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg:
     return seg->getGroup();
 }
 
-osg::Node* RobotModel::makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_model ){
+osg::ref_ptr<osg::Node> RobotModel::makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_model ){
     //Parse also to KDL
     KDL::Tree tree;
     kdl_parser::treeFromUrdfModel(*urdf_model, tree);
@@ -345,11 +342,11 @@ osg::Node* RobotModel::makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_mod
     //
     boost::shared_ptr<const urdf::Link> urdf_link; //Temp Storage for current urdf link
     KDL::Segment kdl_segment; //Temp Storage for urrent KDL link (same as URDF, but already parsed to KDL)
-    osg::Node* hook = 0; //Node (from previous segment) to hook up next segment to
+    osg::ref_ptr<osg::Node> hook = 0; //Node (from previous segment) to hook up next segment to
 
     std::vector<boost::shared_ptr<const urdf::Link> > link_buffer; //Buffer for links we still need to visit
     //used after LIFO principle
-    std::vector<osg::Node*> hook_buffer;                  //Same as above but for hook. The top most
+    std::vector<osg::ref_ptr<osg::Node> > hook_buffer;                  //Same as above but for hook. The top most
     //element here corresponds to the hook of the
     //previous depth level in the tree.
     link_buffer.push_back(urdf_model->getRoot()); //Initialize buffers with root
@@ -372,7 +369,7 @@ osg::Node* RobotModel::makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_mod
         hook = hook_buffer.back();
         hook_buffer.pop_back();
         kdl_segment = tree.getSegment(urdf_link->name)->second.segment;
-        osg::Node* new_hook = makeOsg2(kdl_segment,
+        osg::ref_ptr<osg::Node> new_hook = makeOsg2(kdl_segment,
                                        *urdf_link, hook->asGroup());
 
         //Also store names of links and joints
@@ -389,7 +386,7 @@ osg::Node* RobotModel::makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_mod
     return root_;
 }
 
-osg::Node* RobotModel::load(QString path){
+osg::ref_ptr<osg::Node> RobotModel::load(QString path){
 
     loadEmptyScene();
 
@@ -404,15 +401,15 @@ osg::Node* RobotModel::load(QString path){
     return makeOsg(model);
 }
 
-OSGSegment* RobotModel::getSegment(std::string name)
+osg::ref_ptr<OSGSegment> RobotModel::getSegment(std::string name)
 {
-    osg::Node* node = findNamedNode(name, original_root_);
+    osg::ref_ptr<osg::Node> node = findNamedNode(name, original_root_);
     if(!node){
         std::cerr << "Could not find segment with name: " << name << std::endl;
         return 0;
     }
 
-    OSGSegment* jnt = dynamic_cast<OSGSegment*>(node->getUserData());
+    osg::ref_ptr<OSGSegment> jnt = dynamic_cast<OSGSegment*>(node->getUserData());
     if(!jnt){
         std::cerr << "Could not retrieve user data from node "<<name<<std::endl;
     }
@@ -421,7 +418,7 @@ OSGSegment* RobotModel::getSegment(std::string name)
 }
 
 bool RobotModel::relocateRoot(std::string name){
-    OSGSegment* seg = getSegment(name);
+    osg::ref_ptr<OSGSegment> seg = getSegment(name);
     if(seg){
         root_->removeChildren(0, root_->getNumChildren());
         root_->addChild(seg->post_transform_);
@@ -441,11 +438,11 @@ bool RobotModel::relocateRoot(std::string name){
 
 bool RobotModel::setJointState(std::string jointName, double jointVal)
 {
-    osg::Node* node = findNamedNode(jointName, original_root_);
+    osg::ref_ptr<osg::Node> node = findNamedNode(jointName, original_root_);
     if(!node)
         return false;
 
-    OSGSegment* jnt = dynamic_cast<OSGSegment*>(node->getUserData());
+    osg::ref_ptr<OSGSegment> jnt = dynamic_cast<OSGSegment*>(node->getUserData());
     jnt->setJointPos(jointVal);
     return true;
 }
@@ -454,11 +451,11 @@ bool RobotModel::setJointState(const std::map<std::string, double>& jointVals)
 {
     for (std::map<std::string, double>::const_iterator it=jointVals.begin();
          it!=jointVals.end(); ++it){
-        osg::Node* node = findNamedNode( it->first, original_root_);
+        osg::ref_ptr<osg::Node> node = findNamedNode( it->first, original_root_);
         if(!node)
             return false;
 
-        OSGSegment* jnt = dynamic_cast<OSGSegment*>(node->getUserData());
+        osg::ref_ptr<OSGSegment> jnt = dynamic_cast<OSGSegment*>(node->getUserData());
         jnt->setJointPos(it->second);
     }
     return true;
@@ -466,7 +463,7 @@ bool RobotModel::setJointState(const std::map<std::string, double>& jointVals)
 
 bool RobotModel::toggleHighlight(std::string name)
 {
-    OSGSegment* seg = getSegment(name);
+    osg::ref_ptr<OSGSegment> seg = getSegment(name);
     assert(seg);
 
     seg->toggleSelected();

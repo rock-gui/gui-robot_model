@@ -58,7 +58,6 @@ public slots:
     /** Joints Frame using RigidBodyStateVisualization
     */
     void setJointsSize(double size);
-
     void highlightSegment(QString);
     void showSegmentName(QString);
     void hideSegmentName(QString link_name);
