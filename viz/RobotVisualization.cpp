@@ -61,12 +61,12 @@ void RobotVisualization::highlightSegment(QString link_name){
         toggleHighlight(link_name.toStdString());
 }
 
-void RobotVisualization::showSegmentName(QString link_name){
+void RobotVisualization::showSegmentText(QString link_name, QString text){
     OSGSegment* seg = getSegment(link_name.toStdString());
-    seg->attachTextLabel();
+    seg->attachTextLabel(text.toStdString());
 }
 
-void RobotVisualization::hideSegmentName(QString link_name){
+void RobotVisualization::hideSegmentText(QString link_name){
     OSGSegment* seg = getSegment(link_name.toStdString());
     seg->removeTextLabel();
 }
