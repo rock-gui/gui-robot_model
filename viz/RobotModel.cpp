@@ -14,8 +14,6 @@
 #include "osg/ShapeDrawable"
 #include "osg/TextureRectangle"
 #include "osg/TexMat"
-//#include <resource_retriever/retriever.h>
-//#include "ros/ros.h"
 #include "OSGHelpers.hpp"
 #include <base/Logging.hpp>
 #include <QFileInfo>
