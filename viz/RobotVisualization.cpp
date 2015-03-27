@@ -134,6 +134,11 @@ void RobotVisualization::setFramesEnabled(bool value)
 void RobotVisualization::setFrameEnabled(QString segment_name, bool value, double size){
     map<string, RigidBodyStateVisualization*>::iterator it;
     it=_frameVisualizers.find(segment_name.toStdString());
+
+    if(size<0){
+        size = joints_size;
+    }
+
     if(it == _frameVisualizers.end()){
         std::clog << "Tried to enable frame display of link " << segment_name.toStdString() << ", but could not find it." << std::endl;
         return;
