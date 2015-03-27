@@ -281,7 +281,7 @@ bool OSGSegment::toggleSelected(){
     isSelected_ = !isSelected_;
 
     if(!visual_){
-        std::clog << "Tried to highligt " << seg_.getName() << ", but it has no visual." << std::endl;
+        std::clog << "Tried to highlight " << seg_.getName() << ", but it has no visual." << std::endl;
         return false;
     }
     osg::ref_ptr<osg::Group> parent = visual_->getParent(0);
@@ -291,7 +291,7 @@ bool OSGSegment::toggleSelected(){
         scribe->setWidth(1);
         scribe->setColor(osg::Vec4(1,0,0,1));
         scribe->addChild(visual_);
-        parent->replaceChild(visual_,scribe);
+        parent->replaceChild(visual_, scribe);
     }
     else{
         //node already picked so we want to remove marker to unpick it.
@@ -446,6 +446,7 @@ bool RobotModel::relocateRoot(std::string name){
         return false;
     }
     current_root_name_ = name;
+
     return true;
 }
 
