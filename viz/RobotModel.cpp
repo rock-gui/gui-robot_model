@@ -237,13 +237,14 @@ void OSGSegment::setupTextLabel(){
     text_label_ = osg::ref_ptr<osgText::Text>(new osgText::Text());
     text_label_geode_ = osg::ref_ptr<osg::Geode>(new osg::Geode());
     osg::ref_ptr<osg::StateSet> set = text_label_geode_->getOrCreateStateSet();
-    /// Disable depth test to avoid sort problems and Lighting
+    /// Disable depth test and Lighting
     set->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
     set->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
     text_label_geode_->addDrawable(text_label_);
 
     //Text should be rather small and be always readable on the screen
-    text_label_->setCharacterSize(0.05);
+    text_label_->setCharacterSizeMode(osgText::Text::SCREEN_COORDS);
+    text_label_->setCharacterSize(18);
     text_label_->setFont("/fonts/arial.ttf");
     text_label_->setAxisAlignment(osgText::Text::SCREEN);
 
