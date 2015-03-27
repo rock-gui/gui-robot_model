@@ -240,29 +240,33 @@ void RobotVisualization::setJointsSize(double size)
         it->second->resetModel(joints_size);
 }
 
-void RobotVisualization::updateDataIntern(base::samples::Joints const& value)
-{
+void RobotVisualization::setJointsState(const base::samples::Joints &sample){
     vector<string> names = getJointNames();
-    if (value.hasNames())
-        names = value.names;
-    if (names.size() != value.elements.size())
+    if (sample.hasNames())
+        names = sample.names;
+    if (names.size() != sample.elements.size())
         throw std::runtime_error("RobotVisualization::updateDataIntern: state vector size and expected joint size differ, and there are no names in the Joints sample");
 
     for(uint i=0; i<names.size(); i++){
-        if(base::isUnknown(value[i].position) || base::isInfinity(value[i].position)){
+        if(base::isUnknown(sample[i].position) || base::isInfinity(sample[i].position)){
             if(names.size()){
-                LOG_ERROR("Position of joint %s is invalid: %d", value.names[i].c_str(), value[i].position);
+                LOG_ERROR("Position of joint %s is invalid: %d", sample.names[i].c_str(), sample[i].position);
             }
             else{
-                LOG_ERROR("Position of joint %d is invalid: %d", i, value[i].position);
+                LOG_ERROR("Position of joint %d is invalid: %d", i, sample[i].position);
             }
             //throw std::runtime_error("RobotVisualization::updateDataIntern: invalid joint position detected.");
             setJointState(names[i], 0);
         }
         else{
-            setJointState(names[i], value[i].position);
+            setJointState(names[i], sample[i].position);
         }
     }
+}
+
+void RobotVisualization::updateDataIntern(base::samples::Joints const& sample)
+{
+    setJointsState(sample);
 }
 
 void RobotVisualization::updateDataIntern(base::samples::RigidBodyState const& pos){

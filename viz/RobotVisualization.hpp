@@ -75,12 +75,13 @@ public slots:
     void setFollowModelWithCamera(bool value);
 
     void handlePropertyChanged(QString);
+    void setJointsState(base::samples::Joints const& sample);
 
 
 protected:
     virtual osg::ref_ptr<osg::Node> createMainNode();
     virtual void updateMainNode(osg::Node* node);
-    virtual void updateDataIntern(base::samples::Joints const& plan);
+    virtual void updateDataIntern(base::samples::Joints const& sample);
     virtual void updateDataIntern(base::samples::RigidBodyState const& pos);
 
     void deleteFrameVisualizers();
