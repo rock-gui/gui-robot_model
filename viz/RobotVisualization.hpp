@@ -59,6 +59,7 @@ public slots:
     */
     void setJointsSize(double size);
     void highlightSegment(QString);
+    void deHighlightSegment(QString);
     //If no text is given, the segment name in written
     void showSegmentText(QString link_name, QString text="");
     void hideSegmentText(QString link_name);
