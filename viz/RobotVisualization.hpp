@@ -23,6 +23,7 @@ class RobotVisualization
     Q_PROPERTY(double jointsSize READ getJointsSize WRITE setJointsSize)
     Q_PROPERTY(bool followModelWithCamera READ getFollowModelWithCamera WRITE setFollowModelWithCamera)
     Q_PROPERTY(QString rootLink READ getRootLink WRITE setRootLink)
+    Q_PROPERTY(bool segmentNamesEnabled READ areSegmentNamesEnabled WRITE setSegmentNamesEnabled)
 
 public:
     RobotVisualization();
@@ -59,6 +60,10 @@ public slots:
     void setJointsSize(double size);
 
     void highlightSegment(QString);
+    void showSegmentName(QString);
+    void hideSegmentName(QString link_name);
+    bool areSegmentNamesEnabled() const;
+    void setSegmentNamesEnabled(bool value);
 
     /**
      * camera rotation center follows the robot
@@ -81,6 +86,7 @@ private:
     struct Data;
     bool framesEnabled_;
     bool followModelWithCamera;
+    bool segmentNamesEnabled_;
     double joints_size;
     Data* p;
     QString _modelFile;

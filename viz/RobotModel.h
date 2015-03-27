@@ -8,6 +8,7 @@
 #include <osg/Group>
 #include <osg/Geode>
 #include <osg/Geometry>
+#include <osgText/Text>
 #include <osg/PositionAttitudeTransform>
 #include <osg/MatrixTransform>
 #include <osgDB/ReadFile>
@@ -58,6 +59,19 @@ public:
      * @param filepath: Path to an image file for the label. Should 256x256 Pixel.
      */
     void attachLabel(std::string name, std::string filepath);
+
+
+    void setupTextLabel();
+    /**
+     * Attach a text label to a segemnt. If en empty string is given, the segment name is used
+     * as label.
+     */
+    void attachTextLabel(std::string text="");
+
+    /**
+     * Remove text label
+     */
+    void removeTextLabel();
 
     /**
      * @brief Switch on/off highlighting visualization
@@ -112,6 +126,8 @@ private:
     float jointPos_; /**< Current joint position in radians */
     osg::Geode* visual_; /**< OSG node for visual element */
     osg::Geode* label_; /**< OSG node for label */
+    osgText::Text* text_label_;
+    osg::Geode* text_label_geode_;
     bool isSelected_; /**< Selection state */
 
     friend class InteractionHandler;

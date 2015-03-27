@@ -36,6 +36,7 @@ OSGSegment::OSGSegment(KDL::Segment seg)
     post_transform_->setUserData( this );
     post_transform_->setUpdateCallback(new OSGSegmentCallback);
     toTipOsg_->setUserData(this);
+    setupTextLabel();
 
     updateJoint();
 }
@@ -225,6 +226,42 @@ void OSGSegment::attachLabel(std::string name, std::string filepath){
     geode->setUserData(this);
 
     label_ = geode;
+}
+
+void OSGSegment::setupTextLabel(){
+    text_label_ = new osgText::Text();
+    text_label_geode_ = new osg::Geode();
+    osg::StateSet *set = text_label_geode_->getOrCreateStateSet();
+    /// Disable depth test to avoid sort problems and Lighting
+    set->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
+    set->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+    text_label_geode_->addDrawable(text_label_);
+
+    //Text should be rather small and be always readable on the screen
+    text_label_->setCharacterSize(0.05);
+    text_label_->setFont("/fonts/arial.ttf");
+    text_label_->setAxisAlignment(osgText::Text::SCREEN);
+
+    // Set the text to render with alignment anchor and bounding box around it:
+    text_label_->setDrawMode(osgText::Text::TEXT |
+                           osgText::Text::ALIGNMENT);
+    text_label_->setAlignment(osgText::Text::CENTER_TOP);
+    text_label_->setPosition( osg::Vec3(0,0,0) );
+    text_label_->setColor( osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+}
+
+void OSGSegment::attachTextLabel(std::string text){
+    if(text == ""){
+        text = seg_.getName();
+    }
+
+    text_label_->setText(text);
+    post_transform_->addChild(text_label_geode_);
+}
+
+void OSGSegment::removeTextLabel()
+{
+    post_transform_->removeChild(text_label_geode_);
 }
 
 bool OSGSegment::toggleSelected(){

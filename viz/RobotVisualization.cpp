@@ -25,6 +25,7 @@ RobotVisualization::RobotVisualization()
     this->joints_size = 0.1;
     this->modelPos = new osg::PositionAttitudeTransform();
     this->followModelWithCamera = false;
+    this->segmentNamesEnabled_ = false;
     connect(this, SIGNAL(propertyChanged(QString)), this, SLOT(handlePropertyChanged(QString)));
 }
 
@@ -58,6 +59,16 @@ void RobotVisualization::highlightSegment(QString link_name){
     bool highlighted = toggleHighlight(link_name.toStdString());
     if(!highlighted)
         toggleHighlight(link_name.toStdString());
+}
+
+void RobotVisualization::showSegmentName(QString link_name){
+    OSGSegment* seg = getSegment(link_name.toStdString());
+    seg->attachTextLabel();
+}
+
+void RobotVisualization::hideSegmentName(QString link_name){
+    OSGSegment* seg = getSegment(link_name.toStdString());
+    seg->removeTextLabel();
 }
 
 void RobotVisualization::setModelFile(QString modelFile)
@@ -115,6 +126,23 @@ void RobotVisualization::setFramesEnabled(bool value)
             rbsv->setSize(joints_size);
         else
             rbsv->setSize(0);
+    }
+}
+
+bool RobotVisualization::areSegmentNamesEnabled() const
+{
+    return segmentNamesEnabled_;
+}
+
+void RobotVisualization::setSegmentNamesEnabled(bool value)
+{
+    segmentNamesEnabled_ = value;
+    for (size_t i=0; i<segmentNames_.size(); i++){
+        OSGSegment* seg = getSegment(segmentNames_[i]);
+        if(value)
+            seg->attachTextLabel();
+        else
+            seg->removeTextLabel();
     }
 }
 
