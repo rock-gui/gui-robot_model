@@ -51,6 +51,7 @@ public slots:
 
     bool areFramesEnabled() const;
     void setFramesEnabled(bool value);
+    void setFrameEnabled(QString segment_name, bool value, double size);
     /** Joints Frame using RigidBodyStateVisualization
     * The default is 0.1
     */

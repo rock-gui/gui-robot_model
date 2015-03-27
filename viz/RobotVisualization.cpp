@@ -102,7 +102,6 @@ void RobotVisualization::setModelFile(QString modelFile)
         vizkit3d::RigidBodyStateVisualization* frame =
                 new vizkit3d::RigidBodyStateVisualization(this);
         frame->setPluginName(QString::fromStdString(segments[i]));
-        frame->setPluginEnabled(true);
         segment->getGroup()->addChild(frame->getRootNode());
         _frameVisualizers[segments[i]] = frame;
     }
@@ -127,12 +126,25 @@ bool RobotVisualization::areFramesEnabled() const
 void RobotVisualization::setFramesEnabled(bool value)
 {
     framesEnabled_ = value;
-    for (map<string, RigidBodyStateVisualization*>::iterator it = _frameVisualizers.begin(); it != _frameVisualizers.end(); ++it){
-        RigidBodyStateVisualization* rbsv = it->second;
-        if(value)
-            rbsv->setSize(joints_size);
-        else
-            rbsv->setSize(0);
+    for (size_t i=0; i<segmentNames_.size(); i++){
+        setFrameEnabled(QString(segmentNames_[i].c_str()), framesEnabled_, joints_size);
+    }
+}
+
+void RobotVisualization::setFrameEnabled(QString segment_name, bool value, double size){
+    map<string, RigidBodyStateVisualization*>::iterator it;
+    it=_frameVisualizers.find(segment_name.toStdString());
+    if(it == _frameVisualizers.end()){
+        std::clog << "Tried to enable frame display of link " << segment_name.toStdString() << ", but could not find it." << std::endl;
+        return;
+    }
+    if(value){
+        it->second->setSize(size);
+        it->second->setPluginEnabled(true);
+    }
+    else{
+        it->second->setSize(0);
+        it->second->setPluginEnabled(false);
     }
 }
 
