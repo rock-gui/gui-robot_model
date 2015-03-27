@@ -271,6 +271,10 @@ void OSGSegment::removeTextLabel()
 bool OSGSegment::toggleSelected(){
     isSelected_ = !isSelected_;
 
+    if(!visual_){
+        std::clog << "Tried to highligt " << seg_.getName() << ", but it has no visual." << std::endl;
+        return false;
+    }
     osg::ref_ptr<osg::Group> parent = visual_->getParent(0);
 
     if(isSelected_){
