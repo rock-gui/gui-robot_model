@@ -244,8 +244,13 @@ void OSGSegment::setupTextLabel(){
 
     //Text should be rather small and be always readable on the screen
     text_label_->setCharacterSizeMode(osgText::Text::SCREEN_COORDS);
-    text_label_->setCharacterSize(18);
-    text_label_->setFont("/fonts/arial.ttf");
+    text_label_->setCharacterSize(20);
+
+    osgText::Font* font = osgText::Font::getDefaultFont();
+    font->setMinFilterHint(osg::Texture::NEAREST); // aliasing when zoom out, this doesnt look so ugly because text is small
+    font->setMagFilterHint(osg::Texture::NEAREST); // aliasing when zoom in
+    text_label_->setFont(font);
+
     text_label_->setAxisAlignment(osgText::Text::SCREEN);
 
     // Set the text to render with alignment anchor and bounding box around it:
@@ -254,6 +259,9 @@ void OSGSegment::setupTextLabel(){
     text_label_->setAlignment(osgText::Text::CENTER_TOP);
     text_label_->setPosition( osg::Vec3(0,0,0) );
     text_label_->setColor( osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+
+    text_label_->setBackdropType(osgText::Text::OUTLINE);
+    text_label_->setBackdropColor(osg::Vec4(0, 0, 0, 1.0f));
 }
 
 void OSGSegment::attachTextLabel(std::string text){
