@@ -21,12 +21,12 @@ struct RobotVisualization::Data {
 RobotVisualization::RobotVisualization()
     : p(new Data)
 {
-    this->framesEnabled_ = true;
-    this->joints_size = 0.03;
     this->modelPos = new osg::PositionAttitudeTransform();
-    this->followModelWithCamera = false;
-    this->segmentNamesEnabled_ = false;
     connect(this, SIGNAL(propertyChanged(QString)), this, SLOT(handlePropertyChanged(QString)));
+    setJointsSize(0.03);
+    setFramesEnabled(false);
+    setSegmentNamesEnabled(false);
+    setFollowModelWithCamera(false);
 }
 
 RobotVisualization::~RobotVisualization()
@@ -96,11 +96,12 @@ void RobotVisualization::setModelFile(QString modelFile)
         vizkit3d::RigidBodyStateVisualization* frame =
                 new vizkit3d::RigidBodyStateVisualization(this);
         frame->setPluginName(QString::fromStdString(segments[i]));
-        frame->setPluginEnabled(framesEnabled_);
-        frame->resetModel(joints_size);
+        frame->setPluginEnabled(true);
         segment->getGroup()->addChild(frame->getRootNode());
         _frameVisualizers[segments[i]] = frame;
     }
+    setFramesEnabled(areFramesEnabled());
+    setSegmentNamesEnabled(areSegmentNamesEnabled());
 
     emit childrenChanged();
 }
