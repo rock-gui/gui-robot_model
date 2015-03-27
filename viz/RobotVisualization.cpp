@@ -22,7 +22,7 @@ RobotVisualization::RobotVisualization()
     : p(new Data)
 {
     this->framesEnabled_ = true;
-    this->joints_size = 0.1;
+    this->joints_size = 0.03;
     this->modelPos = new osg::PositionAttitudeTransform();
     this->followModelWithCamera = false;
     this->segmentNamesEnabled_ = false;
