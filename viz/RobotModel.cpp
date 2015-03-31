@@ -483,3 +483,8 @@ bool RobotModel::toggleHighlight(std::string name)
     seg->toggleSelected();
     return seg->isSelected_;
 }
+
+osg::Matrixd RobotModel::getRelativeTransform(std::string source_segment, std::string target_segment)
+{
+    return getTransformBetweenNodes(getSegment(source_segment)->post_transform_, getSegment(target_segment)->post_transform_);
+}

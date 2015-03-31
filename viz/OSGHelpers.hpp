@@ -116,6 +116,25 @@ inline osg::Matrixd* getWorldCoords( osg::Node* node)
     }
 }
 
+//
+// Will return the transform required to transform a point described in coordinate frame 'source'
+// to the frame 'target'.
+//
+// To calculate the world transform of both nodes is calculated. and afterwards:
+// T_source_to_target = Source_to_world * target_to_world^-1
+//
+inline osg::Matrixd getTransformBetweenNodes(osg::ref_ptr<osg::Node> source, osg::ref_ptr<osg::Node> target)
+{
+    osg::Matrixd* source_to_world = getWorldCoords(source);
+    osg::Matrixd* target_to_world = getWorldCoords(target);
+
+    osg::Matrixd inv;
+    inv = osg::Matrixd::inverse(*target_to_world);
+
+    osg::Matrixd source_to_target = (*source_to_world)*inv;
+    return source_to_target;
+}
+
 
 // Given a Camera, create a wireframe representation of its
 // view frustum. Create a default representation if camera==NULL.

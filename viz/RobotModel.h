@@ -226,6 +226,16 @@ public:
     const std::vector<std::string>& getSegmentNames(){return segmentNames_;}
 
     /**
+     * @brief Calculate relative transform between two segments
+     *
+     * Will return the transform required to transform a point described in coordinate frame of
+     * 'source_segment' to the frame 'target_segment'.
+     *
+     * @return osg::Matrixd
+     */
+    osg::Matrixd getRelativeTransform(std::string source_segment, std::string target_segment);
+
+    /**
      * @brief Relocate the root to a given segment
      */
     bool relocateRoot(std::string name);
