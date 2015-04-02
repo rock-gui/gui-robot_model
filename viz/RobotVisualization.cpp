@@ -236,8 +236,7 @@ double RobotVisualization::getJointsSize() const
 void RobotVisualization::setJointsSize(double size)
 {
     joints_size = size;
-    for (map<string, RigidBodyStateVisualization*>::iterator it = _frameVisualizers.begin(); it != _frameVisualizers.end(); ++it)
-        it->second->resetModel(joints_size);
+    setFramesEnabled(framesEnabled_);
 }
 
 void RobotVisualization::setJointsState(const base::samples::Joints &sample){
