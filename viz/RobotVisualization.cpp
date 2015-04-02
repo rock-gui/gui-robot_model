@@ -23,7 +23,7 @@ RobotVisualization::RobotVisualization()
 {
     this->modelPos = new osg::PositionAttitudeTransform();
     connect(this, SIGNAL(propertyChanged(QString)), this, SLOT(handlePropertyChanged(QString)));
-    setJointsSize(0.03);
+    setJointsSize(0.1);
     setFramesEnabled(false);
     setSegmentNamesEnabled(false);
     setFollowModelWithCamera(false);
@@ -188,9 +188,6 @@ QString RobotVisualization::modelFile() const{
 
 osg::ref_ptr<osg::Node> RobotVisualization::createMainNode()
 {
-
-
-
     if(!root_){
         loadEmptyScene();
     }
@@ -198,7 +195,6 @@ osg::ref_ptr<osg::Node> RobotVisualization::createMainNode()
     modelPos->addChild(root_);
 
     return modelPos;
-
 }
 
 void RobotVisualization::updateMainNode ( osg::Node* node )

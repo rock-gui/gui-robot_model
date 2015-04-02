@@ -69,7 +69,6 @@ view3d = Vizkit.vizkit3d_widget
 view3d.show
 vis_gui = Vizkit.default_loader.RobotVisualization
 vis_gui.modelFile = model_file.dup
-vis_gui.jointsSize = 0.02
 
 if not @state_task_name.empty?
     @state_task_name.each_with_index do | task_name, index | 
