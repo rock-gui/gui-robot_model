@@ -2,6 +2,7 @@
   <description brief="robot visualization based on URDF/Collada models and base::samples::Joints data">
   </description>
   <author>Malte Wirkus/malte.wirkus@dfki.de</author>
+  <maintainer>Malte Wirkus/malte.wirkus@dfki.de</maintainer>
   <license>LGPLv2 or later</license>
 
   <depend package="gui/control_ui" />
