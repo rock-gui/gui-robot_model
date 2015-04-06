@@ -14,8 +14,11 @@
 #include <osg/MatrixTransform>
 #include <osgDB/ReadFile>
 #include <osgFX/Outline>
-#include <QObject>
 #include <QDir>
+#include <QHash>
+#include <QObject>
+
+#include <sdf/sdf.hh>
 
 /** 
  * Struct to hold mimic joint properties
@@ -134,6 +137,25 @@ protected:
    */
    void attachVisuals(std::vector<urdf::VisualSharedPtr > &visual_array, QDir prefix = QDir());
 
+   /**
+   * @brief Attach visual mesh to node.
+   *
+   * Should only be called during initial construction of the robot model.
+   *
+   * @param visual: Parsed SDF tag (using sdformat) of the visual.
+   */
+   void attachVisual(sdf::ElementPtr visual, QDir prefix = QDir());
+
+   /**
+   * @brieg Create nodes with visual meshes
+   *
+   * Should only be called during initial construction of the robot model
+   *
+   * @param visual_array: Parsed SDF tag (using sdformat) of the visual.
+   */
+   void attachVisuals(std::vector<sdf::ElementPtr> &visual_array, QDir prefix = QDir());
+
+
 private:
     KDL::Segment seg_; /**< KDKL representation of the segment */
     KDL::Frame toTipKdl_; /**< Temp storage for the current joint pose */
@@ -189,6 +211,8 @@ public:
  */
 class RobotModel
 {
+    //this typedef define a pointer function to a load file function
+    typedef osg::Node* (RobotModel::*LoadModelFunctionPtr)(QString path);
 public:
 /**
  * @brief Constructor, does nearly nothing.
@@ -265,6 +289,26 @@ protected:
     osg::ref_ptr<osg::Node> makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root);
     osg::ref_ptr<osg::Node> makeOsg( urdf::ModelInterfaceSharedPtr urdf_model );
 
+    osg::Node* makeOsg2(KDL::Segment kdl_seg, sdf::ElementPtr sdf_link, sdf::ElementPtr sdf_parent_link, osg::Group* root);
+    osg::Node* makeOsg( sdf::ElementPtr sdf );
+
+    osg::Node* loadURDF(QString path);
+
+    /**
+     * @brief load SDF file by filename
+     */
+    osg::Node* loadSDF(QString path);
+
+    /**
+     * @brief load openscenegraph plugins
+     *
+     * these plugins are used to load meshs in a openscenegraph structure
+     */
+    void loadPlugins();
+
+    std::map<std::string, sdf::ElementPtr> loadSdfModelLinks(sdf::ElementPtr sdf_model);
+
+
 protected:
     osg::ref_ptr<osg::Group> root_; /**< Root of the OSG scene containing the robot */
     osg::ref_ptr<osg::Group> original_root_; /**< The original root always corresponding to the root of the URDF. If relocateRoot was called this get's not affected */
@@ -275,6 +319,9 @@ protected:
     QDir rootPrefix;
 
     std::map< std::string, MimicJoint > mimic_joints_;
+    //Hash with pointer function
+    //this functions load robot definition files such as SDF, URDF
+    QHash<QString, LoadModelFunctionPtr> loadFunctions;
 
 public:
     //bool set_joint_state(std::vector<double> joint_vals);
