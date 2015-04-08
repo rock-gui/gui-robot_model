@@ -16,8 +16,7 @@
 #include <QDir>
 #include <QHash>
 #include <QObject>
-
-
+#include <sdf/sdf.hh>
 /**
  * @brief Data structure that is attached as 'User Data' to nodes within the RobotModel.
  *
@@ -187,8 +186,6 @@ public:
     }
 };
 
-typedef std::map<std::string, sdf::ElementPtr> SdfElementPtrMap;
-
 /**
  * @brief This class is used for creating a visualization of a robot model and access it.
  *
@@ -285,7 +282,7 @@ protected:
      */
     void loadPlugins();
 
-    SdfElementPtrMap loadSdfModelLinks(sdf::ElementPtr sdf_model);
+    std::map<std::string, sdf::ElementPtr> loadSdfModelLinks(sdf::ElementPtr sdf_model);
 
 
 protected:

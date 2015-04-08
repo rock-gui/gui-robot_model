@@ -3,7 +3,9 @@ require 'vizkit'
 view3d = Vizkit.vizkit3d_widget
 
 #model_file = File.join(Dir.pwd, 'test_data', 'spacebot_arm', 'spacebot_arm.urdf')
-model_file = File.join(Dir.pwd, 'test_data', 'simple_arm', 'model.sdf')
+#model_file = File.join(Dir.pwd, 'test_data', 'simple_arm', 'model.sdf')
+#model_file = File.join(Dir.pwd, 'test_data', 'pioneer2dx', 'model.sdf')
+model_file = File.join(Dir.pwd, 'test_data', 'irobot_hand', 'model.sdf')
 
 view3d = Vizkit.vizkit3d_widget
 

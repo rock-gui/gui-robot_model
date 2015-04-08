@@ -79,7 +79,6 @@ void RobotVisualization::hideSegmentText(QString link_name){
 
 void RobotVisualization::setModelFile(QString modelFile)
 {
-    std::cout << "RobotVisualization::setModelFile 1" << std::endl;
     //Extact file extension
     QStringList tokens = modelFile.split(QChar('.'));
     QString ext = tokens.back();

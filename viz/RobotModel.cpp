@@ -30,8 +30,6 @@
 #include <osgDB/ReaderWriter>
 #include <osgDB/PluginQuery>
 
-#define CALL_MEMBER_POINTER_FUNCTION(obj, fnc) ((obj).*(fnc))
-
 OSGSegment::OSGSegment(KDL::Segment seg)
 {
     isSelected_=false;
@@ -236,10 +234,11 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
             }
 
             QString qfilename = QString::fromStdString(filename);
+
             if (QFileInfo(qfilename).isRelative()){
-                filename = baseDir.absoluteFilePath(QFileInfo(qfilename).fileName()).toStdString();
-//                filename = baseDir.absoluteFilePath(QFileInfo(qfilename).baseName()).toStdString();
-//                filename += ".osg";
+                QDir modelPaths = baseDir;
+                modelPaths.cdUp();
+                filename = modelPaths.absoluteFilePath(qfilename).toStdString();
             }
 
             osg_visual = osgDB::readNodeFile(filename);
@@ -252,6 +251,7 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
         }
         else {
             osg_visual = new osg::Geode;
+            LOG_ERROR("It was not possible to find a geometry type compatible.");
         }
     }
 
@@ -505,8 +505,6 @@ osg::Node* RobotModel::makeOsg2(KDL::Segment kdl_seg, sdf::ElementPtr sdf_link, 
     }
 
 
-    //transform to joint
-    osg::PositionAttitudeTransform *joint_forward = new osg::PositionAttitudeTransform();
     //transform to parent link
     //gazebo uses model position as reference. It is necessary convert to relative position from parent
     //to create the same behavior of gazebo it is necessary transform link position to parent position
@@ -517,7 +515,7 @@ osg::Node* RobotModel::makeOsg2(KDL::Segment kdl_seg, sdf::ElementPtr sdf_link, 
 
     osg::ref_ptr<OSGSegment> seg = osg::ref_ptr<OSGSegment>(new OSGSegment(kdl_seg));
 
-    //if link doesn't have a parent then your position is relative to world
+    //if link doesn't have a parent then your position is relative to model
     if (!sdf_parent_link){
         if (sdf_link->HasElement("pose")){
             sdf_pose_to_osg(sdf_link->GetElement("pose"), *to_link);
@@ -558,7 +556,20 @@ osg::Node* RobotModel::makeOsg2(KDL::Segment kdl_seg, sdf::ElementPtr sdf_link, 
         seg->attachVisuals(visuals, rootPrefix);
     }
     else {
-        seg->attachVisual(visuals[0], rootPrefix);
+        //in sdf files it is possible to create links without visuals
+        //the code below create a representation of visual to attach the segment
+        //to keep the compatibility create the nodes to_visual and osg_visual
+        //the segment is attached in the osg_visual
+        osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
+        seg->post_transform_->addChild(to_visual);
+
+        //create an invisible node only to represent the visual information and keep the compatibility
+        osg::Node *node = new osg::Geode();
+        node->setUserData(seg.get());
+        node->setName(kdl_seg.getName());
+        to_visual->addChild(node);
+        seg->visual_ = node->asGeode();
+
     }
 
     return seg->getGroup();
@@ -622,7 +633,7 @@ osg::ref_ptr<osg::Node> RobotModel::makeOsg( boost::shared_ptr<urdf::ModelInterf
 osg::Node* RobotModel::makeOsg( sdf::ElementPtr sdf_model )
 {
     std::string model_name = sdf_model->GetAttribute("name")->GetAsString();
-    SdfElementPtrMap links = loadSdfModelLinks(sdf_model);
+    std::map<std::string, sdf::ElementPtr> links = loadSdfModelLinks(sdf_model);
 
     KDL::Tree tree;
     kdl_parser::treeFromSdfModel(sdf_model, tree);
@@ -656,31 +667,32 @@ osg::Node* RobotModel::makeOsg( sdf::ElementPtr sdf_model )
         std::map<std::string, sdf::ElementPtr>::iterator link_itr = links.find(kdl_segment.getName());
         std::map<std::string, sdf::ElementPtr>::iterator link_parent_itr = links.find(kdl_parent_segment.getName());
 
-        if (link_itr != links.end()){
-            sdf::ElementPtr sdf_link = link_itr->second;
-            sdf::ElementPtr sdf_parent_link;
+        //check if link exists
+        if (link_itr == links.end())
+          throw std::runtime_error("Internal error: expected to find a SDF link called " + kdl_segment.getName());
 
-            if (link_parent_itr != links.end()) {
-                sdf_parent_link = link_parent_itr->second;
-            }
+        sdf::ElementPtr sdf_link = link_itr->second;
+        sdf::ElementPtr sdf_parent_link;
 
-            //create osg link
-            hook = hook_buffer.back();
-            hook_buffer.pop_back();
-
-            osg::Node* new_hook = makeOsg2(kdl_segment, sdf_link, sdf_parent_link, hook->asGroup());
-
-            //Append hooks
-            for(uint i = 0; i < it->second.children.size(); i++){
-                hook_buffer.push_back(new_hook);
-            }
-
-            std::cout << "segment_name: " << kdl_segment.getName() << std::endl;
-
-            segmentNames_.push_back(kdl_segment.getName());
-            if(kdl_segment.getJoint().getType() != KDL::Joint::None)
-                jointNames_.push_back(kdl_segment.getJoint().getName());
+        //if did not find the parent, then the child it is a root link
+        if (link_parent_itr != links.end()) {
+            sdf_parent_link = link_parent_itr->second;
         }
+
+        //create osg link
+        hook = hook_buffer.back();
+        hook_buffer.pop_back();
+
+        osg::Node* new_hook = makeOsg2(kdl_segment, sdf_link, sdf_parent_link, hook->asGroup());
+
+        //Append hooks
+        for(uint i = 0; i < it->second.children.size(); i++){
+            hook_buffer.push_back(new_hook);
+        }
+
+        segmentNames_.push_back(kdl_segment.getName());
+        if(kdl_segment.getJoint().getType() != KDL::Joint::None)
+            jointNames_.push_back(kdl_segment.getJoint().getName());
 
     }
 
@@ -706,11 +718,12 @@ osg::ref_ptr<osg::Node> RobotModel::load(QString path){
      * call the function based in the file suffix
      */
     if (loadFunctions.contains(suffix)){
-        osg::Node *node= CALL_MEMBER_POINTER_FUNCTION(*this, loadFunctions[suffix])(path);
-        return node;
+        //call member-to-pointer function
+        return (this->*loadFunctions[suffix])(path);
     }
     else {
         LOG_ERROR("the %s type of file is not supported .", suffix.toStdString().c_str());
+        throw std::runtime_error("Internal error: the " + suffix.toStdString() + " type of file is not supported .");
     }
 
     return new osg::Group();
@@ -768,9 +781,9 @@ void RobotModel::loadPlugins()
     }
 }
 
-SdfElementPtrMap RobotModel::loadSdfModelLinks(sdf::ElementPtr sdf_model)
+std::map<std::string, sdf::ElementPtr> RobotModel::loadSdfModelLinks(sdf::ElementPtr sdf_model)
 {
-    SdfElementPtrMap links;
+    std::map<std::string, sdf::ElementPtr> links;
 
     if (sdf_model->HasElement("link")){
         sdf::ElementPtr linkElem = sdf_model->GetElement("link");
