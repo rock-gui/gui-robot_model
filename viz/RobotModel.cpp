@@ -504,52 +504,9 @@ osg::Node* RobotModel::makeOsg2(KDL::Segment kdl_seg, sdf::ElementPtr sdf_link, 
         }
     }
 
-
-    //transform to parent link
-    //gazebo uses model position as reference. It is necessary convert to relative position from parent
-    //to create the same behavior of gazebo it is necessary transform link position to parent position
-    osg::PositionAttitudeTransform *to_parent_link = new osg::PositionAttitudeTransform();
-
-    //set the link position using relative position. the reference position is the parent.
-    osg::PositionAttitudeTransform *to_link = new osg::PositionAttitudeTransform();
-
     osg::ref_ptr<OSGSegment> seg = osg::ref_ptr<OSGSegment>(new OSGSegment(kdl_seg));
 
-    //if link doesn't have a parent then your position is relative to model
-    if (!sdf_parent_link){
-        if (sdf_link->HasElement("pose")){
-            sdf_pose_to_osg(sdf_link->GetElement("pose"), *to_link);
-        }
-    }
-    else { //link has a parent. your position is relative to the parent position
-
-        osg::Vec3 link_position;
-        osg::Quat link_rotation;
-        osg::Vec3 link_parent_position;
-        osg::Quat link_parent_rotation;
-
-        //get link position and rotation
-        if (sdf_link->HasElement("pose")){
-            sdf_pose_to_osg(sdf_link->GetElement("pose"), link_position, link_rotation);
-        }
-
-        //get parent link position and rotation
-        if (sdf_parent_link->HasElement("pose")){
-            sdf_pose_to_osg(sdf_parent_link->GetElement("pose"), link_parent_position, link_parent_rotation);
-        }
-
-        //revert to the parent rotation
-        to_parent_link->setAttitude(link_parent_rotation.inverse());
-        //rotate link
-        to_link->setAttitude(link_rotation);
-        //set relative position
-        to_link->setPosition(link_position-link_parent_position);
-    }
-
-    to_link->addChild(seg->toTipOsg_);
-    to_parent_link->addChild(to_link);
-
-    root->addChild(to_parent_link);
+    root->addChild(seg->toTipOsg_);
 
     if (visuals.size() > 0)
     {

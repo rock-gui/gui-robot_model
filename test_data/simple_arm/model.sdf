@@ -73,7 +73,7 @@
 			</visual>
 		</link>
 		<link name="arm_shoulder_pan">
-			<pose>0 0 1.1 0 0 0</pose>
+			<pose>0 0 1.1 0 1.5 0</pose>
 			<inertial>
 				<pose>0.045455 0 0 0 0 0</pose>
 				<inertia>
@@ -349,7 +349,7 @@
                     <upper>2</upper>
                 </limit>
 				<xyz>0 0 1</xyz>
-				<use_parent_model_frame>false</use_parent_model_frame>
+				<use_parent_model_frame>true</use_parent_model_frame>
 			</axis>
 		</joint>
 
