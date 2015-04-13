@@ -5,6 +5,7 @@
 #include <vizkit3d/Vizkit3DPlugin.hpp>
 #include <base/samples/Joints.hpp>
 #include <base/samples/RigidBodyState.hpp>
+#include <QMessageBox>
 #include "RobotModel.h"
 
 namespace vizkit3d

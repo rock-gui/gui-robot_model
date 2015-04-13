@@ -2,7 +2,6 @@
 #include "RobotVisualization.hpp"
 #include <vizkit3d/RigidBodyStateVisualization.hpp>
 #include <vizkit3d/Vizkit3DWidget.hpp>
-#include <QMessageBox>
 #include <base/Logging.hpp>
 #include <osg/Geode>
 
