@@ -458,8 +458,6 @@ RobotModel::RobotModel(){
     //Root is the entry point to the scene graph
     root_ = osg::ref_ptr<osg::Group>(new osg::Group());
     original_root_ = osg::ref_ptr<osg::Group>(new osg::Group());
-    loadFunctions["urdf"] = &RobotModel::loadURDF;
-    loadFunctions["sdf"] = &RobotModel::loadSDF;
     loadEmptyScene();
 }
 
@@ -666,55 +664,61 @@ osg::Node* RobotModel::makeOsg( sdf::ElementPtr sdf_model )
 
 osg::ref_ptr<osg::Node> RobotModel::load(QString path){
 
+    return loadFromFile(path);
+}
+
+osg::ref_ptr<osg::Node> RobotModel::loadFromFile(QString path, ROBOT_MODEL_FORMAT format)
+{
+    if (format == ROBOT_MODEL_AUTO)
+    {
+        kdl_parser::ROBOT_MODEL_FORMAT kdl_format = 
+            kdl_parser::guessFormatFromFilename(path.toStdString());
+        LOG_INFO("file %s guessed to be of type %s", path.toStdString().c_str(),
+                kdl_parser::formatNameFromID(kdl_format));
+        format = static_cast<ROBOT_MODEL_FORMAT>(kdl_format);
+    }
+
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly))
+        throw std::invalid_argument("cannot open " + path.toStdString() + " for reading");
+    return loadFromString(QString::fromUtf8(file.readAll()), format, QFileInfo(path).absoluteDir().path());
+}
+
+osg::ref_ptr<osg::Node> RobotModel::loadFromString(QString xml, ROBOT_MODEL_FORMAT format, QString _rootPrefix)
+{
+    rootPrefix = QDir(_rootPrefix);
+
     loadPlugins();
     loadEmptyScene();
 
-    QString suffix = QFileInfo(path).suffix().toLower();
-
-    /*
-     * call the function based in the file suffix
-     */
-    if (loadFunctions.contains(suffix)){
-        //call member-to-pointer function
-        return (this->*loadFunctions[suffix])(path);
-    }
-    else {
-        LOG_ERROR("the %s type of file is not supported .", suffix.toStdString().c_str());
-        throw std::runtime_error("Internal error: the " + suffix.toStdString() + " type of file is not supported .");
-    }
-
-    return new osg::Group();
+    if (format == ROBOT_MODEL_URDF)
+        return loadFromURDFString(xml);
+    else if (format == ROBOT_MODEL_SDF)
+        return loadFromSDFString(xml);
+    else
+        throw std::invalid_argument(std::string("unknown robot model format ") + kdl_parser::formatNameFromID(format));
 }
 
-osg::Node* RobotModel::loadURDF(QString path)
+osg::ref_ptr<osg::Node> RobotModel::loadFromURDFString(QString xml)
 {
-    std::ifstream t( path.toStdString().c_str() );
-    std::string xml_str((std::istreambuf_iterator<char>(t)),
-                       std::istreambuf_iterator<char>());
-
-    rootPrefix = QDir(QFileInfo(path).absoluteDir());
-
-    //Parse urdf
-    boost::shared_ptr<urdf::ModelInterface> model = urdf::parseURDF( xml_str );
+    boost::shared_ptr<urdf::ModelInterface> model = urdf::parseURDF( xml.toStdString() );
     if (!model)
         return NULL;
 
     return makeOsg(model);
 }
 
-osg::Node* RobotModel::loadSDF(QString path)
+osg::ref_ptr<osg::Node> RobotModel::loadFromSDFString(QString xml)
 {
-    rootPrefix = QDir(QFileInfo(path).absoluteDir());
-
     sdf::SDFPtr sdf(new sdf::SDF);
-
     if (!sdf::init(sdf)){
         LOG_ERROR("unable to initialize sdf.");
         return NULL;
     }
-
-    if (!sdf::readFile(path.toStdString(), sdf)){
-        LOG_ERROR("unabled to read sdf file %s.", path.toStdString().c_str());
+    std::string xml_s = xml.toStdString();
+    if (!sdf::readString(xml_s, sdf))
+    {
+        LOG_ERROR("unable to load sdf from string %s.\n", xml_s.c_str());
         return NULL;
     }
 

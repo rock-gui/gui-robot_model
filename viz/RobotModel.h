@@ -192,13 +192,18 @@ public:
  */
 class RobotModel
 {
-    //this typedef define a pointer function to a load file function
-    typedef osg::Node* (RobotModel::*LoadModelFunctionPtr)(QString path);
 public:
-/**
- * @brief Constructor, does nearly nothing.
- *
- */
+    enum ROBOT_MODEL_FORMAT
+    {
+        ROBOT_MODEL_AUTO = kdl_parser::ROBOT_MODEL_AUTO,
+        ROBOT_MODEL_URDF = kdl_parser::ROBOT_MODEL_URDF,
+        ROBOT_MODEL_SDF  = kdl_parser::ROBOT_MODEL_SDF
+    };
+
+    /**
+     * @brief Constructor, does nearly nothing.
+     *
+     */
     RobotModel();
 
     /**
@@ -208,10 +213,30 @@ public:
     ~RobotModel(){}
 
     /**
-     * @brief Create visualization of a robot described as urdf file.
+     * @brief Create visualization of a robot
      *
-     * @param path: Path to URDF file.
+     * The model file format is guessed based on the file's extension. To
+     * provide it explicitely. use loadFromFile(path, format)
+     *
+     * @param path: Path to the file.
+     * @param format: the file format (either ROBOT_MODEL_URDF or
+     *   ROBOT_MODEL_SDF)
      * @return osg::Node: Root node of the constructed OSG scene for the robot.
+     */
+    osg::ref_ptr<osg::Node> loadFromFile(QString path, ROBOT_MODEL_FORMAT format = ROBOT_MODEL_AUTO);
+
+    /**
+     * @brief Create visualization of a robot from a XML string
+     *
+     * @param xml: the XML document, as a string
+     * @param format: the file format (either ROBOT_MODEL_URDF or
+     *   ROBOT_MODEL_SDF)
+     * @return osg::Node: Root node of the constructed OSG scene for the robot.
+     */
+    osg::ref_ptr<osg::Node> loadFromString(QString xml, ROBOT_MODEL_FORMAT format, QString rootPrefix = "");
+
+    /**
+     * @deprecated use loadFromFile instead
      */
     osg::ref_ptr<osg::Node> load(QString path);
 
@@ -268,12 +293,19 @@ protected:
     osg::Node* makeOsg2(KDL::Segment kdl_seg, sdf::ElementPtr sdf_link, sdf::ElementPtr sdf_parent_link, osg::Group* root);
     osg::Node* makeOsg( sdf::ElementPtr sdf );
 
-    osg::Node* loadURDF(QString path);
+    /**
+     * @brief load from a string containing a URDF model
+     *
+     * This is a helper from loadFromString
+     */
+    osg::ref_ptr<osg::Node> loadFromURDFString(QString xml);
 
     /**
-     * @brief load SDF file by filename
+     * @brief load from a string containing a SDF model
+     *
+     * This is a helper from loadFromString
      */
-    osg::Node* loadSDF(QString path);
+    osg::ref_ptr<osg::Node> loadFromSDFString(QString xml);
 
     /**
      * @brief load openscenegraph plugins
@@ -293,10 +325,6 @@ protected:
     std::vector<std::string> jointNames_; /**< Joint names defined in URDF (joint of type none are NOT included) */
     std::vector<std::string> segmentNames_; /**< Segment names defined in URDF */
     QDir rootPrefix;
-
-    //Hash with pointer function
-    //this functions load robot definition files such as SDF, URDF
-    QHash<QString, LoadModelFunctionPtr> loadFunctions;
 
 public:
     //bool set_joint_state(std::vector<double> joint_vals);
