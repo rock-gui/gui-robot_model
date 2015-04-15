@@ -241,17 +241,16 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
                 filename = modelPaths.absoluteFilePath(qfilename).toStdString();
             }
 
+            LOG_INFO("loading visual %s", filename.c_str());
             osg_visual = osgDB::readNodeFile(filename);
-
             if (!osg_visual) {
-                LOG_ERROR("OpenSceneGraph did not succees loading the mesh file %s.", filename.c_str());
-                throw std::runtime_error("Error loading mesh file.");
+                LOG_WARN("OpenSceneGraph did not succeed in loading the mesh file %s.", filename.c_str());
+                osg_visual = new osg::Geode;
             }
-
         }
         else {
+            LOG_WARN("SDF: %s is not a supported geometry", sdf_geom_elem->GetName().c_str());
             osg_visual = new osg::Geode;
-            LOG_ERROR("It was not possible to find a geometry type compatible.");
         }
     }
 
