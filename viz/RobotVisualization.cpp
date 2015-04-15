@@ -49,8 +49,10 @@ void RobotVisualization::handlePropertyChanged(QString property){
                            << "'rootFrame' to a reasonable body part name.";
             }
             else{ //Its world_osg, set to original root if it was determined yet
-                if(original_root_name_ != "")
-                    setRootLink(original_root_name_.c_str());
+                try {
+                    relocateRoot(original_root_);
+                }
+                catch(std::invalid_argument) {}
             }
         }
     }

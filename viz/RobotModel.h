@@ -277,6 +277,14 @@ public:
     osg::ref_ptr<OSGSegment> getSegment(std::string name);
 
     /**
+     * @brief Retrieve an OSG Segment by the corresponding OSG node
+     *
+     * @param node: the OSG node
+     * @return OSGSegment
+     */
+    osg::ref_ptr<OSGSegment> getSegment(osg::ref_ptr<osg::Node> node);
+
+    /**
      * @brief Retrieve joint names of all joints defined in URDF file which are not of type KDL::Joint::None.
      *
      * @return const std::vector<std::string>
@@ -309,6 +317,10 @@ public:
      * @brief Finds the relevant node and sets the position value
      */
     bool setJointPos(std::string jointName, double jointVal);
+    /**
+     * @brief Relocate the root to a given segment
+     */
+    bool relocateRoot(osg::ref_ptr<osg::Node> group);
 
 protected:
     osg::ref_ptr<osg::Group> makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root);

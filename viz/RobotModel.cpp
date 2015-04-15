@@ -759,13 +759,24 @@ osg::ref_ptr<OSGSegment> RobotModel::getSegment(std::string name)
         std::cerr << "Could not find segment with name: " << name << std::endl;
         return 0;
     }
+    return getSegment(node);
+}
 
+osg::ref_ptr<OSGSegment> RobotModel::getSegment(osg::ref_ptr<osg::Node> node)
+{
     osg::ref_ptr<OSGSegment> jnt = dynamic_cast<OSGSegment*>(node->getUserData());
     if(!jnt){
-        std::cerr << "Could not retrieve user data from node "<<name<<std::endl;
+        throw std::invalid_argument("Could not retrieve user data from node " + node->getName());
     }
-    assert(jnt);
     return jnt;
+}
+
+bool RobotModel::relocateRoot(osg::ref_ptr<osg::Node> group)
+{
+    osg::ref_ptr<OSGSegment> seg = getSegment(group);
+    root_->removeChildren(0, root_->getNumChildren());
+    root_->addChild(seg->post_transform_);
+    return true;
 }
 
 bool RobotModel::relocateRoot(std::string name){
