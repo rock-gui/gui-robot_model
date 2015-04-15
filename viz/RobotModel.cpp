@@ -310,10 +310,11 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
     visual_ = osg_visual->asGeode();
 }
 
-void OSGSegment::attachVisuals(std::vector<sdf::ElementPtr> &visual_array, QDir prefix){
+void OSGSegment::attachVisuals(std::vector<sdf::ElementPtr> const &visual_array, QDir prefix){
 
-    std::vector<sdf::ElementPtr>::iterator itr = visual_array.begin();
-    std::vector<sdf::ElementPtr >::iterator itr_end = visual_array.end();
+    std::vector<sdf::ElementPtr>::const_iterator
+        itr,
+        itr_end = visual_array.end();
 
     for(itr = visual_array.begin(); itr != itr_end; ++itr)
     {
@@ -473,7 +474,7 @@ osg::ref_ptr<osg::Node> RobotModel::loadEmptyScene(){
     return root_;
 }
 
-osg::ref_ptr<osg::Node> RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root){
+osg::ref_ptr<osg::Group> RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root){
     osg::ref_ptr<OSGSegment> seg = osg::ref_ptr<OSGSegment>(new OSGSegment(kdl_seg));
     root->addChild(seg->toTipOsg_);
 
@@ -572,7 +573,7 @@ osg::ref_ptr<osg::Node> RobotModel::makeOsg( urdf::ModelInterfaceSharedPtr urdf_
         hook = hook_buffer.back();
         hook_buffer.pop_back();
         kdl_segment = tree.getSegment(urdf_link->name)->second.segment;
-        osg::ref_ptr<osg::Node> new_hook = makeOsg2(kdl_segment,
+        osg::ref_ptr<osg::Group> new_hook = makeOsg2(kdl_segment,
                                        *urdf_link, hook->asGroup());
 
         //Also store names of links and joints
