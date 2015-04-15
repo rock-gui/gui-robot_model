@@ -494,26 +494,11 @@ osg::ref_ptr<osg::Group> RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link u
     return seg->getGroup();
 }
 
-osg::Node* RobotModel::makeOsg2(KDL::Segment kdl_seg, sdf::ElementPtr sdf_link, sdf::ElementPtr sdf_parent_link, osg::Group* root){
-
-    std::vector<sdf::ElementPtr> visuals;
-
-    if (sdf_link->HasElement("visual")){
-
-        sdf::ElementPtr visualElem= sdf_link->GetElement("visual");
-        while (visualElem){
-            visuals.push_back(visualElem);
-            visualElem = visualElem->GetNextElement("visual");
-        }
-    }
-
-    osg::ref_ptr<OSGSegment> seg = osg::ref_ptr<OSGSegment>(new OSGSegment(kdl_seg));
-
-    root->addChild(seg->toTipOsg_);
+void RobotModel::makeOsg2(KDL::Segment const& kdl_seg, std::vector<sdf::ElementPtr> const& visuals, OSGSegment& seg){
 
     if (visuals.size() > 0)
     {
-        seg->attachVisuals(visuals, rootPrefix);
+        seg.attachVisuals(visuals, rootPrefix);
     }
     else {
         //in sdf files it is possible to create links without visuals
@@ -521,18 +506,16 @@ osg::Node* RobotModel::makeOsg2(KDL::Segment kdl_seg, sdf::ElementPtr sdf_link, 
         //to keep the compatibility create the nodes to_visual and osg_visual
         //the segment is attached in the osg_visual
         osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
-        seg->post_transform_->addChild(to_visual);
+        seg.post_transform_->addChild(to_visual);
 
         //create an invisible node only to represent the visual information and keep the compatibility
         osg::Node *node = new osg::Geode();
-        node->setUserData(seg.get());
+        node->setUserData(&seg);
         node->setName(kdl_seg.getName());
         to_visual->addChild(node);
-        seg->visual_ = node->asGeode();
+        seg.visual_ = node->asGeode();
 
     }
-
-    return seg->getGroup();
 }
 
 osg::ref_ptr<osg::Node> RobotModel::makeOsg( urdf::ModelInterfaceSharedPtr urdf_model ){
@@ -593,78 +576,62 @@ osg::ref_ptr<osg::Node> RobotModel::makeOsg( urdf::ModelInterfaceSharedPtr urdf_
 
 osg::Node* RobotModel::makeOsg( sdf::ElementPtr sdf_model )
 {
-    std::string model_name = sdf_model->GetAttribute("name")->GetAsString();
-    std::map<std::string, sdf::ElementPtr> links = loadSdfModelLinks(sdf_model);
+    typedef std::map<std::string, sdf::ElementPtr>::const_iterator SDFLinkIterator;
+    typedef KDL::SegmentMap::const_iterator SegmentIterator;
 
     KDL::Tree tree;
     kdl_parser::treeFromSdfModel(sdf_model, tree);
 
-    KDL::SegmentMap::const_iterator root = tree.getRootSegment();
+    std::map<std::string, sdf::ElementPtr> sdf_links = loadSdfModelLinks(sdf_model);
 
-    std::vector<KDL::SegmentMap::const_iterator> segment_buffer;
-    segment_buffer.insert(segment_buffer.end(), root->second.children.begin(), root->second.children.end());
+    std::list<SegmentIterator> queue;
+    std::list< osg::ref_ptr<osg::Group> > queue_osg;
+    queue.push_back(tree.getRootSegment());
+    queue_osg.push_back(root_);
 
-    std::vector<osg::Node*> hook_buffer;
-    for(uint i = 0; i < root->second.children.size(); i++){
-        hook_buffer.push_back(original_root_);
+    while (!queue.empty()){
+        SegmentIterator it = queue.front();
+        osg::ref_ptr<osg::Group> parent_osg = queue_osg.front();
+        queue.pop_front();
+        queue_osg.pop_front();
+
+        KDL::Segment const& kdl = it->second.segment;
+
+        osg::ref_ptr<OSGSegment> seg = new OSGSegment(kdl);
+        parent_osg->addChild(seg->toTipOsg_);
+
+        SDFLinkIterator sdf = sdf_links.find(kdl.getName());
+
+        std::vector<sdf::ElementPtr> visuals;
+        if (sdf != sdf_links.end()){
+            sdf::ElementPtr sdf_link = sdf->second;
+            sdf::ElementPtr visualElem = sdf_link->GetElement("visual");
+            while (visualElem){
+                visuals.push_back(visualElem);
+                visualElem = visualElem->GetNextElement("visual");
+            }
+        }
+
+        makeOsg2(kdl, visuals, *seg);
+
+        osg::ref_ptr<osg::Group> osg = seg->getGroup();
+        std::vector<SegmentIterator> const& children =
+            it->second.children;
+        for (std::vector<SegmentIterator>::const_iterator child_it = children.begin();
+                child_it != children.end(); ++child_it) {
+            queue.push_back(*child_it);
+            queue_osg.push_back(osg);
+        }
+
+        segmentNames_.push_back(kdl.getName());
+        if(kdl.getJoint().getType() != KDL::Joint::None)
+            jointNames_.push_back(kdl.getJoint().getName());
     }
 
-    original_root_name_ = root->second.segment.getName();
-
-    osg::Node* hook = 0;
-    while (!segment_buffer.empty()){
-
-        KDL::SegmentMap::const_iterator it = segment_buffer.back();
-        KDL::SegmentMap::const_iterator parent_it = it->second.parent;
-
-        segment_buffer.pop_back();
-        KDL::Segment kdl_segment = it->second.segment;
-        KDL::Segment kdl_parent_segment = parent_it->second.segment;
-
-        if (it->second.children.size() > 0){
-            segment_buffer.insert(segment_buffer.end(), it->second.children.begin(), it->second.children.end());
-        }
-
-        std::map<std::string, sdf::ElementPtr>::iterator link_itr = links.find(kdl_segment.getName());
-        std::map<std::string, sdf::ElementPtr>::iterator link_parent_itr = links.find(kdl_parent_segment.getName());
-
-        //check if link exists
-        if (link_itr == links.end())
-          throw std::runtime_error("Internal error: expected to find a SDF link called " + kdl_segment.getName());
-
-        sdf::ElementPtr sdf_link = link_itr->second;
-        sdf::ElementPtr sdf_parent_link;
-
-        //if did not find the parent, then the child it is a root link
-        if (link_parent_itr != links.end()) {
-            sdf_parent_link = link_parent_itr->second;
-        }
-
-        //create osg link
-        hook = hook_buffer.back();
-        hook_buffer.pop_back();
-
-        osg::Node* new_hook = makeOsg2(kdl_segment, sdf_link, sdf_parent_link, hook->asGroup());
-
-        //Append hooks
-        for(uint i = 0; i < it->second.children.size(); i++){
-            hook_buffer.push_back(new_hook);
-        }
-
-        segmentNames_.push_back(kdl_segment.getName());
-        if(kdl_segment.getJoint().getType() != KDL::Joint::None)
-            jointNames_.push_back(kdl_segment.getJoint().getName());
-
-    }
-
-    /**
-     * in the SDF files it is not necessary one joint per two links
-     * in the SDF files it is possible to create a file with multiple links without joints
-     * original_root_ is not a segment, is only used to store the segments
-     * if the links in the SDF doesn't have a joint, then this segment will be a direct child of original_root_
-     * if all links doen't have a joint, then all segments will be children direct of original_root_
-     */
-    root_->addChild(original_root_);
+    // Since we inject the KDL tree root, root_ is guaranteed to have only one
+    // element, and that it is the segment for the tree root
+    original_root_ = root_->getChild(0)->asGroup();
+    original_root_name_ = tree.getRootSegment()->first;
     return root_;
 }
 

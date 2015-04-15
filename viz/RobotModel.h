@@ -326,7 +326,10 @@ protected:
     osg::ref_ptr<osg::Group> makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root);
     osg::ref_ptr<osg::Node> makeOsg( urdf::ModelInterfaceSharedPtr urdf_model );
 
-    osg::Node* makeOsg2(KDL::Segment kdl_seg, sdf::ElementPtr sdf_link, sdf::ElementPtr sdf_parent_link, osg::Group* root);
+    void makeOsg2(
+            KDL::Segment const &kdl_seg,
+            std::vector<sdf::ElementPtr> const& visuals,
+            OSGSegment& seg);
     osg::Node* makeOsg( sdf::ElementPtr sdf );
 
     /**
