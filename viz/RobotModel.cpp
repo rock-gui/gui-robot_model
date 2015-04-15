@@ -687,7 +687,6 @@ osg::ref_ptr<osg::Node> RobotModel::loadFromString(QString xml, ROBOT_MODEL_FORM
 {
     rootPrefix = QDir(_rootPrefix);
 
-    loadPlugins();
     loadEmptyScene();
 
     if (format == ROBOT_MODEL_URDF)
@@ -727,18 +726,6 @@ osg::ref_ptr<osg::Node> RobotModel::loadFromSDFString(QString xml)
     }
 
     return makeOsg(sdf->root->GetElement("model"));
-}
-
-void RobotModel::loadPlugins()
-{
-    osgDB::FileNameList plugins = osgDB::listAllAvailablePlugins();
-    for(osgDB::FileNameList::iterator itr = plugins.begin();
-        itr != plugins.end();
-        ++itr)
-    {
-        osgDB::ReaderWriterInfoList infoList;
-        osgDB::queryPlugin(*itr, infoList);
-    }
 }
 
 std::map<std::string, sdf::ElementPtr> RobotModel::loadSdfModelLinks(sdf::ElementPtr sdf_model)
