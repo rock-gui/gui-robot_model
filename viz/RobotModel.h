@@ -331,13 +331,6 @@ protected:
      */
     osg::ref_ptr<osg::Node> loadFromSDFString(QString xml);
 
-    /**
-     * @brief load openscenegraph plugins
-     *
-     * these plugins are used to load meshs in a openscenegraph structure
-     */
-    void loadPlugins();
-
     std::map<std::string, sdf::ElementPtr> loadSdfModelLinks(sdf::ElementPtr sdf_model);
 
 
