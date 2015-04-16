@@ -13,10 +13,10 @@
 #include <osg/MatrixTransform>
 #include <osgDB/ReadFile>
 #include <osgFX/Outline>
-#include <QObject>
 #include <QDir>
-
-
+#include <QHash>
+#include <QObject>
+#include <sdf/sdf.hh>
 /**
  * @brief Data structure that is attached as 'User Data' to nodes within the RobotModel.
  *
@@ -118,6 +118,25 @@ protected:
    */
    void attachVisuals(std::vector<boost::shared_ptr<urdf::Visual> > &visual_array, QDir prefix = QDir());
 
+   /**
+   * @brief Attach visual mesh to node.
+   *
+   * Should only be called during initial construction of the robot model.
+   *
+   * @param visual: Parsed SDF tag (using sdformat) of the visual.
+   */
+   void attachVisual(sdf::ElementPtr visual, QDir prefix = QDir());
+
+   /**
+   * @brieg Create nodes with visual meshes
+   *
+   * Should only be called during initial construction of the robot model
+   *
+   * @param visual_array: Parsed SDF tag (using sdformat) of the visual.
+   */
+   void attachVisuals(std::vector<sdf::ElementPtr> &visual_array, QDir prefix = QDir());
+
+
 private:
     KDL::Segment seg_; /**< KDKL representation of the segment */
     KDL::Frame toTipKdl_; /**< Temp storage for the current joint pose */
@@ -174,10 +193,17 @@ public:
 class RobotModel
 {
 public:
-/**
- * @brief Constructor, does nearly nothing.
- *
- */
+    enum ROBOT_MODEL_FORMAT
+    {
+        ROBOT_MODEL_AUTO = kdl_parser::ROBOT_MODEL_AUTO,
+        ROBOT_MODEL_URDF = kdl_parser::ROBOT_MODEL_URDF,
+        ROBOT_MODEL_SDF  = kdl_parser::ROBOT_MODEL_SDF
+    };
+
+    /**
+     * @brief Constructor, does nearly nothing.
+     *
+     */
     RobotModel();
 
     /**
@@ -187,10 +213,30 @@ public:
     ~RobotModel(){}
 
     /**
-     * @brief Create visualization of a robot described as urdf file.
+     * @brief Create visualization of a robot
      *
-     * @param path: Path to URDF file.
+     * The model file format is guessed based on the file's extension. To
+     * provide it explicitely. use loadFromFile(path, format)
+     *
+     * @param path: Path to the file.
+     * @param format: the file format (either ROBOT_MODEL_URDF or
+     *   ROBOT_MODEL_SDF)
      * @return osg::Node: Root node of the constructed OSG scene for the robot.
+     */
+    osg::ref_ptr<osg::Node> loadFromFile(QString path, ROBOT_MODEL_FORMAT format = ROBOT_MODEL_AUTO);
+
+    /**
+     * @brief Create visualization of a robot from a XML string
+     *
+     * @param xml: the XML document, as a string
+     * @param format: the file format (either ROBOT_MODEL_URDF or
+     *   ROBOT_MODEL_SDF)
+     * @return osg::Node: Root node of the constructed OSG scene for the robot.
+     */
+    osg::ref_ptr<osg::Node> loadFromString(QString xml, ROBOT_MODEL_FORMAT format, QString rootPrefix = "");
+
+    /**
+     * @deprecated use loadFromFile instead
      */
     osg::ref_ptr<osg::Node> load(QString path);
 
@@ -243,6 +289,26 @@ public:
 protected:
     osg::ref_ptr<osg::Node> makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root);
     osg::ref_ptr<osg::Node> makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_model );
+
+    osg::Node* makeOsg2(KDL::Segment kdl_seg, sdf::ElementPtr sdf_link, sdf::ElementPtr sdf_parent_link, osg::Group* root);
+    osg::Node* makeOsg( sdf::ElementPtr sdf );
+
+    /**
+     * @brief load from a string containing a URDF model
+     *
+     * This is a helper from loadFromString
+     */
+    osg::ref_ptr<osg::Node> loadFromURDFString(QString xml);
+
+    /**
+     * @brief load from a string containing a SDF model
+     *
+     * This is a helper from loadFromString
+     */
+    osg::ref_ptr<osg::Node> loadFromSDFString(QString xml);
+
+    std::map<std::string, sdf::ElementPtr> loadSdfModelLinks(sdf::ElementPtr sdf_model);
+
 
 protected:
     osg::ref_ptr<osg::Group> root_; /**< Root of the OSG scene containing the robot */
