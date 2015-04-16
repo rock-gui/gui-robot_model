@@ -23,12 +23,19 @@ end
 @state_port_name = Array.new
 use_test_gui = true
 hostname = nil
+model_file_mode = 'auto'
 options = OptionParser.new do |opt|
     opt.banner = <<-EOD
 rock-roboviz [options] /path/to/model/file
   If no task context is given, a UI window is started to allow changing
   the joint values. Use --no-joint-gui to disable
     EOD
+    opt.on '--urdf', 'load the given file as URDF' do
+        model_file_mode = 'urdf'
+    end
+    opt.on '--sdf', 'load the given file as SDF' do
+        model_file_mode = 'sdf'
+    end
     opt.on '--no-test-gui', 'disable the test GUI if no task context has been given' do
         use_test_gui = false
     end
@@ -68,7 +75,7 @@ end
 view3d = Vizkit.vizkit3d_widget
 view3d.show
 vis_gui = Vizkit.default_loader.RobotVisualization
-vis_gui.modelFile = model_file.dup
+vis_gui.loadFromFile(model_file.dup, model_file_mode.dup)
 
 if not @state_task_name.empty?
     @state_task_name.each_with_index do | task_name, index | 
@@ -111,7 +118,7 @@ elsif use_test_gui
     no_effort=true
     no_velocity=true
     ctrl_gui.configureUi(override_vel_limits, only_positive, no_effort, no_velocity)
-    ctrl_gui.initFromURDF(model_file.dup)
+    ctrl_gui.initFromFile(model_file.dup, model_file_mode.dup)
     ctrl_gui.connect(SIGNAL('sendSignal()')) do 
         sample = ctrl_gui.getJoints()
         vis_gui.updateData(sample)
