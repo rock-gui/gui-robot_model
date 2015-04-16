@@ -705,12 +705,13 @@ osg::ref_ptr<osg::Node> RobotModel::loadFromSDFString(QString xml)
 std::map<std::string, sdf::ElementPtr> RobotModel::loadSdfModelLinks(sdf::ElementPtr sdf_model)
 {
     std::map<std::string, sdf::ElementPtr> links;
+    std::string model_name = sdf_model->Get<std::string>("name");
 
     if (sdf_model->HasElement("link")){
         sdf::ElementPtr linkElem = sdf_model->GetElement("link");
         while (linkElem){
             std::string link_name = linkElem->Get<std::string>("name");
-            links.insert(std::make_pair<std::string, sdf::ElementPtr>(link_name, linkElem));
+            links.insert(std::make_pair(model_name + "::" + link_name, linkElem));
             linkElem = linkElem->GetNextElement("link");
         }
     }
