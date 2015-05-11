@@ -1,44 +1,38 @@
 #ifndef OSGHELPERS_HPP
 #define OSGHELPERS_HPP
 
-inline void sdf_pose_to_osg(sdf::ElementPtr pose, osg::Vec3& pos, osg::Quat& quat)
-{
-    double x, y, z;
-    double roll, pitch, yaw;
-    sscanf(pose->Get<std::string>().c_str(), "%lf %lf %lf %lf %lf %lf", &x, &y, &z, &roll, &pitch, &yaw);
-    pos.set(x, y, z);
-    osg::Quat q = osg::Quat(roll, osg::Vec3d(1, 0, 0), pitch, osg::Vec3d(0, 1, 0), yaw, osg::Vec3d(0, 0, 1));
-    quat.set(q.x(), q.y(), q.z(), q.w());
+inline void sdf_to_osg(sdf::Pose in, osg::PositionAttitudeTransform& out) {
+    out.setPosition(osg::Vec3(in.pos.x, in.pos.y, in.pos.z));
+    out.setAttitude(osg::Quat(in.rot.x, in.rot.y, in.rot.z, in.rot.w));
 }
 
-
-inline void sdf_pose_to_osg(sdf::ElementPtr pose, osg::PositionAttitudeTransform& out)
-{
-    double x, y, z;
-    double roll, pitch, yaw;
-    sscanf(pose->Get<std::string>().c_str(), "%lf %lf %lf %lf %lf %lf", &x, &y, &z, &roll, &pitch, &yaw);
-    out.setPosition(osg::Vec3(x, y, z));
-    out.setAttitude(osg::Quat(roll, osg::Vec3d(1, 0, 0), pitch, osg::Vec3d(0, 1, 0), yaw, osg::Vec3d(0, 0, 1)));
+inline void sdf_to_osg(sdf::Vector3 in, osg::Vec3& out) {
+    out.set(in.x, in.y, in.z);
 }
 
-inline void sdf_size_to_osg(sdf::ElementPtr size, osg::Vec3& out)
-{
-    double x, y, z;
-    sscanf(size->Get<std::string>().c_str(), "%lf %lf %lf", &x, &y, &z);
-    out.set(x, y, z);
+inline void sdf_to_osg(sdf::Color in, osg::Vec4& out) {
+    out.set(in.r, in.g, in.b, in.a);
 }
 
-inline void sdf_scale_to_osg(sdf::ElementPtr scale, osg::Vec3& out)
-{
-    sdf_size_to_osg(scale, out);
-}
-
-inline void sdf_color_to_osg(sdf::ElementPtr color, osg::Vec4& out)
-{
-    double r, g, b, a;
-    sscanf(color->Get<std::string>().c_str(), "%lf %lf %lf %lf", &r, &g, &b, &a);
-    out.set(r, g, b, a);
-}
+//inline void sdf_pose_to_osg(sdf::ElementPtr pose, osg::Vec3& pos, osg::Quat& quat)
+//{
+//    double x, y, z;
+//    double roll, pitch, yaw;
+//    sscanf(pose->Get<std::string>().c_str(), "%lf %lf %lf %lf %lf %lf", &x, &y, &z, &roll, &pitch, &yaw);
+//    pos.set(x, y, z);
+//    osg::Quat q = osg::Quat(roll, osg::Vec3d(1, 0, 0), pitch, osg::Vec3d(0, 1, 0), yaw, osg::Vec3d(0, 0, 1));
+//    quat.set(q.x(), q.y(), q.z(), q.w());
+//}
+//
+//
+//inline void sdf_pose_to_osg(sdf::ElementPtr pose, osg::PositionAttitudeTransform& out)
+//{
+//    double x, y, z;
+//    double roll, pitch, yaw;
+//    sscanf(pose->Get<std::string>().c_str(), "%lf %lf %lf %lf %lf %lf", &x, &y, &z, &roll, &pitch, &yaw);
+//    out.setPosition(osg::Vec3(x, y, z));
+//    out.setAttitude(osg::Quat(roll, osg::Vec3d(1, 0, 0), pitch, osg::Vec3d(0, 1, 0), yaw, osg::Vec3d(0, 0, 1)));
+//}
 
 inline void kdl_to_osg(KDL::Frame& in, osg::PositionAttitudeTransform& out){
     out.setPosition(osg::Vec3(in.p[0],in.p[1],in.p[2]));

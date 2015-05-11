@@ -189,19 +189,20 @@ void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
 void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
 
     osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
-    sdf_pose_to_osg(sdf_visual->GetElement("pose"), *to_visual);
+    sdf_to_osg(sdf_visual->GetElement("pose")->Get<sdf::Pose>(), *to_visual);
 
 //    toTipOsg_->addChild(to_visual);
     post_transform_->addChild(to_visual);
 
     osg::Node* osg_visual = 0;
     if (sdf_visual->HasElement("geometry")){
+
         sdf::ElementPtr sdf_geometry  = sdf_visual->GetElement("geometry");
         sdf::ElementPtr sdf_geom_elem = sdf_geometry->GetFirstElement();
 
         if (sdf_geom_elem->GetName() == "box"){
             osg::Vec3f size;
-            sdf_size_to_osg(sdf_geom_elem->GetElement("size"), size);
+            sdf_to_osg(sdf_geom_elem->GetElement("size")->Get<sdf::Vector3>(), size);
             osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3(0,0,0), size.x(), size.y(), size.z()));
             osg_visual = new osg::Geode;
             osg_visual->asGeode()->addDrawable(drawable);
@@ -219,9 +220,9 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
             osg_visual = new osg::Geode;
             osg_visual->asGeode()->addDrawable(drawable);
         }
-        else if  (sdf_geom_elem->GetName() == "mesh"){
+        else if (sdf_geom_elem->GetName() == "mesh") {
             osg::Vec3 scale;
-            sdf_scale_to_osg(sdf_geom_elem->GetElement("scale"), scale);
+            sdf_to_osg(sdf_geom_elem->GetElement("scale")->Get<sdf::Vector3>(), scale);
 
             to_visual->setScale(scale);
 
@@ -272,26 +273,26 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
 
         if (sdf_material->HasElement("ambient")){
             osg::Vec4 ambient;
-            sdf_color_to_osg(sdf_material->GetElement("ambient"), ambient);
+            sdf_to_osg(sdf_material->GetElement("ambient")->Get<sdf::Color>(), ambient);
             nodematerial->setAmbient(osg::Material::FRONT,ambient);
         }
 
         if (sdf_material->HasElement("diffuse")){
             osg::Vec4 diffuse;
-            sdf_color_to_osg(sdf_material->GetElement("diffuse"), diffuse);
+            sdf_to_osg(sdf_material->GetElement("diffuse")->Get<sdf::Color>(), diffuse);
             nodematerial->setDiffuse(osg::Material::FRONT,diffuse);
         }
 
         if (sdf_material->HasElement("specular")){
             osg::Vec4 specular;
-            sdf_color_to_osg(sdf_material->GetElement("specular"), specular);
+            sdf_to_osg(sdf_material->GetElement("specular")->Get<sdf::Color>(), specular);
             nodematerial->setSpecular(osg::Material::FRONT, specular);
 
         }
 
         if (sdf_material->HasElement("emissive")){
             osg::Vec4 emissive;
-            sdf_color_to_osg(sdf_material->GetElement("emissive"), emissive);
+            sdf_to_osg(sdf_material->GetElement("emissive")->Get<sdf::Color>(), emissive);
             nodematerial->setEmission(osg::Material::FRONT, emissive);
         }
 
@@ -632,6 +633,7 @@ osg::Node* RobotModel::makeOsg( sdf::ElementPtr sdf_model )
     // element, and that it is the segment for the tree root
     original_root_ = root_->getChild(0)->asGroup();
     original_root_name_ = tree.getRootSegment()->first;
+
     return root_;
 }
 
