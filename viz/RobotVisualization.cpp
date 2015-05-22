@@ -174,6 +174,18 @@ void RobotVisualization::setSegmentNamesEnabled(bool value)
     }
 }
 
+QQuaternion RobotVisualization::getRotation(QString source_frame, QString target_frame){
+    osg::Matrixd tr = getRelativeTransform(target_frame.toStdString(), source_frame.toStdString());
+    osg::Quat q = tr.getRotate();
+    return QQuaternion(q.w(), q.x(), q.y(), q.z());
+}
+
+QVector3D RobotVisualization::getTranslation(QString source_frame, QString target_frame){
+    osg::Matrixd tr = getRelativeTransform(target_frame.toStdString(), source_frame.toStdString());
+    osg::Vec3d t = tr.getTrans();
+    return QVector3D(t.x(),t.y(),t.z());
+}
+
 bool RobotVisualization::getFollowModelWithCamera() const{
 	return followModelWithCamera;
 }

@@ -68,6 +68,8 @@ public slots:
     void hideSegmentText(QString link_name);
     bool areSegmentNamesEnabled() const;
     void setSegmentNamesEnabled(bool value);
+    QQuaternion getRotation(QString source_frame, QString target_frame);
+    QVector3D getTranslation(QString source_frame, QString target_frame);
 
     /**
      * camera rotation center follows the robot
