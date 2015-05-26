@@ -199,8 +199,11 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
 
         sdf::ElementPtr sdf_geometry  = sdf_visual->GetElement("geometry");
         sdf::ElementPtr sdf_geom_elem = sdf_geometry->GetFirstElement();
-
-        if (sdf_geom_elem->GetName() == "box"){
+        if (!sdf_geom_elem){
+            LOG_WARN("SDF: no geometry element");
+            osg_visual = new osg::Geode;
+        }
+        else if (sdf_geom_elem->GetName() == "box"){
             osg::Vec3f size;
             sdf_to_osg(sdf_geom_elem->GetElement("size")->Get<sdf::Vector3>(), size);
             osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3(0,0,0), size.x(), size.y(), size.z()));
