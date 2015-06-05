@@ -231,23 +231,26 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
 
             std::string uri = sdf_geom_elem->GetElement("uri")->Get<std::string>();
 
-            std::string model_prefix = "model://";
+            std::string filename = sdf::findFile(uri, true, false);
 
-            std::string filename = "";
+            if (!QFileInfo(QString::fromStdString(filename)).exists()) {
 
-            if(uri.compare(0, model_prefix.length(), model_prefix) == 0){
-                filename = uri.substr(model_prefix.length());
-            }
-            else {
-                filename = uri;
-            }
+                std::string model_prefix = "model://";
 
-            QString qfilename = QString::fromStdString(filename);
+                if(uri.compare(0, model_prefix.length(), model_prefix) == 0) {
+                    filename = uri.substr(model_prefix.length());
+                }
+                else {
+                    filename = uri;
+                }
 
-            if (QFileInfo(qfilename).isRelative()){
-                QDir modelPaths = baseDir;
-                modelPaths.cdUp();
-                filename = modelPaths.absoluteFilePath(qfilename).toStdString();
+                QString qfilename = QString::fromStdString(filename);
+
+                if (QFileInfo(qfilename).isRelative()){
+                    QDir modelPaths = baseDir;
+                    modelPaths.cdUp();
+                    filename = modelPaths.absoluteFilePath(qfilename).toStdString();
+                }
             }
 
             LOG_INFO("loading visual %s", filename.c_str());
