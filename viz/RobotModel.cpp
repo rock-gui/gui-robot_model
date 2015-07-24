@@ -72,6 +72,30 @@ void OSGSegment::attachVisuals(std::vector<urdf::VisualSharedPtr > &visual_array
     }
 }
 
+class VBOVisitor : public osg::NodeVisitor
+{
+public:
+    VBOVisitor()
+    {
+        setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
+    }
+
+    virtual void apply(osg::Node& node)
+    {
+        osg::Geode *geode = node.asGeode();
+        if (geode != NULL)
+        {
+            for (unsigned int i = 0; i < geode->getNumDrawables(); i++)
+            {
+                osg::Drawable &drawable = *geode->getDrawable(i);
+                drawable.setUseDisplayList(false);
+                drawable.setUseVertexBufferObjects(true);
+            }
+        }
+        traverse(node);
+    }
+};
+
 void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
 {
     osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
@@ -179,6 +203,8 @@ void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
     //The smooting visitor calculates surface normals for correct shading
     osgUtil::SmoothingVisitor sv;
     osg_visual->accept(sv);
+    VBOVisitor vbo;
+    osg_visual->accept(vbo);
 
     to_visual->addChild(osg_visual);
     osg_visual->setUserData(this);
@@ -310,6 +336,8 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
     //The smooting visitor calculates surface normals for correct shading
     osgUtil::SmoothingVisitor sv;
     osg_visual->accept(sv);
+    VBOVisitor vbo;
+    osg_visual->accept(vbo);
 
     to_visual->addChild(osg_visual);
     osg_visual->setUserData(this);
