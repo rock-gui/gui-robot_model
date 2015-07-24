@@ -31,6 +31,8 @@
 #include <osgDB/ReaderWriter>
 #include <osgDB/PluginQuery>
 
+#include <osgUtil/Optimizer>
+
 OSGSegment::OSGSegment(KDL::Segment seg)
 {
     isSelected_=false;
@@ -205,6 +207,9 @@ void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
     osg_visual->accept(sv);
     VBOVisitor vbo;
     osg_visual->accept(vbo);
+    osgUtil::Optimizer optimizer;
+    optimizer.optimize(osg_visual,
+            osgUtil::Optimizer::INDEX_MESH | osgUtil::Optimizer::STATIC_OBJECT_DETECTION);
 
     to_visual->addChild(osg_visual);
     osg_visual->setUserData(this);
@@ -338,6 +343,9 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
     osg_visual->accept(sv);
     VBOVisitor vbo;
     osg_visual->accept(vbo);
+    osgUtil::Optimizer optimizer;
+    optimizer.optimize(osg_visual,
+            osgUtil::Optimizer::INDEX_MESH | osgUtil::Optimizer::STATIC_OBJECT_DETECTION | osgUtil::Optimizer::VERTEX_POSTTRANSFORM);
 
     to_visual->addChild(osg_visual);
     osg_visual->setUserData(this);
