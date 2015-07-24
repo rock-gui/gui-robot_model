@@ -121,13 +121,17 @@ void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
 
         QString qfilename = QString::fromStdString(filename);
         if (QFileInfo(qfilename).isRelative())
-            filename = baseDir.absoluteFilePath(qfilename).toStdString();
+            qfilename = baseDir.absoluteFilePath(qfilename);
+        if (QFileInfo(qfilename + ".osgb").exists())
+            qfilename = qfilename + ".osgb";
 
         //Force 'classic' ('C'-style) encoding before loading mesh files.
         //This allows loading of .obj files from within an Qt App on a german system.
         //Otherwise decimal delimeter confusion prevents loading of obj-files correctly
         std::locale::global(std::locale::classic());
+        filename = qfilename.toStdString();
         osg_visual = osgDB::readNodeFile(filename);
+
         if(!osg_visual){
             LOG_ERROR("OpenSceneGraph did not succees loading the mesh file %s.", filename.c_str());
             throw std::runtime_error("Error loading mesh file.");
@@ -203,13 +207,8 @@ void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
     }
 
     //The smooting visitor calculates surface normals for correct shading
-    osgUtil::SmoothingVisitor sv;
-    osg_visual->accept(sv);
     VBOVisitor vbo;
     osg_visual->accept(vbo);
-    osgUtil::Optimizer optimizer;
-    optimizer.optimize(osg_visual,
-            osgUtil::Optimizer::INDEX_MESH | osgUtil::Optimizer::STATIC_OBJECT_DETECTION);
 
     to_visual->addChild(osg_visual);
     osg_visual->setUserData(this);
@@ -261,13 +260,9 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
             to_visual->setScale(scale);
 
             std::string uri = sdf_geom_elem->GetElement("uri")->Get<std::string>();
-
             std::string filename = sdf::findFile(uri, true, false);
-
             if (!QFileInfo(QString::fromStdString(filename)).exists()) {
-
                 std::string model_prefix = "model://";
-
                 if(uri.compare(0, model_prefix.length(), model_prefix) == 0) {
                     filename = uri.substr(model_prefix.length());
                 }
@@ -276,13 +271,15 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
                 }
 
                 QString qfilename = QString::fromStdString(filename);
-
                 if (QFileInfo(qfilename).isRelative()){
                     QDir modelPaths = baseDir;
                     modelPaths.cdUp();
                     filename = modelPaths.absoluteFilePath(qfilename).toStdString();
                 }
             }
+
+            if (QFileInfo(QString::fromStdString(filename + ".osgb")).exists())
+                filename = filename + ".osgb";
 
             LOG_INFO("loading visual %s", filename.c_str());
             osg_visual = osgDB::readNodeFile(filename);
@@ -339,13 +336,8 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
     }
 
     //The smooting visitor calculates surface normals for correct shading
-    osgUtil::SmoothingVisitor sv;
-    osg_visual->accept(sv);
     VBOVisitor vbo;
     osg_visual->accept(vbo);
-    osgUtil::Optimizer optimizer;
-    optimizer.optimize(osg_visual,
-            osgUtil::Optimizer::INDEX_MESH | osgUtil::Optimizer::STATIC_OBJECT_DETECTION | osgUtil::Optimizer::VERTEX_POSTTRANSFORM);
 
     to_visual->addChild(osg_visual);
     osg_visual->setUserData(this);
