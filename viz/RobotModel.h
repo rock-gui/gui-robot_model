@@ -16,6 +16,21 @@
 #include <QObject>
 #include <QDir>
 
+/** 
+ * Struct to hold mimic joint properties
+ */
+struct MimicJoint {
+    std::string jointToMimic;
+    double multiplier;
+    double offset;
+
+    MimicJoint( std::string jointToMimic_ = "",
+            double multiplier_ = 1,
+            double offset_ = 0 )
+        : jointToMimic( jointToMimic_ ),
+        multiplier( multiplier_ ),
+        offset( offset_ ) { }
+};
 
 /**
  * @brief Data structure that is attached as 'User Data' to nodes within the RobotModel.
@@ -240,6 +255,11 @@ public:
      */
     bool relocateRoot(std::string name);
 
+    /** 
+     * @brief Finds the relevant node and sets the position value
+     */
+    bool setJointPos(std::string jointName, double jointVal);
+
 protected:
     osg::ref_ptr<osg::Node> makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root);
     osg::ref_ptr<osg::Node> makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_model );
@@ -252,6 +272,8 @@ protected:
     std::vector<std::string> jointNames_; /**< Joint names defined in URDF (joint of type none are NOT included) */
     std::vector<std::string> segmentNames_; /**< Segment names defined in URDF */
     QDir rootPrefix;
+
+    std::map< std::string, MimicJoint > mimic_joints_;
 
 public:
     //bool set_joint_state(std::vector<double> joint_vals);
