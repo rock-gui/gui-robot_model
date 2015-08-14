@@ -396,6 +396,7 @@ osg::ref_ptr<osg::Node> RobotModel::makeOsg( boost::shared_ptr<urdf::ModelInterf
     }
     relocateRoot(urdf_model->getRoot()->name);
 
+    
     return root_;
 }
 
@@ -411,6 +412,21 @@ osg::ref_ptr<osg::Node> RobotModel::load(QString path){
     rootPrefix = QDir(QFileInfo(path).absoluteDir());
     if (!model)
         return NULL;
+
+    // Create map of mimic joints
+    std::map<std::string, boost::shared_ptr<urdf::Joint> >::const_iterator it;
+    for( it = model->joints_.begin(); it!=model->joints_.end(); ++it ) {
+        boost::shared_ptr<urdf::Joint> joint = it->second;
+
+        if(joint->type != urdf::Joint::FIXED){
+            if(joint->mimic)
+            {
+                mimic_joints_[ it->first ] = MimicJoint( joint->mimic->joint_name,
+                    joint->mimic->multiplier, joint->mimic->offset );
+            }
+        }
+    }
+
     return makeOsg(model);
 }
 
@@ -450,7 +466,7 @@ bool RobotModel::relocateRoot(std::string name){
     return true;
 }
 
-bool RobotModel::setJointState(std::string jointName, double jointVal)
+bool RobotModel::setJointPos(std::string jointName, double jointVal)
 {
     osg::ref_ptr<osg::Node> node = findNamedNode(jointName, original_root_);
     if(!node)
@@ -461,16 +477,37 @@ bool RobotModel::setJointState(std::string jointName, double jointVal)
     return true;
 }
 
+bool RobotModel::setJointState(std::string jointName, double jointVal)
+{
+    // Checks if the joint is a mimic joint, then ignore the call
+    if( mimic_joints_.find( jointName ) != mimic_joints_.end() ) {
+        std::cerr << "Cannot set joint state for a mimic joint ( " <<
+            jointName << " ) directly, ignoring value" << std::endl;
+        return true;
+    }
+    
+    // Loops through all the mimic joints to check it the joint needs to be mimiced
+    for( std::map< std::string, MimicJoint >::const_iterator it = mimic_joints_.begin();
+         it != mimic_joints_.end(); ++it ) {
+        if( it->second.jointToMimic == jointName ) {
+            if( !setJointPos( it->first, ( jointVal * it->second.multiplier ) + it->second.offset ) ) {
+                return false;
+            }
+        }
+    }
+
+    // Sets the original joint
+    return setJointPos( jointName, jointVal );
+}
+
 bool RobotModel::setJointState(const std::map<std::string, double>& jointVals)
 {
     for (std::map<std::string, double>::const_iterator it=jointVals.begin();
          it!=jointVals.end(); ++it){
-        osg::ref_ptr<osg::Node> node = findNamedNode( it->first, original_root_);
-        if(!node)
-            return false;
 
-        osg::ref_ptr<OSGSegment> jnt = dynamic_cast<OSGSegment*>(node->getUserData());
-        jnt->setJointPos(it->second);
+        if( !setJointState( it->first, it->second ) ) {
+            return false;
+        }
     }
     return true;
 }
