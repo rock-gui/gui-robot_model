@@ -93,21 +93,24 @@ void RobotVisualization::setModelFile(QString modelFile)
 
     // Now create a RBS visualization for each of the frames in the model
     deleteFrameVisualizers();
-    vector<string> segments = getSegmentNames();
-    for (std::size_t i = 0; i != segments.size(); ++i)
-    {
-        OSGSegment* segment = getSegment(segments[i]);
-        assert(segment);
-        vizkit3d::RigidBodyStateVisualization* frame =
-                new vizkit3d::RigidBodyStateVisualization(this);
-        frame->setPluginName(QString::fromStdString(segments[i]));
 
-        osg::ref_ptr<osg::Group> frame_attachment = frame->getRootNode();
-        osg::ref_ptr<osg::StateSet> state = frame_attachment->getOrCreateStateSet();
-        state->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
+    if (areFramesEnabled()){
+    	vector<string> segments = getSegmentNames();
+		for (std::size_t i = 0; i != segments.size(); ++i)
+		{
+			OSGSegment* segment = getSegment(segments[i]);
+			assert(segment);
+			vizkit3d::RigidBodyStateVisualization* frame =
+					new vizkit3d::RigidBodyStateVisualization(this);
+			frame->setPluginName(QString::fromStdString(segments[i]));
 
-        segment->getGroup()->addChild(frame_attachment);
-        _frameVisualizers[segments[i]] = frame;
+			osg::ref_ptr<osg::Group> frame_attachment = frame->getRootNode();
+			osg::ref_ptr<osg::StateSet> state = frame_attachment->getOrCreateStateSet();
+			state->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
+
+			segment->getGroup()->addChild(frame_attachment);
+			_frameVisualizers[segments[i]] = frame;
+		}
     }
     setFramesEnabled(areFramesEnabled());
     setSegmentNamesEnabled(areSegmentNamesEnabled());
