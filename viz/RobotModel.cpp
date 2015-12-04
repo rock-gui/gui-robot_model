@@ -22,6 +22,7 @@
 
 #include <fstream>
 #include <streambuf>
+#include <locale>
 
 OSGSegment::OSGSegment(KDL::Segment seg)
 {
@@ -89,6 +90,10 @@ void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir baseD
         if (QFileInfo(qfilename).isRelative())
             filename = baseDir.absoluteFilePath(qfilename).toStdString();
 
+        //Force 'classic' ('C'-style) encoding before loading mesh files.
+        //This allows loading of .obj files from within an Qt App on a german system.
+        //Otherwise decimal delimeter confusion prevents loading of obj-files correctly
+        std::locale::global(std::locale::classic());
         osg_visual = osgDB::readNodeFile(filename);
         if(!osg_visual){
             LOG_ERROR("OpenSceneGraph did not succees loading the mesh file %s.", filename.c_str());
