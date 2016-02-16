@@ -3,6 +3,16 @@
 require 'vizkit'
 require 'optparse'
 
+have_joints_exporter = false
+joints_exporter = nil
+begin
+    require 'waypoint_editor/joints_exporter'
+    have_joints_exporter = true
+    joints_exporter = JointsExporter.new false
+rescue Exception => ex
+    have_joints_exporter = false
+end
+
 def try_to_get_task(task_name, retry_on_error=true)
     task = nil
     begin
@@ -100,7 +110,13 @@ if not @state_task_name.empty?
 elsif use_test_gui
     main = Qt::Widget.new
     layout = Qt::VBoxLayout.new(main)
-    layout.add_widget(view3d)
+    splitter = Qt::Splitter.new(main)
+    layout.add_widget splitter
+    splitter.setOrientation(Qt::Vertical)
+    splitter.add_widget(view3d)
+    if have_joints_exporter
+        splitter.add_widget joints_exporter
+    end
 
     ctrl_gui = Vizkit.default_loader.ControlUi
     override_vel_limits=0
@@ -112,8 +128,17 @@ elsif use_test_gui
     ctrl_gui.connect(SIGNAL('sendSignal()')) do 
         sample = ctrl_gui.getJoints()
         vis_gui.updateData(sample)
+        if have_joints_exporter
+            joints_exporter.setJoints sample
+        end
     end
-    layout.add_widget(ctrl_gui)
+    if have_joints_exporter
+        joints_exporter.connect(SIGNAL('configurationChanged()')) do
+            puts "joints: #{joints_exporter.getJoints()}"
+            ctrl_gui.setJointState(joints_exporter.getJoints())
+        end
+    end
+    splitter.add_widget(ctrl_gui)
     main.show
 end
 
