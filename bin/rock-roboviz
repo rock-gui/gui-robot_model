@@ -100,7 +100,10 @@ if not @state_task_name.empty?
 elsif use_test_gui
     main = Qt::Widget.new
     layout = Qt::VBoxLayout.new(main)
-    layout.add_widget(view3d)
+    splitter = Qt::Splitter.new(main)
+    layout.add_widget splitter
+    splitter.setOrientation(Qt::Vertical)
+    splitter.add_widget(view3d)
 
     ctrl_gui = Vizkit.default_loader.ControlUi
     override_vel_limits=0
@@ -113,7 +116,7 @@ elsif use_test_gui
         sample = ctrl_gui.getJoints()
         vis_gui.updateData(sample)
     end
-    layout.add_widget(ctrl_gui)
+    splitter.add_widget ctrl_gui
     main.show
 end
 
