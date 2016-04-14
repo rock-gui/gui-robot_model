@@ -43,8 +43,10 @@ void RobotVisualization::handlePropertyChanged(QString property){
         }
         else{
             if(getVisualizationFrame() != "world_osg"){
-                QMessageBox::information(NULL, "vizkit3d::RobotVisualization", "The visualization frame was changed to "+getVisualizationFrame()+", but "\
-                                         "this is not a known body part. Make sure to set 'rootFrame' to a reasonable body part name.");
+                LOG_WARN_S << "The visualization frame was changed to "
+                           << getVisualizationFrame().toStdString()
+                           << " this is not a known body part. Make sure to set"
+                           << "'rootFrame' to a reasonable body part name.";
             }
             else{ //Its world_osg, set to original root if it was determined yet
                 if(original_root_name_ != "")
@@ -86,7 +88,8 @@ void RobotVisualization::setModelFile(QString modelFile)
     bool st;
     st = load(modelFile);
     if(!st)
-        QMessageBox::critical(NULL, "vizkit3d::RobotVisualization", "cannot load " + modelFile + ", it either does not exist or is not a proper robot model file");
+        LOG_FATAL_S << "cannot load " << modelFile.toStdString()
+                   << ", it either does not exist or is not a proper robot model file";
     else
         _modelFile = modelFile;
     //emit propertyChanged("modelFile");
