@@ -152,7 +152,7 @@ void RobotVisualization::setFrameEnabled(QString segment_name, bool value, doubl
         it->second->setPluginEnabled(true);
     }
     else{
-        it->second->setSize(0);
+        it->second->setSize(1e-10);
         it->second->setPluginEnabled(false);
     }
 }
