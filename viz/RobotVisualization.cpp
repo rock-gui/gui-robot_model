@@ -2,7 +2,7 @@
 #include "RobotVisualization.hpp"
 #include <vizkit3d/RigidBodyStateVisualization.hpp>
 #include <vizkit3d/Vizkit3DWidget.hpp>
-#include <base/Logging.hpp>
+#include <base-logging/Logging.hpp>
 #include <osg/Geode>
 
 using namespace vizkit3d;

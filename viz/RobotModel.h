@@ -122,7 +122,7 @@ protected:
     *
     * @param visual: Parsed URDF tag (using urdf_parser) of the visual.
     */
-   void attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir prefix = QDir());
+   void attachVisual(std::shared_ptr<urdf::Visual> visual, QDir prefix = QDir());
 
    /**
    * @brieg Create nodes with visual meshes
@@ -131,7 +131,7 @@ protected:
    *
    * @param visual_array: Parsed URDF tag (using urdf_parser) of the visual.
    */
-   void attachVisuals(std::vector<boost::shared_ptr<urdf::Visual> > &visual_array, QDir prefix = QDir());
+   void attachVisuals(std::vector<std::shared_ptr<urdf::Visual> > &visual_array, QDir prefix = QDir());
 
 private:
     KDL::Segment seg_; /**< KDKL representation of the segment */
@@ -262,7 +262,7 @@ public:
 
 protected:
     osg::ref_ptr<osg::Node> makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root);
-    osg::ref_ptr<osg::Node> makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_model );
+    osg::ref_ptr<osg::Node> makeOsg( std::shared_ptr<urdf::ModelInterface> urdf_model );
 
 protected:
     osg::ref_ptr<osg::Group> root_; /**< Root of the OSG scene containing the robot */

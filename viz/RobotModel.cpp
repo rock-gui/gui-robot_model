@@ -15,7 +15,7 @@
 #include "osg/TextureRectangle"
 #include "osg/TexMat"
 #include "OSGHelpers.hpp"
-#include <base/Logging.hpp>
+#include <base-logging/Logging.hpp>
 #include <QFileInfo>
 #include <osg/ShadeModel>
 #include <osgUtil/SmoothingVisitor>
@@ -53,19 +53,19 @@ void OSGSegment::updateJoint(){
     kdl_to_osg(toTipKdl_, *toTipOsg_);
 }
 
-void OSGSegment::attachVisuals(std::vector<boost::shared_ptr<urdf::Visual> > &visual_array, QDir prefix)
+void OSGSegment::attachVisuals(std::vector<std::shared_ptr<urdf::Visual> > &visual_array, QDir prefix)
 {
-    std::vector<boost::shared_ptr<urdf::Visual> >::iterator itr = visual_array.begin();
-    std::vector<boost::shared_ptr<urdf::Visual> >::iterator itr_end = visual_array.end();
+    std::vector<std::shared_ptr<urdf::Visual> >::iterator itr = visual_array.begin();
+    std::vector<std::shared_ptr<urdf::Visual> >::iterator itr_end = visual_array.end();
 
     for(itr = visual_array.begin(); itr != itr_end; ++itr)
     {
-        boost::shared_ptr<urdf::Visual> visual = *itr;
+        std::shared_ptr<urdf::Visual> visual = *itr;
         attachVisual(visual, prefix);
     }
 }
 
-void OSGSegment::attachVisual(boost::shared_ptr<urdf::Visual> visual, QDir baseDir)
+void OSGSegment::attachVisual(std::shared_ptr<urdf::Visual> visual, QDir baseDir)
 {
     osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
     if (visual)
@@ -336,20 +336,20 @@ osg::ref_ptr<osg::Node> RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link ur
     //Attach one visual to joint
     if (urdf_link.visual_array.size() == 0)
     {
-        boost::shared_ptr<urdf::Visual> visual = urdf_link.visual;
+        std::shared_ptr<urdf::Visual> visual = urdf_link.visual;
         seg->attachVisual(visual, rootPrefix);
     }
     //Attach several visuals to joint
     else
     {
-         std::vector<boost::shared_ptr<urdf::Visual> > visual_array = urdf_link.visual_array;
+         std::vector<std::shared_ptr<urdf::Visual> > visual_array = urdf_link.visual_array;
          seg->attachVisuals(visual_array, rootPrefix);
     }
 
     return seg->getGroup();
 }
 
-osg::ref_ptr<osg::Node> RobotModel::makeOsg( boost::shared_ptr<urdf::ModelInterface> urdf_model ){
+osg::ref_ptr<osg::Node> RobotModel::makeOsg( std::shared_ptr<urdf::ModelInterface> urdf_model ){
     //Parse also to KDL
     KDL::Tree tree;
     kdl_parser::treeFromUrdfModel(*urdf_model, tree);
@@ -358,11 +358,11 @@ osg::ref_ptr<osg::Node> RobotModel::makeOsg( boost::shared_ptr<urdf::ModelInterf
     // Here we perform a full traversal throu the kinematic tree
     // hereby we go depth first
     //
-    boost::shared_ptr<const urdf::Link> urdf_link; //Temp Storage for current urdf link
+    std::shared_ptr<const urdf::Link> urdf_link; //Temp Storage for current urdf link
     KDL::Segment kdl_segment; //Temp Storage for urrent KDL link (same as URDF, but already parsed to KDL)
     osg::ref_ptr<osg::Node> hook = 0; //Node (from previous segment) to hook up next segment to
 
-    std::vector<boost::shared_ptr<const urdf::Link> > link_buffer; //Buffer for links we still need to visit
+    std::vector<std::shared_ptr<const urdf::Link> > link_buffer; //Buffer for links we still need to visit
     //used after LIFO principle
     std::vector<osg::ref_ptr<osg::Node> > hook_buffer;                  //Same as above but for hook. The top most
     //element here corresponds to the hook of the
@@ -413,15 +413,15 @@ osg::ref_ptr<osg::Node> RobotModel::load(QString path){
     std::string xml_str((std::istreambuf_iterator<char>(t)),
 	                     std::istreambuf_iterator<char>());
     //Parse urdf
-    boost::shared_ptr<urdf::ModelInterface> model = urdf::parseURDF( xml_str );
+    std::shared_ptr<urdf::ModelInterface> model = urdf::parseURDF( xml_str );
     rootPrefix = QDir(QFileInfo(path).absoluteDir());
     if (!model)
         return NULL;
 
     // Create map of mimic joints
-    std::map<std::string, boost::shared_ptr<urdf::Joint> >::const_iterator it;
+    std::map<std::string, std::shared_ptr<urdf::Joint> >::const_iterator it;
     for( it = model->joints_.begin(); it!=model->joints_.end(); ++it ) {
-        boost::shared_ptr<urdf::Joint> joint = it->second;
+        std::shared_ptr<urdf::Joint> joint = it->second;
 
         if(joint->type != urdf::Joint::FIXED){
             if(joint->mimic)
