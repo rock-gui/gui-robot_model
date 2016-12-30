@@ -219,7 +219,7 @@ void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
 void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
 
     osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
-    sdf_to_osg(sdf_visual->GetElement("pose")->Get<sdf::Pose>(), *to_visual);
+    sdf_to_osg(sdf_visual->GetElement("pose")->Get<ignition::math::Pose3d>(), *to_visual);
 
 //    toTipOsg_->addChild(to_visual);
     post_transform_->addChild(to_visual);
@@ -235,7 +235,7 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
         }
         else if (sdf_geom_elem->GetName() == "box"){
             osg::Vec3f size;
-            sdf_to_osg(sdf_geom_elem->GetElement("size")->Get<sdf::Vector3>(), size);
+            sdf_to_osg(sdf_geom_elem->GetElement("size")->Get<ignition::math::Vector3d>(), size);
             osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3(0,0,0), size.x(), size.y(), size.z()));
             osg_visual = new osg::Geode;
             osg_visual->asGeode()->addDrawable(drawable);
@@ -255,7 +255,7 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
         }
         else if (sdf_geom_elem->GetName() == "mesh") {
             osg::Vec3 scale;
-            sdf_to_osg(sdf_geom_elem->GetElement("scale")->Get<sdf::Vector3>(), scale);
+            sdf_to_osg(sdf_geom_elem->GetElement("scale")->Get<ignition::math::Vector3d>(), scale);
 
             to_visual->setScale(scale);
 
@@ -730,12 +730,12 @@ osg::ref_ptr<osg::Node> RobotModel::loadFromSDFString(QString xml)
         return NULL;
     }
 
-    if (!sdf->root->HasElement("model")){
+    if (!sdf->Root()->HasElement("model")){
         LOG_ERROR("the <model> tag not exists");
         return NULL;
     }
 
-    return makeOsg(sdf->root->GetElement("model"));
+    return makeOsg(sdf->Root()->GetElement("model"));
 }
 
 std::map<std::string, sdf::ElementPtr> RobotModel::loadSdfModelLinks(sdf::ElementPtr sdf_model)

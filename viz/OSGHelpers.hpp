@@ -1,13 +1,17 @@
 #ifndef OSGHELPERS_HPP
 #define OSGHELPERS_HPP
 
-inline void sdf_to_osg(sdf::Pose in, osg::PositionAttitudeTransform& out) {
-    out.setPosition(osg::Vec3(in.pos.x, in.pos.y, in.pos.z));
-    out.setAttitude(osg::Quat(in.rot.x, in.rot.y, in.rot.z, in.rot.w));
+inline void sdf_to_osg(ignition::math::Pose3d const& in, osg::PositionAttitudeTransform& out) {
+    out.setPosition(osg::Vec3(in.Pos().X(), in.Pos().Y(), in.Pos().Z()));
+    out.setAttitude(osg::Quat(in.Rot().X(), in.Rot().Y(), in.Rot().Z(), in.Rot().W()));
 }
 
-inline void sdf_to_osg(sdf::Vector3 in, osg::Vec3& out) {
-    out.set(in.x, in.y, in.z);
+inline void sdf_to_osg(ignition::math::Vector3d const& in, osg::PositionAttitudeTransform& out) {
+    out.setPosition(osg::Vec3(in.X(), in.Y(), in.Z()));
+}
+
+inline void sdf_to_osg(ignition::math::Vector3d const& in, osg::Vec3& out) {
+    out.set(in.X(), in.Y(), in.Z());
 }
 
 inline void sdf_to_osg(sdf::Color in, osg::Vec4& out) {
