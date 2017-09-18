@@ -20,4 +20,6 @@ rock_standard_layout()
  
 install(PROGRAMS bin/rock-roboviz
     DESTINATION bin)
+install(PROGRAMS bin/optimize_meshes
+    DESTINATION bin)
     
