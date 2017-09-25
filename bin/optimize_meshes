@@ -56,14 +56,15 @@ fi
 #Process files
 for fullfile in "$@"
 do
-  filedir=$(dirname "$fullfile")
-  filename=$(basename "$fullfile")
-  extension="${filename##*.}"
-  filename="${filename%.*}"
-  of="$filedir/$filename.osgb"
-  echo ""
-  echo "Processing $fullfile file to $of"
-  
-  OSG_OPTIMIZER="INDEX_MESH STATIC_OBJECT_DETECTION VERTEX_POSTTRANSFORM" osgconv $OSGCONVARGS $fullfile $of
+
+  case "$fullfile" in
+    *.osgb)
+      ;;
+    *)
+      echo ""
+      echo "Processing $fullfile file to $fullfile.osgb"
+      OSG_OPTIMIZER="INDEX_MESH STATIC_OBJECT_DETECTION VERTEX_POSTTRANSFORM" osgconv $OSGCONVARGS $fullfile $fullfile.osgb
+      ;;
+  esac
 done
 
