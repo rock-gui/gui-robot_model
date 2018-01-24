@@ -38,6 +38,8 @@ public:
 
     Q_INVOKABLE void updateData(base::samples::RigidBodyState const &sample)
     {vizkit3d::Vizkit3DPlugin<base::samples::Joints>::updateData(sample);}
+    Q_INVOKABLE void updateRBS(base::samples::RigidBodyState const &sample)
+    {updateData(sample);}
 
 public slots:
     void setRootLink(QString segment_name){
