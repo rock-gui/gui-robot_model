@@ -12,8 +12,8 @@ public:
 
 public slots:
     void update_transform(){
-        std::string source_frame = "Hand_r";
-        std::string target_frame = "Chest";
+        std::string source_frame = "base_link";
+        std::string target_frame = "link_6";
 
         osg::Matrixd t=plugin->getRelativeTransform(source_frame, target_frame);
         std::stringstream ss;
