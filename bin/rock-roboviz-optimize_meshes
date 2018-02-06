@@ -1,6 +1,6 @@
 #!/bin/bash
 
-USAGE="Usage: $0 file1 file2 ...
+USAGE="Usage: `basename $0` file1 file2 ...
 
 This program will use osgconv to convert mesh files into a simplified binary representation using the program 'osgconv'.
 The environment variable SIMPLIFY is used to control the level of simpification (corresponding to the --simplify parameter of 'osgconv'). By default SIMPIFY=1.0 is assumed.
@@ -9,13 +9,13 @@ If the envorinment variable SMOOTH is set to True
     SIMPLIFY     Argument must be a
                  normalized value for the resultant percentage
                  reduction.
-                 Example: --simplify .5
+                 Example: SIMPIFY=0.5
                           will produce a 50% reduced model.
                           
     SMOOTH       Smooth the surface by regenerating surface normals on
                  all geometry nodes
 
-Example: SIMPLIFY=0.5 SMOOTH=true $0 path/to/meshes/*.obj
+Example: SIMPLIFY=0.5 SMOOTH=true `basename $0` path/to/meshes/*.obj
 "
 
 #check if osgconv is installed
