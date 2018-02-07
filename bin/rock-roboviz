@@ -22,13 +22,32 @@ end
 @state_task_name = Array.new
 @state_port_name = Array.new
 use_test_gui = true
+mode_optimize = false
+simplify = nil
+smooth = false
+parallel = 1
 hostname = nil
 options = OptionParser.new do |opt|
     opt.banner = <<-EOD
 rock-roboviz [options] /path/to/model/file
-  If no task context is given, a UI window is started to allow changing
+  Opens a UI that allows to either display a model file (offline),
+  or display the state of a model based on joint data from a port (with
+  --joint-state-port)
+
+  If --joint-state-port is not given, a UI window is started to allow changing
   the joint values. Use --no-joint-gui to disable
+
+  See the Display Options section below for an option description
+
+rock-roboviz --optimize-meshes [options] FILES
+  Create optimized osgb files from other mesh files in a way that the robot
+  model visualization would load automatically. This speeds up loading
+  significantly, and allows to do more expensive passes - such as simplification
+  and smoothing.
+
+  See the Optimization Options section below for an option description
     EOD
+    opt.separator "\nDisplay Options"
     opt.on '--no-test-gui', 'disable the test GUI if no task context has been given' do
         use_test_gui = false
     end
@@ -44,12 +63,68 @@ rock-roboviz [options] /path/to/model/file
         @state_task_name.push( splitted[0] )
         @state_port_name.push( splitted[1] )
     end
+    opt.separator "\nOptimization Options"
+    opt.on '--optimize-meshes' do
+        mode_optimize = true
+    end
+    opt.on '--simplify[=VALUE]', Float, 'normalized simplification factor, 0.5 will produce a 50% reduced model. If no value is given, it defaults to the OSG default of 1' do |value|
+        simplify = value || 0.5
+    end
+    opt.on '--smooth', 'whether the model should be smoothed (default is not)' do
+        smooth = true
+    end
+    opt.on '--threads=N', Integer, 'how many parallel threads can be run to process the files' do |value|
+        parallel = value
+    end
     opt.on '--help', 'this help message' do
         puts opt
+        exit 0
     end
 end
 
 args = options.parse(ARGV)
+
+class ConversionFailed < RuntimeError; end
+if mode_optimize
+    queue = Queue.new
+    env = Hash[
+        'OSG_OPTIMIZER' => 'INDEX_MASH STATIC_OBJECT_DETECTION VERTEX_POSTTRANSFORM',
+        'OSG_NOTIFY_LEVEL' => 'WARN'
+    ]
+    osgconv_args = []
+    if smooth
+        osgconv_args << '--smooth'
+    end
+    if simplify
+        osgconv_args << "--simplify" << simplify.to_s
+    end
+    args.each { |file| queue << file }
+    threads = (0...parallel).map do
+        Thread.new do
+            while !queue.empty?
+                file = queue.pop
+                if !system(env, "osgconv", *osgconv_args, file, "#{file}.osgb")
+                    raise ConversionFailed, "conversion of #{file} failed"
+                end
+            end
+            nil
+        end
+    end
+    has_error = false
+    threads.each do |t|
+        begin t.value
+        rescue ConversionFailed => e
+            has_error = true
+            STDERR.puts e.message
+        end
+    end
+    if has_error
+        exit 0
+    else
+        exit 1
+    end
+end
+
 model_file = args.shift
 
 if !model_file
