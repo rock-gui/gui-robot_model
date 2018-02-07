@@ -56,7 +56,7 @@ public:
  * @param node: The Node this OSGSegment is attached to. Should be the joint transform
  * @param seg: KDL segment corresponding to the node.
  */
-    OSGSegment(KDL::Segment seg);
+    OSGSegment(KDL::Segment seg, bool useVBO);
 
     /**
      * @brief Set position of joint
@@ -155,6 +155,8 @@ protected:
    */
    void attachVisuals(std::vector<sdf::ElementPtr> const&visual_array, QDir prefix = QDir());
 
+   /** Attach the VBO visitor to the node if VBOs are enabled */
+   void useVBOIfEnabled(osg::Node* node);
 
 private:
     KDL::Segment seg_; /**< KDKL representation of the segment */
@@ -167,6 +169,7 @@ private:
     osg::ref_ptr<osgText::Text> text_label_;
     osg::ref_ptr<osg::Geode> text_label_geode_;
     bool isSelected_; /**< Selection state */
+    bool useVBO_; /**< Whether rendering should use VBOs */
 
     friend class InteractionHandler;
     friend class OSGSegmentCallback;
@@ -322,6 +325,16 @@ public:
      */
     bool relocateRoot(osg::ref_ptr<osg::Node> group);
 
+    /**
+     * Enables or disables usage of VBO (might affect performance)
+     */
+    void setUseVBO(bool enabled);
+
+    /**
+     * Checks whether VBOs will be used or not
+     */
+    bool getUseVBO() const;
+
 protected:
     osg::ref_ptr<osg::Group> makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root);
     osg::ref_ptr<osg::Node> makeOsg( urdf::ModelInterfaceSharedPtr urdf_model );
@@ -359,6 +372,11 @@ protected:
     QDir rootPrefix;
 
     std::map< std::string, MimicJoint > mimic_joints_;
+
+    bool useVBO_;
+
+    static bool getVBODefault();
+
 public:
     //bool set_joint_state(std::vector<double> joint_vals);
     /**
