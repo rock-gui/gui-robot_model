@@ -33,13 +33,14 @@
 
 #include <osgUtil/Optimizer>
 
-OSGSegment::OSGSegment(KDL::Segment seg)
+OSGSegment::OSGSegment(KDL::Segment seg, bool useVBO)
 {
     isSelected_=false;
     seg_ = seg;
     jointPos_ = 0;
     label_ = 0;
     visual_ = 0;
+    useVBO_ = useVBO;
     post_transform_ = new osg::Group();
     toTipOsg_ = new osg::PositionAttitudeTransform();
     toTipOsg_->addChild(post_transform_);
@@ -206,9 +207,7 @@ void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
         }
     }
 
-    //The smooting visitor calculates surface normals for correct shading
-    VBOVisitor vbo;
-    osg_visual->accept(vbo);
+    useVBOIfEnabled(osg_visual);
 
     to_visual->addChild(osg_visual);
     osg_visual->setUserData(this);
@@ -335,14 +334,25 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
         nodess->setAttribute(nodematerial.get());
     }
 
-    //The smooting visitor calculates surface normals for correct shading
-    VBOVisitor vbo;
-    osg_visual->accept(vbo);
+    useVBOIfEnabled(osg_visual);
 
     to_visual->addChild(osg_visual);
     osg_visual->setUserData(this);
     osg_visual->setName(seg_.getName());
     visual_ = osg_visual->asGeode();
+}
+
+void OSGSegment::useVBOIfEnabled(osg::Node* node)
+{
+    if (useVBO_)
+    {
+        LOG_DEBUG("Using VBOs to display meshes")
+        VBOVisitor vbo;
+        node->accept(vbo);
+    }
+    else {
+        LOG_DEBUG("Not using VBOs to display meshes, enable globally with ROCK_VIZ_USE_VBO")
+    }
 }
 
 void OSGSegment::attachVisuals(std::vector<sdf::ElementPtr> const &visual_array, QDir prefix){
@@ -494,10 +504,11 @@ bool OSGSegment::toggleSelected(){
 }
 
 
-RobotModel::RobotModel(){
+RobotModel::RobotModel() {
     //Root is the entry point to the scene graph
     root_ = osg::ref_ptr<osg::Group>(new osg::Group());
     original_root_ = osg::ref_ptr<osg::Group>(new osg::Group());
+    useVBO_ = RobotModel::getVBODefault();
     loadEmptyScene();
 }
 
@@ -510,7 +521,7 @@ osg::ref_ptr<osg::Node> RobotModel::loadEmptyScene(){
 }
 
 osg::ref_ptr<osg::Group> RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root){
-    osg::ref_ptr<OSGSegment> seg = osg::ref_ptr<OSGSegment>(new OSGSegment(kdl_seg));
+    osg::ref_ptr<OSGSegment> seg = osg::ref_ptr<OSGSegment>(new OSGSegment(kdl_seg, useVBO_));
     root->addChild(seg->toTipOsg_);
 
     //Attach one visual to joint
@@ -632,7 +643,7 @@ osg::Node* RobotModel::makeOsg( sdf::ElementPtr sdf_model )
 
         KDL::Segment const& kdl = it->second.segment;
 
-        osg::ref_ptr<OSGSegment> seg = new OSGSegment(kdl);
+        osg::ref_ptr<OSGSegment> seg = new OSGSegment(kdl, useVBO_);
         parent_osg->addChild(seg->toTipOsg_);
 
         SDFLinkIterator sdf = sdf_links.find(kdl.getName());
@@ -856,6 +867,22 @@ bool RobotModel::toggleHighlight(std::string name)
 
     seg->toggleSelected();
     return seg->isSelected_;
+}
+
+bool RobotModel::getVBODefault()
+{
+    const char* env = getenv("ROCK_VIZ_USE_VBO");
+    return (env && *env == '1');
+}
+
+void RobotModel::setUseVBO(bool flag)
+{
+    useVBO_ = flag;
+}
+
+bool RobotModel::getUseVBO() const
+{
+    return useVBO_;
 }
 
 osg::Matrixd RobotModel::getRelativeTransform(std::string source_segment, std::string target_segment)
