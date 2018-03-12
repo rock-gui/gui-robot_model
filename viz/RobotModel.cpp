@@ -24,20 +24,30 @@
 #include <streambuf>
 #include <locale>
 
-OSGSegment::OSGSegment(KDL::Segment seg)
+#include <osgDB/Registry>
+#include <osgDB/ReadFile>
+#include <osgDB/WriteFile>
+#include <osgDB/FileNameUtils>
+#include <osgDB/ReaderWriter>
+#include <osgDB/PluginQuery>
+
+#include <osgUtil/Optimizer>
+
+OSGSegment::OSGSegment(KDL::Segment seg, bool useVBO)
 {
     isSelected_=false;
     seg_ = seg;
     jointPos_ = 0;
     label_ = 0;
     visual_ = 0;
+    useVBO_ = useVBO;
     post_transform_ = new osg::Group();
     toTipOsg_ = new osg::PositionAttitudeTransform();
     toTipOsg_->addChild(post_transform_);
     toTipOsg_->setName(seg_.getJoint().getName());
-
     post_transform_->setUserData( this );
     post_transform_->setUpdateCallback(new OSGSegmentCallback);
+
     toTipOsg_->setUserData(this);
 
     setupTextLabel();
@@ -65,6 +75,30 @@ void OSGSegment::attachVisuals(std::vector<urdf::VisualSharedPtr > &visual_array
     }
 }
 
+class VBOVisitor : public osg::NodeVisitor
+{
+public:
+    VBOVisitor()
+    {
+        setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
+    }
+
+    virtual void apply(osg::Node& node)
+    {
+        osg::Geode *geode = node.asGeode();
+        if (geode != NULL)
+        {
+            for (unsigned int i = 0; i < geode->getNumDrawables(); i++)
+            {
+                osg::Drawable &drawable = *geode->getDrawable(i);
+                drawable.setUseDisplayList(false);
+                drawable.setUseVertexBufferObjects(true);
+            }
+        }
+        traverse(node);
+    }
+};
+
 void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
 {
     osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
@@ -88,13 +122,17 @@ void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
 
         QString qfilename = QString::fromStdString(filename);
         if (QFileInfo(qfilename).isRelative())
-            filename = baseDir.absoluteFilePath(qfilename).toStdString();
+            qfilename = baseDir.absoluteFilePath(qfilename);
+        if (QFileInfo(qfilename + ".osgb").exists())
+            qfilename = qfilename + ".osgb";
 
         //Force 'classic' ('C'-style) encoding before loading mesh files.
         //This allows loading of .obj files from within an Qt App on a german system.
         //Otherwise decimal delimeter confusion prevents loading of obj-files correctly
         std::locale::global(std::locale::classic());
+        filename = qfilename.toStdString();
         osg_visual = osgDB::readNodeFile(filename);
+
         if(!osg_visual){
             LOG_ERROR("OpenSceneGraph did not succees loading the mesh file %s.", filename.c_str());
             throw std::runtime_error("Error loading mesh file.");
@@ -169,15 +207,167 @@ void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
         }
     }
 
-    //The smooting visitor calculates surface normals for correct shading
-    osgUtil::SmoothingVisitor sv;
-    osg_visual->accept(sv);
+    useVBOIfEnabled(osg_visual);
 
     to_visual->addChild(osg_visual);
     osg_visual->setUserData(this);
     osg_visual->setName(seg_.getName());
     visual_ = osg_visual->asGeode();
 }
+
+void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
+
+    osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
+    sdf_to_osg(sdf_visual->GetElement("pose")->Get<ignition::math::Pose3d>(), *to_visual);
+
+//    toTipOsg_->addChild(to_visual);
+    post_transform_->addChild(to_visual);
+
+    osg::Node* osg_visual = 0;
+    if (sdf_visual->HasElement("geometry")){
+
+        sdf::ElementPtr sdf_geometry  = sdf_visual->GetElement("geometry");
+        sdf::ElementPtr sdf_geom_elem = sdf_geometry->GetFirstElement();
+        if (!sdf_geom_elem){
+            LOG_WARN("SDF: no geometry element");
+            osg_visual = new osg::Geode;
+        }
+        else if (sdf_geom_elem->GetName() == "box"){
+            osg::Vec3f size;
+            sdf_to_osg(sdf_geom_elem->GetElement("size")->Get<ignition::math::Vector3d>(), size);
+            osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3(0,0,0), size.x(), size.y(), size.z()));
+            osg_visual = new osg::Geode;
+            osg_visual->asGeode()->addDrawable(drawable);
+        }
+        else if (sdf_geom_elem->GetName() == "cylinder"){
+            double radius = sdf_geom_elem->GetElement("radius")->Get<double>();
+            double length = sdf_geom_elem->GetElement("length")->Get<double>();
+            osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Cylinder(osg::Vec3d(0,0,0), radius, length));
+            osg_visual = new osg::Geode;
+            osg_visual->asGeode()->addDrawable(drawable);
+        }
+        else if (sdf_geom_elem->GetName() == "sphere"){
+            double radius = sdf_geom_elem->GetElement("radius")->Get<double>();
+            osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Sphere(osg::Vec3d(0,0,0), radius));
+            osg_visual = new osg::Geode;
+            osg_visual->asGeode()->addDrawable(drawable);
+        }
+        else if (sdf_geom_elem->GetName() == "mesh") {
+            osg::Vec3 scale;
+            sdf_to_osg(sdf_geom_elem->GetElement("scale")->Get<ignition::math::Vector3d>(), scale);
+
+            to_visual->setScale(scale);
+
+            std::string uri = sdf_geom_elem->GetElement("uri")->Get<std::string>();
+            std::string filename = sdf::findFile(uri, true, false);
+            if (!QFileInfo(QString::fromStdString(filename)).exists()) {
+                std::string model_prefix = "model://";
+                if(uri.compare(0, model_prefix.length(), model_prefix) == 0) {
+                    filename = uri.substr(model_prefix.length());
+                }
+                else {
+                    filename = uri;
+                }
+
+                QString qfilename = QString::fromStdString(filename);
+                if (QFileInfo(qfilename).isRelative()){
+                    QDir modelPaths = baseDir;
+                    modelPaths.cdUp();
+                    filename = modelPaths.absoluteFilePath(qfilename).toStdString();
+                }
+            }
+
+            if (QFileInfo(QString::fromStdString(filename + ".osgb")).exists())
+                filename = filename + ".osgb";
+
+            LOG_INFO("loading visual %s", filename.c_str());
+            osg_visual = osgDB::readNodeFile(filename);
+            if (!osg_visual) {
+                LOG_WARN("OpenSceneGraph did not succeed in loading the mesh file %s.", filename.c_str());
+                osg_visual = new osg::Geode;
+            }
+        }
+        else {
+            LOG_WARN("SDF: %s is not a supported geometry", sdf_geom_elem->GetName().c_str());
+            osg_visual = new osg::Geode;
+        }
+    }
+
+    if (sdf_visual->HasElement("material")){
+
+        osg::ref_ptr<osg::Material> nodematerial = new osg::Material;
+
+        nodematerial->setSpecular(osg::Material::FRONT,osg::Vec4(0.2,
+                                                                 0.2,
+                                                                 0.2,
+                                                                 1));
+
+        sdf::ElementPtr sdf_material = sdf_visual->GetElement("material");
+
+        if (sdf_material->HasElement("ambient")){
+            osg::Vec4 ambient;
+            sdf_to_osg(sdf_material->GetElement("ambient")->Get<sdf::Color>(), ambient);
+            nodematerial->setAmbient(osg::Material::FRONT,ambient);
+        }
+
+        if (sdf_material->HasElement("diffuse")){
+            osg::Vec4 diffuse;
+            sdf_to_osg(sdf_material->GetElement("diffuse")->Get<sdf::Color>(), diffuse);
+            nodematerial->setDiffuse(osg::Material::FRONT,diffuse);
+        }
+
+        if (sdf_material->HasElement("specular")){
+            osg::Vec4 specular;
+            sdf_to_osg(sdf_material->GetElement("specular")->Get<sdf::Color>(), specular);
+            nodematerial->setSpecular(osg::Material::FRONT, specular);
+
+        }
+
+        if (sdf_material->HasElement("emissive")){
+            osg::Vec4 emissive;
+            sdf_to_osg(sdf_material->GetElement("emissive")->Get<sdf::Color>(), emissive);
+            nodematerial->setEmission(osg::Material::FRONT, emissive);
+        }
+
+        osg::ref_ptr<osg::StateSet> nodess = osg_visual->getOrCreateStateSet();
+        nodess->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
+        nodess->setAttribute(nodematerial.get());
+    }
+
+    useVBOIfEnabled(osg_visual);
+
+    to_visual->addChild(osg_visual);
+    osg_visual->setUserData(this);
+    osg_visual->setName(seg_.getName());
+    visual_ = osg_visual->asGeode();
+}
+
+void OSGSegment::useVBOIfEnabled(osg::Node* node)
+{
+    if (useVBO_)
+    {
+        LOG_DEBUG("Using VBOs to display meshes")
+        VBOVisitor vbo;
+        node->accept(vbo);
+    }
+    else {
+        LOG_DEBUG("Not using VBOs to display meshes, enable globally with ROCK_VIZ_USE_VBO")
+    }
+}
+
+void OSGSegment::attachVisuals(std::vector<sdf::ElementPtr> const &visual_array, QDir prefix){
+
+    std::vector<sdf::ElementPtr>::const_iterator
+        itr,
+        itr_end = visual_array.end();
+
+    for(itr = visual_array.begin(); itr != itr_end; ++itr)
+    {
+        sdf::ElementPtr visual = *itr;
+        attachVisual(visual, prefix);
+    }
+}
+
 
 void OSGSegment::removeLabel(){
     if(label_)
@@ -314,10 +504,11 @@ bool OSGSegment::toggleSelected(){
 }
 
 
-RobotModel::RobotModel(){
+RobotModel::RobotModel() {
     //Root is the entry point to the scene graph
     root_ = osg::ref_ptr<osg::Group>(new osg::Group());
     original_root_ = osg::ref_ptr<osg::Group>(new osg::Group());
+    useVBO_ = RobotModel::getVBODefault();
     loadEmptyScene();
 }
 
@@ -329,8 +520,8 @@ osg::ref_ptr<osg::Node> RobotModel::loadEmptyScene(){
     return root_;
 }
 
-osg::ref_ptr<osg::Node> RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root){
-    osg::ref_ptr<OSGSegment> seg = osg::ref_ptr<OSGSegment>(new OSGSegment(kdl_seg));
+osg::ref_ptr<osg::Group> RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root){
+    osg::ref_ptr<OSGSegment> seg = osg::ref_ptr<OSGSegment>(new OSGSegment(kdl_seg, useVBO_));
     root->addChild(seg->toTipOsg_);
 
     //Attach one visual to joint
@@ -347,6 +538,30 @@ osg::ref_ptr<osg::Node> RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link ur
     }
 
     return seg->getGroup();
+}
+
+void RobotModel::makeOsg2(KDL::Segment const& kdl_seg, std::vector<sdf::ElementPtr> const& visuals, OSGSegment& seg){
+
+    if (visuals.size() > 0)
+    {
+        seg.attachVisuals(visuals, rootPrefix);
+    }
+    else {
+        //in sdf files it is possible to create links without visuals
+        //the code below create a representation of visual to attach the segment
+        //to keep the compatibility create the nodes to_visual and osg_visual
+        //the segment is attached in the osg_visual
+        osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
+        seg.post_transform_->addChild(to_visual);
+
+        //create an invisible node only to represent the visual information and keep the compatibility
+        osg::Node *node = new osg::Geode();
+        node->setUserData(&seg);
+        node->setName(kdl_seg.getName());
+        to_visual->addChild(node);
+        seg.visual_ = node->asGeode();
+
+    }
 }
 
 osg::ref_ptr<osg::Node> RobotModel::makeOsg( urdf::ModelInterfaceSharedPtr urdf_model ){
@@ -387,7 +602,7 @@ osg::ref_ptr<osg::Node> RobotModel::makeOsg( urdf::ModelInterfaceSharedPtr urdf_
         hook = hook_buffer.back();
         hook_buffer.pop_back();
         kdl_segment = tree.getSegment(urdf_link->name)->second.segment;
-        osg::ref_ptr<osg::Node> new_hook = makeOsg2(kdl_segment,
+        osg::ref_ptr<osg::Group> new_hook = makeOsg2(kdl_segment,
                                        *urdf_link, hook->asGroup());
 
         //Also store names of links and joints
@@ -405,35 +620,152 @@ osg::ref_ptr<osg::Node> RobotModel::makeOsg( urdf::ModelInterfaceSharedPtr urdf_
     return root_;
 }
 
+osg::Node* RobotModel::makeOsg( sdf::ElementPtr sdf_model )
+{
+    typedef std::map<std::string, sdf::ElementPtr>::const_iterator SDFLinkIterator;
+    typedef KDL::SegmentMap::const_iterator SegmentIterator;
+
+    KDL::Tree tree;
+    kdl_parser::treeFromSdfModel(sdf_model, tree);
+
+    std::map<std::string, sdf::ElementPtr> sdf_links = loadSdfModelLinks(sdf_model);
+
+    std::list<SegmentIterator> queue;
+    std::list< osg::ref_ptr<osg::Group> > queue_osg;
+    queue.push_back(tree.getRootSegment());
+    queue_osg.push_back(root_);
+
+    while (!queue.empty()){
+        SegmentIterator it = queue.front();
+        osg::ref_ptr<osg::Group> parent_osg = queue_osg.front();
+        queue.pop_front();
+        queue_osg.pop_front();
+
+        KDL::Segment const& kdl = it->second.segment;
+
+        osg::ref_ptr<OSGSegment> seg = new OSGSegment(kdl, useVBO_);
+        parent_osg->addChild(seg->toTipOsg_);
+
+        SDFLinkIterator sdf = sdf_links.find(kdl.getName());
+
+        std::vector<sdf::ElementPtr> visuals;
+        if (sdf != sdf_links.end()){
+            sdf::ElementPtr sdf_link = sdf->second;
+            sdf::ElementPtr visualElem = sdf_link->GetElement("visual");
+            while (visualElem){
+                visuals.push_back(visualElem);
+                visualElem = visualElem->GetNextElement("visual");
+            }
+        }
+
+        makeOsg2(kdl, visuals, *seg);
+
+        osg::ref_ptr<osg::Group> osg = seg->getGroup();
+        std::vector<SegmentIterator> const& children =
+            it->second.children;
+        for (std::vector<SegmentIterator>::const_iterator child_it = children.begin();
+                child_it != children.end(); ++child_it) {
+            queue.push_back(*child_it);
+            queue_osg.push_back(osg);
+        }
+
+        segmentNames_.push_back(kdl.getName());
+        if(kdl.getJoint().getType() != KDL::Joint::None)
+            jointNames_.push_back(kdl.getJoint().getName());
+    }
+
+    // Since we inject the KDL tree root, root_ is guaranteed to have only one
+    // element, and that it is the segment for the tree root
+    original_root_ = root_->getChild(0)->asGroup();
+    original_root_name_ = tree.getRootSegment()->first;
+
+    return root_;
+}
+
 osg::ref_ptr<osg::Node> RobotModel::load(QString path){
+
+    return loadFromFile(path);
+}
+
+osg::ref_ptr<osg::Node> RobotModel::loadFromFile(QString path, ROBOT_MODEL_FORMAT format)
+{
+    if (format == ROBOT_MODEL_AUTO)
+    {
+        kdl_parser::ROBOT_MODEL_FORMAT kdl_format = 
+            kdl_parser::guessFormatFromFilename(path.toStdString());
+        LOG_INFO("file %s guessed to be of type %s", path.toStdString().c_str(),
+                kdl_parser::formatNameFromID(kdl_format));
+        format = static_cast<ROBOT_MODEL_FORMAT>(kdl_format);
+    }
+
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly))
+        throw std::invalid_argument("cannot open " + path.toStdString() + " for reading");
+    return loadFromString(QString::fromUtf8(file.readAll()), format, QFileInfo(path).absoluteDir().path());
+}
+
+osg::ref_ptr<osg::Node> RobotModel::loadFromString(QString xml, ROBOT_MODEL_FORMAT format, QString _rootPrefix)
+{
+    rootPrefix = QDir(_rootPrefix);
 
     loadEmptyScene();
 
-    std::ifstream t( path.toStdString().c_str() );
-    std::string xml_str((std::istreambuf_iterator<char>(t)),
-	                     std::istreambuf_iterator<char>());
-    //Parse urdf
-    urdf::ModelInterfaceSharedPtr model = urdf::parseURDF( xml_str );
-    rootPrefix = QDir(QFileInfo(path).absoluteDir());
+    if (format == ROBOT_MODEL_URDF)
+        return loadFromURDFString(xml);
+    else if (format == ROBOT_MODEL_SDF)
+        return loadFromSDFString(xml);
+    else
+        throw std::invalid_argument(std::string("unknown robot model format ") + kdl_parser::formatNameFromID(format));
+}
+
+osg::ref_ptr<osg::Node> RobotModel::loadFromURDFString(QString xml)
+{
+    urdf::ModelInterfaceSharedPtr model = urdf::parseURDF( xml.toStdString() );
     if (!model)
         return NULL;
 
-    // Create map of mimic joints
-    std::map<std::string, urdf::JointSharedPtr >::const_iterator it;
-    for( it = model->joints_.begin(); it!=model->joints_.end(); ++it ) {
-        urdf::JointSharedPtr joint = it->second;
+    return makeOsg(model);
+}
 
-        if(joint->type != urdf::Joint::FIXED){
-            if(joint->mimic)
-            {
-                mimic_joints_[ it->first ] = MimicJoint( joint->mimic->joint_name,
-                    joint->mimic->multiplier, joint->mimic->offset );
-            }
+osg::ref_ptr<osg::Node> RobotModel::loadFromSDFString(QString xml)
+{
+    sdf::SDFPtr sdf(new sdf::SDF);
+    if (!sdf::init(sdf)){
+        LOG_ERROR("unable to initialize sdf.");
+        return NULL;
+    }
+    std::string xml_s = xml.toStdString();
+    if (!sdf::readString(xml_s, sdf))
+    {
+        LOG_ERROR("unable to load sdf from string %s.\n", xml_s.c_str());
+        return NULL;
+    }
+
+    if (!sdf->Root()->HasElement("model")){
+        LOG_ERROR("the <model> tag not exists");
+        return NULL;
+    }
+
+    return makeOsg(sdf->Root()->GetElement("model"));
+}
+
+std::map<std::string, sdf::ElementPtr> RobotModel::loadSdfModelLinks(sdf::ElementPtr sdf_model)
+{
+    std::map<std::string, sdf::ElementPtr> links;
+    std::string model_name = sdf_model->Get<std::string>("name");
+
+    if (sdf_model->HasElement("link")){
+        sdf::ElementPtr linkElem = sdf_model->GetElement("link");
+        while (linkElem){
+            std::string link_name = linkElem->Get<std::string>("name");
+            links.insert(std::make_pair(model_name + "::" + link_name, linkElem));
+            linkElem = linkElem->GetNextElement("link");
         }
     }
 
-    return makeOsg(model);
+    return links;
 }
+
 
 osg::ref_ptr<OSGSegment> RobotModel::getSegment(std::string name)
 {
@@ -442,13 +774,24 @@ osg::ref_ptr<OSGSegment> RobotModel::getSegment(std::string name)
         std::cerr << "Could not find segment with name: " << name << std::endl;
         return 0;
     }
+    return getSegment(node);
+}
 
+osg::ref_ptr<OSGSegment> RobotModel::getSegment(osg::ref_ptr<osg::Node> node)
+{
     osg::ref_ptr<OSGSegment> jnt = dynamic_cast<OSGSegment*>(node->getUserData());
     if(!jnt){
-        std::cerr << "Could not retrieve user data from node "<<name<<std::endl;
+        throw std::invalid_argument("Could not retrieve user data from node " + node->getName());
     }
-    assert(jnt);
     return jnt;
+}
+
+bool RobotModel::relocateRoot(osg::ref_ptr<osg::Node> group)
+{
+    osg::ref_ptr<OSGSegment> seg = getSegment(group);
+    root_->removeChildren(0, root_->getNumChildren());
+    root_->addChild(seg->post_transform_);
+    return true;
 }
 
 bool RobotModel::relocateRoot(std::string name){
@@ -524,6 +867,22 @@ bool RobotModel::toggleHighlight(std::string name)
 
     seg->toggleSelected();
     return seg->isSelected_;
+}
+
+bool RobotModel::getVBODefault()
+{
+    const char* env = getenv("ROCK_VIZ_USE_VBO");
+    return (env && *env == '1');
+}
+
+void RobotModel::setUseVBO(bool flag)
+{
+    useVBO_ = flag;
+}
+
+bool RobotModel::getUseVBO() const
+{
+    return useVBO_;
 }
 
 osg::Matrixd RobotModel::getRelativeTransform(std::string source_segment, std::string target_segment)

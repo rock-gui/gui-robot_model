@@ -19,14 +19,15 @@ def try_to_get_task(task_name, retry_on_error=true)
     return task
 end
 
-@state_task_name = Array.new
-@state_port_name = Array.new
+control_tasks = Array.new
+state_tasks = Array.new
 use_test_gui = true
 mode_optimize = false
 simplify = nil
 smooth = false
 parallel = 1
 hostname = nil
+model_file_mode = 'auto'
 options = OptionParser.new do |opt|
     opt.banner = <<-EOD
 rock-roboviz [options] /path/to/model/file
@@ -48,20 +49,31 @@ rock-roboviz --optimize-meshes [options] FILES
   See the Optimization Options section below for an option description
     EOD
     opt.separator "\nDisplay Options"
+    opt.on '--urdf', 'load the given file as URDF' do
+        model_file_mode = 'urdf'
+    end
+    opt.on '--sdf', 'load the given file as SDF' do
+        model_file_mode = 'sdf'
+    end
     opt.on '--no-test-gui', 'disable the test GUI if no task context has been given' do
         use_test_gui = false
     end
     opt.on '--host=HOSTNAME', String, 'the host we should contact to find RTT tasks' do |host|
         hostname = host
     end
-    opt.on '--joint_state_port=TASK_CONTEXT_NAME:PORT_NAME', '-s=TASK_CONTEXT_NAME:PORT_NAME' , "Use joint state port of task TASK_CONTEXT_NAME to read data from" do |val|
-        puts "Will take port '#{val}' for reading state from"
-        splitted = val.split(':')
-        if splitted.size != 2
-            raise("Definition of command port must follow the pattern 'TASK_CONTEXT_NAME:PORT_NAME'. Example: --joint_command_port=my_task:the_port")
+    opt.on '--joint_control_port=TASK_CONTEXT_NAME:PORT_NAME', '-c=TASK_CONTEXT_NAME:PORT_NAME' , "Spawn a control UI connected to this port" do |val|
+        *task_name, port_name = val.split(':')
+        if task_name.empty?
+            raise("Definition of command port must follow the pattern 'TASK_CONTEXT_NAME[:PORT_NAME]'. Example: --joint_command_port=my_task:the_port")
         end
-        @state_task_name.push( splitted[0] )
-        @state_port_name.push( splitted[1] )
+        control_tasks << [task_name.join(":"), port_name]
+    end
+    opt.on '--joint_state_port=TASK_CONTEXT_NAME:PORT_NAME', '-s=TASK_CONTEXT_NAME:PORT_NAME' , "Use joint state port of task TASK_CONTEXT_NAME to read data from" do |val|
+        *task_name, port_name = val.split(':')
+        if task_name.empty?
+            raise("Definition of command port must follow the pattern 'TASK_CONTEXT_NAME[:PORT_NAME]'. Example: --joint_command_port=my_task:the_port")
+        end
+        state_tasks << [task_name.join(":"), port_name]
     end
     opt.separator "\nOptimization Options"
     opt.on '--optimize-meshes' do
@@ -133,68 +145,123 @@ if !model_file
     exit 1
 end
 
-if not @state_task_name.empty?
-    if hostname
-        Orocos::CORBA.name_service.ip = hostname
+if model_file_mode == 'auto'
+    if model_file =~ /^model:\/\// || model_file.end_with?(".sdf")
+        model_file_mode = 'sdf'
     end
-    Orocos.initialize
 end
 
-view3d = Vizkit.vizkit3d_widget
-view3d.show
-vis_gui = Vizkit.default_loader.RobotVisualization
-vis_gui.modelFile = model_file.dup
+if model_file_mode == 'sdf'
+    # Enable bundle support to resolve inter-model dependencies inside the SDF
+    require 'rock/bundle'
+    require 'sdf'
+    Bundles.load
+    Bundles.find_dirs('models', 'sdf', all: true, order: :specific_last).each do |path|
+        SDF::XML.model_path << path
+    end
+else
+    Orocos.load
+end
 
-if not @state_task_name.empty?
-    @state_task_name.each_with_index do | task_name, index | 
-        control = try_to_get_task(task_name, true)
+def discover_and_connect_to_port(task_name, port_name, options = Hash.new)
+    filter  = options[:filter] || -> { true }
+    handler = options[:handler]
 
-        port = nil
-        if @state_port_name[index]
-            port = control.port(@state_port_name[index] )
-        else
+    task = Orocos::Async.proxy task_name
+    if port_name
+        handler.call(task.port(port_name))
+    else
+        task.on_reachable do
             #find joint state port
-            matching_ports = control.ports.find_all {|p| p.is_a? Orocos::OutputPort and p.type == Types::Base::Samples::Joints}
+            matching_ports = task.ports.find_all(&filter)
             if matching_ports.size > 1
-                puts "Multiple joint state producer ports. Don't know which to use."
-                matching_ports.each do |p| puts p.name end
+                puts "Multiple joint state producer ports. Don't know which to use, explicitly provide one"
+                matching_ports.each { |p| puts p.name }
                 exit 1
             end
-            if matching_ports.size < 1 
-                puts "No joint state producer port available."
+            if matching_ports.empty?
+                puts "No joint state producer port available on #{task_name}, provide one explicitely"
                 exit 1
             end
-            port = matching_ports[0]
-        end 
 
-        port.connect_to do |data|
-            vis_gui.updateData(data)
+            handler.call(matching_ports.first)
         end
     end
+    task
+end
 
-elsif use_test_gui
-    main = Qt::Widget.new
-    layout = Qt::VBoxLayout.new(main)
-    splitter = Qt::Splitter.new(main)
-    layout.add_widget splitter
-    splitter.setOrientation(Qt::Vertical)
-    splitter.add_widget(view3d)
+live = (!state_tasks.empty? || !control_tasks.empty?)
+needs_control_ui = (live && !control_tasks.empty?) || (!live && use_test_gui)
 
+view3d = Vizkit.vizkit3d_widget
+vis_gui = Vizkit.default_loader.RobotVisualization
+
+main = Qt::Widget.new
+layout = Qt::VBoxLayout.new(main)
+layout.add_widget(view3d)
+
+if needs_control_ui
     ctrl_gui = Vizkit.default_loader.ControlUi
     override_vel_limits=0
     only_positive=true
     no_effort=true
     no_velocity=true
     ctrl_gui.configureUi(override_vel_limits, only_positive, no_effort, no_velocity)
-    ctrl_gui.initFromURDF(model_file.dup)
+    ctrl_gui.enabled = false
+    layout.add_widget(ctrl_gui)
+end
+
+if live
+    task_states = Vizkit.default_loader.StateViewer
+    layout.add_widget(task_states)
+end
+
+if model_file_mode == 'sdf'
+    sdf_string = SDF.to_xml(SDF::Root.load(model_file).each_model.first)
+    vis_gui.loadFromString(sdf_string.dup, 'sdf')
+    if ctrl_gui
+        ctrl_gui.initFromString(sdf_string.dup, model_file_mode.dup)
+    end
+else
+    vis_gui.loadFromFile(model_file.dup, model_file_mode.dup)
+    if ctrl_gui
+        ctrl_gui.initFromFile(model_file.dup, model_file_mode.dup)
+    end
+end
+
+if live
+    if hostname
+        Orocos::CORBA.name_service.ip = hostname
+    end
+    Orocos.initialize
+
+    state_tasks.each do | task_name, port_name | 
+        task = discover_and_connect_to_port task_name, port_name,
+            filter:  ->(port) { port.is_a?(Orocos::OutputPort) and p.type == Types::Base::Samples::Joints },
+            handler: ->(port) { port.on_data { |sample| vis_gui.updateData(sample) } }
+        task_states.add task
+    end
+    control_tasks.each do | task_name, port_name |
+        task = discover_and_connect_to_port task_name, port_name,
+            filter:  ->(port) { port.is_a?(Orocos::InputPort) and p.type == Types::Base::Samples::Joints },
+            handler: ->(port) { ctrl_gui.connect(SIGNAL('sendSignal()')) { port.write(ctrl_gui.getJoints) { } } }
+
+        task.on_state_change do |new_state|
+            ctrl_gui.enabled = (new_state == :RUNNING)
+        end
+        task_states.add task
+    end
+
+elsif use_test_gui
+    ctrl_gui.enabled = true
     ctrl_gui.connect(SIGNAL('sendSignal()')) do 
         sample = ctrl_gui.getJoints()
         vis_gui.updateData(sample)
     end
-    splitter.add_widget ctrl_gui
-    main.show
+    layout.add_widget ctrl_gui
 end
 
+main.show
 Vizkit.exec
 
 

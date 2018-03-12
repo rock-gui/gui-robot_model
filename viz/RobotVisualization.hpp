@@ -19,7 +19,7 @@ class RobotVisualization
         , boost::noncopyable
 {
     Q_OBJECT
-    Q_PROPERTY(QString modelFile READ modelFile WRITE setModelFile)
+    Q_PROPERTY(QString modelFile READ modelFile WRITE loadFromFile)
     Q_PROPERTY(bool framesEnabled READ areFramesEnabled WRITE setFramesEnabled)
     Q_PROPERTY(double jointsSize READ getJointsSize WRITE setJointsSize)
     Q_PROPERTY(bool followModelWithCamera READ getFollowModelWithCamera WRITE setFollowModelWithCamera)
@@ -51,6 +51,23 @@ public slots:
     }
     QString getRootLink()
     {return QString(current_root_name_.c_str());}
+
+    /** Loads a model from a file
+     *
+     * @param path the file path
+     * @param type the file type, as either "auto", "urdf" and "sdf". If given
+     *   "auto", the file type will be guessed based on the file extension
+     */
+    void loadFromFile(QString path, QString type = "auto");
+
+    /** Loads a model from the XML string instead of from a file
+     *
+     * @param xml the XML document
+     * @param type the document type, as either "urdf" and "sdf"
+     * @param rootPrefix the path relative to which ressources (such as meshes)
+     *   should be resolved
+     */
+    void loadFromString(QString value, QString type, QString rootPrefix = "");
 
     bool areFramesEnabled() const;
     void setFramesEnabled(bool value);
@@ -89,6 +106,7 @@ protected:
     virtual void updateDataIntern(base::samples::Joints const& sample);
     virtual void updateDataIntern(base::samples::RigidBodyState const& pos);
 
+    void createFrameVisualizers();
     void deleteFrameVisualizers();
 
 private:

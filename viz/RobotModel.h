@@ -14,8 +14,11 @@
 #include <osg/MatrixTransform>
 #include <osgDB/ReadFile>
 #include <osgFX/Outline>
-#include <QObject>
 #include <QDir>
+#include <QHash>
+#include <QObject>
+
+#include <sdf/sdf.hh>
 
 /** 
  * Struct to hold mimic joint properties
@@ -53,7 +56,7 @@ public:
  * @param node: The Node this OSGSegment is attached to. Should be the joint transform
  * @param seg: KDL segment corresponding to the node.
  */
-    OSGSegment(KDL::Segment seg);
+    OSGSegment(KDL::Segment seg, bool useVBO);
 
     /**
      * @brief Set position of joint
@@ -134,6 +137,27 @@ protected:
    */
    void attachVisuals(std::vector<urdf::VisualSharedPtr > &visual_array, QDir prefix = QDir());
 
+   /**
+   * @brief Attach visual mesh to node.
+   *
+   * Should only be called during initial construction of the robot model.
+   *
+   * @param visual: Parsed SDF tag (using sdformat) of the visual.
+   */
+   void attachVisual(sdf::ElementPtr visual, QDir prefix = QDir());
+
+   /**
+   * @brieg Create nodes with visual meshes
+   *
+   * Should only be called during initial construction of the robot model
+   *
+   * @param visual_array: Parsed SDF tag (using sdformat) of the visual.
+   */
+   void attachVisuals(std::vector<sdf::ElementPtr> const&visual_array, QDir prefix = QDir());
+
+   /** Attach the VBO visitor to the node if VBOs are enabled */
+   void useVBOIfEnabled(osg::Node* node);
+
 private:
     KDL::Segment seg_; /**< KDKL representation of the segment */
     KDL::Frame toTipKdl_; /**< Temp storage for the current joint pose */
@@ -145,6 +169,7 @@ private:
     osg::ref_ptr<osgText::Text> text_label_;
     osg::ref_ptr<osg::Geode> text_label_geode_;
     bool isSelected_; /**< Selection state */
+    bool useVBO_; /**< Whether rendering should use VBOs */
 
     friend class InteractionHandler;
     friend class OSGSegmentCallback;
@@ -190,10 +215,17 @@ public:
 class RobotModel
 {
 public:
-/**
- * @brief Constructor, does nearly nothing.
- *
- */
+    enum ROBOT_MODEL_FORMAT
+    {
+        ROBOT_MODEL_AUTO = kdl_parser::ROBOT_MODEL_AUTO,
+        ROBOT_MODEL_URDF = kdl_parser::ROBOT_MODEL_URDF,
+        ROBOT_MODEL_SDF  = kdl_parser::ROBOT_MODEL_SDF
+    };
+
+    /**
+     * @brief Constructor, does nearly nothing.
+     *
+     */
     RobotModel();
 
     /**
@@ -203,10 +235,30 @@ public:
     ~RobotModel(){}
 
     /**
-     * @brief Create visualization of a robot described as urdf file.
+     * @brief Create visualization of a robot
      *
-     * @param path: Path to URDF file.
+     * The model file format is guessed based on the file's extension. To
+     * provide it explicitely. use loadFromFile(path, format)
+     *
+     * @param path: Path to the file.
+     * @param format: the file format (either ROBOT_MODEL_URDF or
+     *   ROBOT_MODEL_SDF)
      * @return osg::Node: Root node of the constructed OSG scene for the robot.
+     */
+    osg::ref_ptr<osg::Node> loadFromFile(QString path, ROBOT_MODEL_FORMAT format = ROBOT_MODEL_AUTO);
+
+    /**
+     * @brief Create visualization of a robot from a XML string
+     *
+     * @param xml: the XML document, as a string
+     * @param format: the file format (either ROBOT_MODEL_URDF or
+     *   ROBOT_MODEL_SDF)
+     * @return osg::Node: Root node of the constructed OSG scene for the robot.
+     */
+    osg::ref_ptr<osg::Node> loadFromString(QString xml, ROBOT_MODEL_FORMAT format, QString rootPrefix = "");
+
+    /**
+     * @deprecated use loadFromFile instead
      */
     osg::ref_ptr<osg::Node> load(QString path);
 
@@ -226,6 +278,14 @@ public:
      * @return OSGSegment
      */
     osg::ref_ptr<OSGSegment> getSegment(std::string name);
+
+    /**
+     * @brief Retrieve an OSG Segment by the corresponding OSG node
+     *
+     * @param node: the OSG node
+     * @return OSGSegment
+     */
+    osg::ref_ptr<OSGSegment> getSegment(osg::ref_ptr<osg::Node> node);
 
     /**
      * @brief Retrieve joint names of all joints defined in URDF file which are not of type KDL::Joint::None.
@@ -260,10 +320,47 @@ public:
      * @brief Finds the relevant node and sets the position value
      */
     bool setJointPos(std::string jointName, double jointVal);
+    /**
+     * @brief Relocate the root to a given segment
+     */
+    bool relocateRoot(osg::ref_ptr<osg::Node> group);
+
+    /**
+     * Enables or disables usage of VBO (might affect performance)
+     */
+    void setUseVBO(bool enabled);
+
+    /**
+     * Checks whether VBOs will be used or not
+     */
+    bool getUseVBO() const;
 
 protected:
-    osg::ref_ptr<osg::Node> makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root);
+    osg::ref_ptr<osg::Group> makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root);
     osg::ref_ptr<osg::Node> makeOsg( urdf::ModelInterfaceSharedPtr urdf_model );
+
+    void makeOsg2(
+            KDL::Segment const &kdl_seg,
+            std::vector<sdf::ElementPtr> const& visuals,
+            OSGSegment& seg);
+    osg::Node* makeOsg( sdf::ElementPtr sdf );
+
+    /**
+     * @brief load from a string containing a URDF model
+     *
+     * This is a helper from loadFromString
+     */
+    osg::ref_ptr<osg::Node> loadFromURDFString(QString xml);
+
+    /**
+     * @brief load from a string containing a SDF model
+     *
+     * This is a helper from loadFromString
+     */
+    osg::ref_ptr<osg::Node> loadFromSDFString(QString xml);
+
+    std::map<std::string, sdf::ElementPtr> loadSdfModelLinks(sdf::ElementPtr sdf_model);
+
 
 protected:
     osg::ref_ptr<osg::Group> root_; /**< Root of the OSG scene containing the robot */
@@ -275,6 +372,10 @@ protected:
     QDir rootPrefix;
 
     std::map< std::string, MimicJoint > mimic_joints_;
+
+    bool useVBO_;
+
+    static bool getVBODefault();
 
 public:
     //bool set_joint_state(std::vector<double> joint_vals);
