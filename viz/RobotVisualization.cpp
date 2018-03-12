@@ -49,8 +49,10 @@ void RobotVisualization::handlePropertyChanged(QString property){
                            << "'rootFrame' to a reasonable body part name.";
             }
             else{ //Its world_osg, set to original root if it was determined yet
-                if(original_root_name_ != "")
-                    setRootLink(original_root_name_.c_str());
+                try {
+                    relocateRoot(original_root_);
+                }
+                catch(std::invalid_argument) {}
             }
         }
     }
@@ -80,21 +82,50 @@ void RobotVisualization::hideSegmentText(QString link_name){
 
 void RobotVisualization::setModelFile(QString modelFile)
 {
-    //Extact file extension
-    QStringList tokens = modelFile.split(QChar('.'));
-    QString ext = tokens.back();
+    loadFromFile(modelFile);
+}
 
-    LOG_INFO("loading %s", modelFile.toLatin1().data());
-    bool st;
-    st = load(modelFile);
+static RobotVisualization::ROBOT_MODEL_FORMAT formatFromString(QString type)
+{
+    if (type == "auto")
+        return RobotVisualization::ROBOT_MODEL_AUTO;
+    else if (type == "sdf")
+        return RobotVisualization::ROBOT_MODEL_SDF;
+    else if (type == "urdf")
+        return RobotVisualization::ROBOT_MODEL_URDF;
+    else
+        throw std::invalid_argument("invalid file format " + type.toStdString() + ", known types are auto, sdf and urdf");
+}
+
+void RobotVisualization::loadFromFile(QString path, QString _format)
+{
+    LOG_INFO("loading %s", path.toLatin1().data());
+    ROBOT_MODEL_FORMAT format = formatFromString(_format);
+
+    bool st = RobotModel::loadFromFile(path, format);
     if(!st)
-        LOG_FATAL_S << "cannot load " << modelFile.toStdString()
+        LOG_FATAL_S << "cannot load " << path.toStdString()
                    << ", it either does not exist or is not a proper robot model file";
     else
-        _modelFile = modelFile;
-    //emit propertyChanged("modelFile");
+    {
+        _modelFile = path;
+        emit propertyChanged("modelFile");
+    }
 
     // Now create a RBS visualization for each of the frames in the model
+    createFrameVisualizers();
+}
+
+void RobotVisualization::loadFromString(QString value, QString _format, QString rootPrefix)
+{
+    ROBOT_MODEL_FORMAT format = formatFromString(_format);
+    if (format == ROBOT_MODEL_AUTO)
+        throw invalid_argument("cannot guess format of a string, only of files");
+    RobotModel::loadFromString(value, format, rootPrefix);
+}
+
+void RobotVisualization::createFrameVisualizers()
+{
     deleteFrameVisualizers();
     vector<string> segments = getSegmentNames();
     for (std::size_t i = 0; i != segments.size(); ++i)

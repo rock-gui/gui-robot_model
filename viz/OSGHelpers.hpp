@@ -1,6 +1,43 @@
 #ifndef OSGHELPERS_HPP
 #define OSGHELPERS_HPP
 
+inline void sdf_to_osg(ignition::math::Pose3d const& in, osg::PositionAttitudeTransform& out) {
+    out.setPosition(osg::Vec3(in.Pos().X(), in.Pos().Y(), in.Pos().Z()));
+    out.setAttitude(osg::Quat(in.Rot().X(), in.Rot().Y(), in.Rot().Z(), in.Rot().W()));
+}
+
+inline void sdf_to_osg(ignition::math::Vector3d const& in, osg::PositionAttitudeTransform& out) {
+    out.setPosition(osg::Vec3(in.X(), in.Y(), in.Z()));
+}
+
+inline void sdf_to_osg(ignition::math::Vector3d const& in, osg::Vec3& out) {
+    out.set(in.X(), in.Y(), in.Z());
+}
+
+inline void sdf_to_osg(sdf::Color in, osg::Vec4& out) {
+    out.set(in.r, in.g, in.b, in.a);
+}
+
+//inline void sdf_pose_to_osg(sdf::ElementPtr pose, osg::Vec3& pos, osg::Quat& quat)
+//{
+//    double x, y, z;
+//    double roll, pitch, yaw;
+//    sscanf(pose->Get<std::string>().c_str(), "%lf %lf %lf %lf %lf %lf", &x, &y, &z, &roll, &pitch, &yaw);
+//    pos.set(x, y, z);
+//    osg::Quat q = osg::Quat(roll, osg::Vec3d(1, 0, 0), pitch, osg::Vec3d(0, 1, 0), yaw, osg::Vec3d(0, 0, 1));
+//    quat.set(q.x(), q.y(), q.z(), q.w());
+//}
+//
+//
+//inline void sdf_pose_to_osg(sdf::ElementPtr pose, osg::PositionAttitudeTransform& out)
+//{
+//    double x, y, z;
+//    double roll, pitch, yaw;
+//    sscanf(pose->Get<std::string>().c_str(), "%lf %lf %lf %lf %lf %lf", &x, &y, &z, &roll, &pitch, &yaw);
+//    out.setPosition(osg::Vec3(x, y, z));
+//    out.setAttitude(osg::Quat(roll, osg::Vec3d(1, 0, 0), pitch, osg::Vec3d(0, 1, 0), yaw, osg::Vec3d(0, 0, 1)));
+//}
+
 inline void kdl_to_osg(KDL::Frame& in, osg::PositionAttitudeTransform& out){
     out.setPosition(osg::Vec3(in.p[0],in.p[1],in.p[2]));
     double x,y,z,w;
@@ -16,6 +53,28 @@ inline void urdf_to_osg(urdf::Pose& in, osg::PositionAttitudeTransform& out){
     out.setPosition(urdf_to_osg(in.position));
     //std::cout << in.position.x << ","<< in.position.y<<","<< in.position.z<<std::endl;
     out.setAttitude(osg::Quat(in.rotation.x, in.rotation.y, in.rotation.z, in.rotation.w));
+}
+
+void printNodeStructureRecursive(osg::Node* node, int levelCount){
+
+    for (int i = 0; i < levelCount; i++) std::cout << "--";
+    std::cout << node->className() << "(" <<  node->getName() << ")" << std::endl;
+
+    osg::Group* group = node->asGroup();
+
+    if (group)
+    {
+        for (unsigned int i = 0 ; i < group->getNumChildren(); i ++)
+        {
+            printNodeStructureRecursive(group->getChild(i), ++levelCount);
+        }
+    }
+
+
+}
+
+void printNodeStructure(osg::Node *node){
+    printNodeStructureRecursive(node, 0);
 }
 
 inline osg::Node* findNamedNode(const std::string& searchName,
