@@ -19,7 +19,7 @@ class RobotVisualization
         , boost::noncopyable
 {
     Q_OBJECT
-    Q_PROPERTY(QString modelFile READ modelFile WRITE loadFromFile)
+    Q_PROPERTY(QString modelFile READ modelFile WRITE setModelFile)
     Q_PROPERTY(bool framesEnabled READ areFramesEnabled WRITE setFramesEnabled)
     Q_PROPERTY(double jointsSize READ getJointsSize WRITE setJointsSize)
     Q_PROPERTY(bool followModelWithCamera READ getFollowModelWithCamera WRITE setFollowModelWithCamera)
