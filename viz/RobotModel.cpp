@@ -616,6 +616,13 @@ osg::ref_ptr<osg::Node> RobotModel::makeOsg( urdf::ModelInterfaceSharedPtr urdf_
     }
     relocateRoot(urdf_model->getRoot()->name);
 
+    // Add mimic joints
+    for(auto j : urdf_model->joints_){
+        if(j.second->mimic != nullptr)
+            mimic_joints_[j.second->name] = MimicJoint(j.second->mimic->joint_name,
+                                                       j.second->mimic->multiplier,
+                                                       j.second->mimic->offset);
+    }
     
     return root_;
 }
