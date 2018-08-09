@@ -82,6 +82,7 @@ void RobotVisualization::hideSegmentText(QString link_name){
 
 void RobotVisualization::setModelFile(QString modelFile)
 {
+    LOG_INFO("setting model file to  %s", modelFile.toLatin1().data());
     loadFromFile(modelFile);
 }
 
