@@ -54,6 +54,13 @@ OSGSegment::OSGSegment(KDL::Segment seg, bool useVBO)
     updateJoint();
 }
 
+std::map<std::string, osg::ref_ptr<osg::Node>> OSGSegment::meshCache;
+
+void OSGSegment::clearMeshCache()
+{
+    meshCache.clear();
+}
+
 osg::ref_ptr<osg::Group> OSGSegment::getGroup() const{
     return post_transform_;
 }
@@ -131,7 +138,14 @@ void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
         //Otherwise decimal delimeter confusion prevents loading of obj-files correctly
         std::locale::global(std::locale::classic());
         filename = qfilename.toStdString();
-        osg_visual = osgDB::readNodeFile(filename);
+        auto it = meshCache.find(filename);
+        if (it == meshCache.end()) {
+            osg_visual = osgDB::readNodeFile(filename);
+            meshCache[filename] = osg_visual;
+        }
+        else {
+            osg_visual = it->second;
+        }
 
         if(!osg_visual){
             LOG_ERROR("OpenSceneGraph did not succees loading the mesh file %s.", filename.c_str());
@@ -281,7 +295,16 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
                 filename = filename + ".osgb";
 
             LOG_INFO("loading visual %s", filename.c_str());
-            osg_visual = osgDB::readNodeFile(filename);
+            auto it = meshCache.find(filename);
+            if (it == meshCache.end()) {
+                osg_visual = osgDB::readNodeFile(filename);
+                meshCache[filename] = osg_visual;
+            }
+            else {
+                LOG_INFO("visual already in cache");
+                osg_visual = it->second;
+            }
+
             if (!osg_visual) {
                 LOG_WARN("OpenSceneGraph did not succeed in loading the mesh file %s.", filename.c_str());
                 osg_visual = new osg::Geode;

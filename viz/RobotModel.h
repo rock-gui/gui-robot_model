@@ -58,6 +58,9 @@ public:
  */
     OSGSegment(KDL::Segment seg, bool useVBO);
 
+    /** Clear the internal mesh file loading cache */
+    static void clearMeshCache();
+
     /**
      * @brief Set position of joint
      *
@@ -170,6 +173,8 @@ private:
     osg::ref_ptr<osg::Geode> text_label_geode_;
     bool isSelected_; /**< Selection state */
     bool useVBO_; /**< Whether rendering should use VBOs */
+
+    static std::map<std::string, osg::ref_ptr<osg::Node>> meshCache;
 
     friend class InteractionHandler;
     friend class OSGSegmentCallback;
