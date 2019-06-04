@@ -174,6 +174,8 @@ private:
     bool isSelected_; /**< Selection state */
     bool useVBO_; /**< Whether rendering should use VBOs */
 
+    /** Caches each loaded mesh indexec by it's filename to prevent double
+     *  loading the fiels and avoid duplicates in osg scene */
     static std::map<std::string, osg::ref_ptr<osg::Node>> meshCache;
 
     friend class InteractionHandler;
