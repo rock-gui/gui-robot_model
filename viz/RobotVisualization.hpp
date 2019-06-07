@@ -33,6 +33,8 @@ public:
     void setModelFile(QString modelFile);
     QString modelFile() const;
 
+    Q_INVOKABLE void clearMeshCache();
+
     Q_INVOKABLE void updateData(base::samples::Joints const &sample)
     {vizkit3d::Vizkit3DPlugin<base::samples::Joints>::updateData(sample);}
 

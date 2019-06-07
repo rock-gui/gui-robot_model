@@ -34,6 +34,11 @@ RobotVisualization::~RobotVisualization()
     deleteFrameVisualizers();
 }
 
+void RobotVisualization::clearMeshCache()
+{
+    OSGSegment::clearMeshCache();
+}
+
 void RobotVisualization::handlePropertyChanged(QString property){
     if(property == "frame"){
         std::vector<std::string>::iterator it;
