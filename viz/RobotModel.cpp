@@ -612,7 +612,6 @@ osg::ref_ptr<osg::Node> RobotModel::makeOsg( urdf::ModelInterfaceSharedPtr urdf_
             osg_hooks.push_back(osg);
         }
     }
-    relocateRoot(urdf_model->getRoot()->name);
 
     // Add mimic joints
     for(auto j : urdf_model->joints_){
@@ -622,8 +621,8 @@ osg::ref_ptr<osg::Node> RobotModel::makeOsg( urdf::ModelInterfaceSharedPtr urdf_
                                                        j.second->mimic->offset);
     }
 
-    original_root_ = root_;
-    original_root_name_ = urdf_model->getRoot()->name;
+    original_root_ = root_->getChild(0)->asGroup();
+    original_root_name_ = tree.getRootSegment()->first;
 
     return root_;
 }
