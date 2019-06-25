@@ -136,7 +136,7 @@ void RobotVisualization::createFrameVisualizers()
     vector<string> segments = getSegmentNames();
     for (std::size_t i = 0; i != segments.size(); ++i)
     {
-        OSGSegment* segment = getSegment(segments[i]);
+        osg::ref_ptr<OSGSegment> segment = getSegment(segments[i]);
         assert(segment);
         vizkit3d::RigidBodyStateVisualization* frame =
                 new vizkit3d::RigidBodyStateVisualization(this);
@@ -252,23 +252,23 @@ void RobotVisualization::updateMainNode ( osg::Node* node )
 {
     // Update the main node using the data in p->pos
     if (p->pos.hasValidPosition()){
-		osg::Vec3d position(p->pos.position.x(), p->pos.position.y(), p->pos.position.z());
-		modelPos->setPosition(position);
+        osg::Vec3d position(p->pos.position.x(), p->pos.position.y(), p->pos.position.z());
+        modelPos->setPosition(position);
 
-		if (followModelWithCamera){
-			Vizkit3DWidget * widget = dynamic_cast<Vizkit3DWidget *>(this->parent());
+        if (followModelWithCamera){
+            Vizkit3DWidget * widget = dynamic_cast<Vizkit3DWidget *>(this->parent());
 
-			QVector3D lookAtPos, eyePos, upVector;
-			widget->getCameraView(lookAtPos, eyePos, upVector);
-			widget->setCameraEye(eyePos.x(),eyePos.y(),eyePos.z());
-			widget->setCameraLookAt(p->pos.position.x(), p->pos.position.y(), p->pos.position.z());
-			widget->setCameraUp(upVector.x(),upVector.y(),upVector.z());
-		}
+            QVector3D lookAtPos, eyePos, upVector;
+            widget->getCameraView(lookAtPos, eyePos, upVector);
+            widget->setCameraEye(eyePos.x(),eyePos.y(),eyePos.z());
+            widget->setCameraLookAt(p->pos.position.x(), p->pos.position.y(), p->pos.position.z());
+            widget->setCameraUp(upVector.x(),upVector.y(),upVector.z());
+        }
     }
 
     if (p->pos.hasValidOrientation()){
-		osg::Quat orientation(p->pos.orientation.x(), p->pos.orientation.y(), p->pos.orientation.z(),p->pos.orientation.w());
-		modelPos->setAttitude(orientation);
+        osg::Quat orientation(p->pos.orientation.x(), p->pos.orientation.y(), p->pos.orientation.z(),p->pos.orientation.w());
+        modelPos->setAttitude(orientation);
     }
 
 }
@@ -316,7 +316,7 @@ void RobotVisualization::updateDataIntern(base::samples::Joints const& sample)
 }
 
 void RobotVisualization::updateDataIntern(base::samples::RigidBodyState const& pos){
-	p->pos = pos;
+    p->pos = pos;
 }
 
 //Macro that makes this plugin loadable in ruby, this is optional.

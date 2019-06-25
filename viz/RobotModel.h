@@ -138,7 +138,7 @@ protected:
    *
    * @param visual_array: Parsed URDF tag (using urdf_parser) of the visual.
    */
-   void attachVisuals(std::vector<urdf::VisualSharedPtr > &visual_array, QDir prefix = QDir());
+   void attachVisuals(const std::vector<urdf::VisualSharedPtr> &visual_array, QDir prefix = QDir());
 
    /**
    * @brief Attach visual mesh to node.
@@ -174,8 +174,8 @@ private:
     bool isSelected_; /**< Selection state */
     bool useVBO_; /**< Whether rendering should use VBOs */
 
-    /** Caches each loaded mesh indexec by it's filename to prevent double
-     *  loading the fiels and avoid duplicates in osg scene */
+    /** Caches each laoded mesh indexed by it's filename to prevent double
+     *  loading the files and avoid duplicates in osg scene */
     static std::map<std::string, osg::ref_ptr<osg::Node>> meshCache;
 
     friend class InteractionHandler;
@@ -343,7 +343,7 @@ public:
     bool getUseVBO() const;
 
 protected:
-    osg::ref_ptr<osg::Group> makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root);
+    void makeOsg2(KDL::Segment kdl_seg, const std::vector<urdf::VisualSharedPtr> &visuals, OSGSegment &seg);
     osg::ref_ptr<osg::Node> makeOsg( urdf::ModelInterfaceSharedPtr urdf_model );
 
     void makeOsg2(

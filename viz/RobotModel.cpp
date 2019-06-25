@@ -70,10 +70,10 @@ void OSGSegment::updateJoint(){
     kdl_to_osg(toTipKdl_, *toTipOsg_);
 }
 
-void OSGSegment::attachVisuals(std::vector<urdf::VisualSharedPtr > &visual_array, QDir prefix)
+void OSGSegment::attachVisuals(const std::vector<urdf::VisualSharedPtr > &visual_array, QDir prefix)
 {
-    std::vector<urdf::VisualSharedPtr >::iterator itr = visual_array.begin();
-    std::vector<urdf::VisualSharedPtr >::iterator itr_end = visual_array.end();
+    std::vector<urdf::VisualSharedPtr >::const_iterator itr = visual_array.begin();
+    std::vector<urdf::VisualSharedPtr >::const_iterator itr_end = visual_array.end();
 
     for(itr = visual_array.begin(); itr != itr_end; ++itr)
     {
@@ -138,7 +138,7 @@ void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
         //Otherwise decimal delimeter confusion prevents loading of obj-files correctly
         std::locale::global(std::locale::classic());
         filename = qfilename.toStdString();
-        auto it = meshCache.find(filename);
+        std::map<std::string, osg::ref_ptr<osg::Node>>::iterator it = meshCache.find(filename);
         if (it == meshCache.end()) {
             osg_visual = osgDB::readNodeFile(filename);
             meshCache[filename] = osg_visual;
@@ -224,8 +224,6 @@ void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
     useVBOIfEnabled(osg_visual);
 
     to_visual->addChild(osg_visual);
-    osg_visual->setUserData(this);
-    osg_visual->setName(seg_.getName());
     visual_ = osg_visual->asGeode();
 }
 
@@ -360,8 +358,6 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
     useVBOIfEnabled(osg_visual);
 
     to_visual->addChild(osg_visual);
-    osg_visual->setUserData(this);
-    osg_visual->setName(seg_.getName());
     visual_ = osg_visual->asGeode();
 }
 
@@ -543,24 +539,9 @@ osg::ref_ptr<osg::Node> RobotModel::loadEmptyScene(){
     return root_;
 }
 
-osg::ref_ptr<osg::Group> RobotModel::makeOsg2(KDL::Segment kdl_seg, urdf::Link urdf_link, osg::ref_ptr<osg::Group> root){
-    osg::ref_ptr<OSGSegment> seg = osg::ref_ptr<OSGSegment>(new OSGSegment(kdl_seg, useVBO_));
-    root->addChild(seg->toTipOsg_);
-
-    //Attach one visual to joint
-    if (urdf_link.visual_array.size() == 0)
-    {
-        urdf::VisualSharedPtr visual = urdf_link.visual;
-        seg->attachVisual(visual, rootPrefix);
-    }
-    //Attach several visuals to joint
-    else
-    {
-         std::vector<urdf::VisualSharedPtr > visual_array = urdf_link.visual_array;
-         seg->attachVisuals(visual_array, rootPrefix);
-    }
-
-    return seg->getGroup();
+void RobotModel::makeOsg2(KDL::Segment kdl_seg, const std::vector<urdf::VisualSharedPtr>& visuals, OSGSegment& seg)
+{
+    seg.attachVisuals(visuals, rootPrefix);
 }
 
 void RobotModel::makeOsg2(KDL::Segment const& kdl_seg, std::vector<sdf::ElementPtr> const& visuals, OSGSegment& seg){
@@ -576,68 +557,61 @@ void RobotModel::makeOsg2(KDL::Segment const& kdl_seg, std::vector<sdf::ElementP
         //the segment is attached in the osg_visual
         osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
         seg.post_transform_->addChild(to_visual);
-
-        //create an invisible node only to represent the visual information and keep the compatibility
-        osg::Node *node = new osg::Geode();
-        node->setUserData(&seg);
-        node->setName(kdl_seg.getName());
-        to_visual->addChild(node);
-        seg.visual_ = node->asGeode();
-
     }
 }
 
 osg::ref_ptr<osg::Node> RobotModel::makeOsg( urdf::ModelInterfaceSharedPtr urdf_model ){
-    //Parse also to KDL
+    //typedef urdf::LinkConstSharedPtr::iterator URDFLinkIterator;
+    typedef KDL::SegmentMap::const_iterator SegmentIterator;
+
     KDL::Tree tree;
     kdl_parser::treeFromUrdfModel(*urdf_model, tree);
 
-    //
-    // Here we perform a full traversal throu the kinematic tree
-    // hereby we go depth first
-    //
-    urdf::LinkConstSharedPtr urdf_link; //Temp Storage for current urdf link
-    KDL::Segment kdl_segment; //Temp Storage for urrent KDL link (same as URDF, but already parsed to KDL)
-    osg::ref_ptr<osg::Node> hook = 0; //Node (from previous segment) to hook up next segment to
+    std::list<urdf::LinkConstSharedPtr > queue;     //FIFO Buffer for links we still need to visit
+    std::list<osg::ref_ptr<osg::Group> > osg_hooks; //The parent node for each element in queue
 
-    std::vector<urdf::LinkConstSharedPtr > link_buffer; //Buffer for links we still need to visit
-    //used after LIFO principle
-    std::vector<osg::ref_ptr<osg::Node> > hook_buffer;                  //Same as above but for hook. The top most
-    //element here corresponds to the hook of the
-    //previous depth level in the tree.
-    link_buffer.push_back(urdf_model->getRoot()); //Initialize buffers with root
-    hook_buffer.push_back(original_root_);
-    original_root_name_ = urdf_model->getRoot()->name;
-    while(!link_buffer.empty()){
-        //get current node in buffer
-        urdf_link = link_buffer.back();
-        link_buffer.pop_back();
+    queue.push_back(urdf_model->getRoot());
+    osg_hooks.push_back(root_);
 
-        //FIXME: This is hacky solution to prevent from links being added twice. There should be a better one
+    //Travers through kinematic tree add each link to OSG
+    while(!queue.empty()){
+        //Retrieve current link and the parent osg_node from queue and remove them
+        urdf::LinkConstSharedPtr urdf_link = queue.front();
+        osg::ref_ptr<osg::Group> parent_osg = osg_hooks.front();
+        queue.pop_front();
+        osg_hooks.pop_front();
+
+        //FIXME: This was to avoid adding the same segment multiple times. Is this still necessary?
         if(std::find (segmentNames_.begin(), segmentNames_.end(), urdf_link->name) != segmentNames_.end())
             continue;
 
-        //expand node
-        link_buffer.reserve(link_buffer.size() + std::distance(urdf_link->child_links.begin(), urdf_link->child_links.end()));
-        link_buffer.insert(link_buffer.end(), urdf_link->child_links.begin(), urdf_link->child_links.end());
+        //Create OSG representation of the link
+        KDL::Segment const& kdl = tree.getSegment(urdf_link->name)->second.segment;
 
-        //create osg link
-        hook = hook_buffer.back();
-        hook_buffer.pop_back();
-        kdl_segment = tree.getSegment(urdf_link->name)->second.segment;
-        osg::ref_ptr<osg::Group> new_hook = makeOsg2(kdl_segment,
-                                       *urdf_link, hook->asGroup());
+        osg::ref_ptr<OSGSegment> seg = new OSGSegment(kdl, useVBO_);
+        parent_osg->addChild(seg->toTipOsg_);
 
-        //Also store names of links and joints
-        segmentNames_.push_back(kdl_segment.getName());
-        if(kdl_segment.getJoint().getType() != KDL::Joint::None)
-            jointNames_.push_back(kdl_segment.getJoint().getName());
+        std::vector<urdf::VisualSharedPtr> visuals = urdf_link->visual_array;
+        if(urdf_link->visual)
+            visuals.push_back(urdf_link->visual);
 
-        //Append hooks
-        for(uint i=0; i<urdf_link->child_links.size(); i++)
-            hook_buffer.push_back(new_hook);
+        makeOsg2(kdl, visuals, *seg);
+
+        //Set name to the main osg node so it can be found by name in the OSG graph
+        osg::ref_ptr<osg::Group> osg = seg->getGroup();
+        osg->setName(urdf_link->name);
+
+        //Store names of links and joints for get*Names-member functions
+        segmentNames_.push_back(kdl.getName());
+        if(kdl.getJoint().getType() != KDL::Joint::None)
+            jointNames_.push_back(kdl.getJoint().getName());
+
+        //Fill queue with children of current link
+        for(std::vector<urdf::LinkSharedPtr>::const_iterator child_it = urdf_link->child_links.begin(); child_it != urdf_link->child_links.end(); child_it++){
+            queue.push_back(*child_it);
+            osg_hooks.push_back(osg);
+        }
     }
-    relocateRoot(urdf_model->getRoot()->name);
 
     // Add mimic joints
     for(auto j : urdf_model->joints_){
@@ -646,7 +620,10 @@ osg::ref_ptr<osg::Node> RobotModel::makeOsg( urdf::ModelInterfaceSharedPtr urdf_
                                                        j.second->mimic->multiplier,
                                                        j.second->mimic->offset);
     }
-    
+
+    original_root_ = root_->getChild(0)->asGroup();
+    original_root_name_ = tree.getRootSegment()->first;
+
     return root_;
 }
 
@@ -690,7 +667,10 @@ osg::Node* RobotModel::makeOsg( sdf::ElementPtr sdf_model )
 
         makeOsg2(kdl, visuals, *seg);
 
+        //Set name to the main osg node so it can be found by name in the OSG graph
         osg::ref_ptr<osg::Group> osg = seg->getGroup();
+        osg->setName(kdl.getName());
+
         std::vector<SegmentIterator> const& children =
             it->second.children;
         for (std::vector<SegmentIterator>::const_iterator child_it = children.begin();
