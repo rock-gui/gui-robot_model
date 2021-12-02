@@ -26,6 +26,7 @@ RobotVisualization::RobotVisualization()
     setFramesEnabled(false);
     setSegmentNamesEnabled(false);
     setFollowModelWithCamera(false);
+    setCollisionsEnabled(false);
 }
 
 RobotVisualization::~RobotVisualization()
@@ -57,7 +58,7 @@ void RobotVisualization::handlePropertyChanged(QString property){
                 try {
                     relocateRoot(original_root_);
                 }
-                catch(std::invalid_argument) {}
+                catch(std::invalid_argument&) {}
             }
         }
     }
@@ -211,6 +212,23 @@ void RobotVisualization::setSegmentNamesEnabled(bool value)
             seg->attachTextLabel();
         else
             seg->removeTextLabel();
+    }
+}
+
+bool RobotVisualization::areCollisionsEnabled() const
+{
+    return collisionsEnabled_;
+}
+
+void RobotVisualization::setCollisionsEnabled(bool value)
+{
+    collisionsEnabled_ = value;
+    for (size_t i=0; i<segmentNames_.size(); i++){
+        OSGSegment* seg = getSegment(segmentNames_[i]);
+        if(value)
+            seg->attachCollision();
+        else
+            seg->removeCollision();
     }
 }
 

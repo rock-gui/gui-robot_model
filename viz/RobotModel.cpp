@@ -78,7 +78,30 @@ void OSGSegment::attachVisuals(const std::vector<urdf::VisualSharedPtr > &visual
     for(itr = visual_array.begin(); itr != itr_end; ++itr)
     {
         urdf::VisualSharedPtr visual = *itr;
-        attachVisual(visual, prefix);
+        visual_ = createVisual(visual, prefix);
+        post_transform_->addChild(visual_);
+    }
+}
+
+void OSGSegment::attachCollisions(const std::vector<urdf::CollisionSharedPtr> &collision_array, QDir prefix)
+{
+    std::vector<urdf::CollisionSharedPtr >::const_iterator itr = collision_array.begin();
+    std::vector<urdf::CollisionSharedPtr >::const_iterator itr_end = collision_array.end();
+
+    for(itr = collision_array.begin(); itr != itr_end; ++itr)
+    {
+        urdf::CollisionSharedPtr elem = *itr;
+        //Convert to visual, then call create visual and attach it as collision
+        urdf::VisualSharedPtr visual = urdf::VisualSharedPtr(new urdf::Visual());
+        visual->geometry = elem->geometry;
+        visual->name = elem->name;
+        visual->origin = elem->origin;
+        visual->material = urdf::MaterialSharedPtr(new urdf::Material());
+        visual->material->color.r = 0;
+        visual->material->color.g = 1;
+        visual->material->color.b = 0;
+        visual->material->color.a = 0.7;
+        collision_ = createVisual(visual, prefix);
     }
 }
 
@@ -106,14 +129,15 @@ public:
     }
 };
 
-void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
+osg::ref_ptr<osg::Group> OSGSegment::createVisual(urdf::VisualSharedPtr visual, QDir baseDir)
 {
-    osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
+    osg::ref_ptr<osg::PositionAttitudeTransform> to_visual(new osg::PositionAttitudeTransform());
     if (visual)
         urdf_to_osg(visual->origin, *to_visual);
-    post_transform_->addChild(to_visual);
 
-    osg::Node* osg_visual = 0;
+
+    osg::ref_ptr<osg::Group> root = osg::ref_ptr<osg::Group>(new osg::Group());
+    osg::Node* osg_visual;
     if(visual && visual->geometry->type == urdf::Geometry::MESH){
         urdf::Mesh* mesh = dynamic_cast<urdf::Mesh*>(visual->geometry.get());
         to_visual->setScale(urdf_to_osg(mesh->scale));
@@ -171,7 +195,7 @@ void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
     }
     else if(visual && visual->geometry->type == urdf::Geometry::SPHERE){
         urdf::Sphere* sphere = dynamic_cast<urdf::Sphere*>(visual->geometry.get());
-         osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Sphere(osg::Vec3d(0,0,0), sphere->radius));
+        osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Sphere(osg::Vec3d(0,0,0), sphere->radius));
 
         osg_visual = new osg::Geode;
         osg_visual->asGeode()->addDrawable(drawable);
@@ -224,10 +248,12 @@ void OSGSegment::attachVisual(urdf::VisualSharedPtr visual, QDir baseDir)
     useVBOIfEnabled(osg_visual);
 
     to_visual->addChild(osg_visual);
-    visual_ = osg_visual->asGeode();
+    root->addChild(to_visual);
+
+    return root;
 }
 
-void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
+osg::ref_ptr<osg::Geode> OSGSegment::createVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
 
     osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
     sdf_to_osg(sdf_visual->GetElement("pose")->Get<ignition::math::Pose3d>(), *to_visual);
@@ -358,7 +384,7 @@ void OSGSegment::attachVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
     useVBOIfEnabled(osg_visual);
 
     to_visual->addChild(osg_visual);
-    visual_ = osg_visual->asGeode();
+    return osg_visual->asGeode();
 }
 
 void OSGSegment::useVBOIfEnabled(osg::Node* node)
@@ -383,7 +409,8 @@ void OSGSegment::attachVisuals(std::vector<sdf::ElementPtr> const &visual_array,
     for(itr = visual_array.begin(); itr != itr_end; ++itr)
     {
         sdf::ElementPtr visual = *itr;
-        attachVisual(visual, prefix);
+        visual_ = createVisual(visual, prefix);
+        post_transform_->addChild(visual_);
     }
 }
 
@@ -491,6 +518,19 @@ void OSGSegment::removeTextLabel()
     post_transform_->removeChild(text_label_geode_);
 }
 
+void OSGSegment::attachCollision(){
+    if(collision_){
+        post_transform_->addChild(collision_);
+    }
+}
+
+void OSGSegment::removeCollision()
+{
+    if(collision_){
+        post_transform_->removeChild(collision_);
+    }
+}
+
 bool OSGSegment::toggleSelected(){
     isSelected_ = !isSelected_;
 
@@ -539,9 +579,10 @@ osg::ref_ptr<osg::Node> RobotModel::loadEmptyScene(){
     return root_;
 }
 
-void RobotModel::makeOsg2(KDL::Segment kdl_seg, const std::vector<urdf::VisualSharedPtr>& visuals, OSGSegment& seg)
+void RobotModel::makeOsg2(KDL::Segment kdl_seg, const std::vector<urdf::VisualSharedPtr>& visuals, const std::vector<urdf::CollisionSharedPtr>& collisions, OSGSegment& seg)
 {
     seg.attachVisuals(visuals, rootPrefix);
+    seg.attachCollisions(collisions, rootPrefix);
 }
 
 void RobotModel::makeOsg2(KDL::Segment const& kdl_seg, std::vector<sdf::ElementPtr> const& visuals, OSGSegment& seg){
@@ -595,7 +636,11 @@ osg::ref_ptr<osg::Node> RobotModel::makeOsg( urdf::ModelInterfaceSharedPtr urdf_
         if(urdf_link->visual)
             visuals.push_back(urdf_link->visual);
 
-        makeOsg2(kdl, visuals, *seg);
+        std::vector<urdf::CollisionSharedPtr> collisions = urdf_link->collision_array;
+        if(urdf_link->collision)
+            collisions.push_back(urdf_link->collision);
+
+        makeOsg2(kdl, visuals, collisions, *seg);
 
         //Set name to the main osg node so it can be found by name in the OSG graph
         osg::ref_ptr<osg::Group> osg = seg->getGroup();

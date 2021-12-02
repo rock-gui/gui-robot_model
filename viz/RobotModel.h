@@ -94,6 +94,8 @@ public:
      * Remove text label
      */
     void removeTextLabel();
+    void attachCollision();
+    void removeCollision();
 
     /**
      * @brief Switch on/off highlighting visualization
@@ -127,9 +129,13 @@ protected:
     *
     * Should only be called during initial construction of the robot model.
     *
+    * The graph strcuture:
+    *    visual -> (to_visual) -> the mesh or alike
+    * To be attached to post_transform_
+    *
     * @param visual: Parsed URDF tag (using urdf_parser) of the visual.
     */
-   void attachVisual(urdf::VisualSharedPtr visual, QDir prefix = QDir());
+   osg::ref_ptr<osg::Group> createVisual(urdf::VisualSharedPtr visual, QDir prefix = QDir());
 
    /**
    * @brieg Create nodes with visual meshes
@@ -140,6 +146,15 @@ protected:
    */
    void attachVisuals(const std::vector<urdf::VisualSharedPtr> &visual_array, QDir prefix = QDir());
 
+  /**
+  * @brieg Create nodes with collsion meshes
+  *
+  * Should only be called during initial construction of the robot model
+  *
+  * @param collision_array: Parsed URDF tag (using urdf_parser) of the visual.
+  */
+  void attachCollisions(const std::vector<urdf::CollisionSharedPtr> &collision_array, QDir prefix = QDir());
+
    /**
    * @brief Attach visual mesh to node.
    *
@@ -147,7 +162,7 @@ protected:
    *
    * @param visual: Parsed SDF tag (using sdformat) of the visual.
    */
-   void attachVisual(sdf::ElementPtr visual, QDir prefix = QDir());
+   osg::ref_ptr<osg::Geode> createVisual(sdf::ElementPtr visual, QDir prefix = QDir());
 
    /**
    * @brieg Create nodes with visual meshes
@@ -164,13 +179,20 @@ protected:
 private:
     KDL::Segment seg_; /**< KDKL representation of the segment */
     KDL::Frame toTipKdl_; /**< Temp storage for the current joint pose */
+    // Graph structure is like this:
+    // toTipOsg_ -> post_transform_ -> visual -> (to_visual) -> the mesh or alike
+    //                                 collision -> (to_visual) -> the mesh or alike
+    //                                 label
+    //                                 text_label_geode -> text_label
     osg::ref_ptr<osg::PositionAttitudeTransform> toTipOsg_; /**< The osg node for the joint pose */
     osg::ref_ptr<osg::Group> post_transform_;
     float jointPos_; /**< Current joint position in radians */
-    osg::ref_ptr<osg::Geode> visual_; /**< OSG node for visual element */
+    osg::ref_ptr<osg::Group> visual_; /**< OSG node for visual element */
     osg::ref_ptr<osg::Geode> label_; /**< OSG node for label */
     osg::ref_ptr<osgText::Text> text_label_;
     osg::ref_ptr<osg::Geode> text_label_geode_;
+    osg::ref_ptr<osg::Group> collision_; /**< OSG node for collision visualization */
+    osg::ref_ptr<osg::Geode> inertia_; /**< OSG node for inertia visualization */
     bool isSelected_; /**< Selection state */
     bool useVBO_; /**< Whether rendering should use VBOs */
 
@@ -343,7 +365,7 @@ public:
     bool getUseVBO() const;
 
 protected:
-    void makeOsg2(KDL::Segment kdl_seg, const std::vector<urdf::VisualSharedPtr> &visuals, OSGSegment &seg);
+    void makeOsg2(KDL::Segment kdl_seg, const std::vector<urdf::VisualSharedPtr> &visuals, const std::vector<urdf::CollisionSharedPtr> &collisions, OSGSegment &seg);
     osg::ref_ptr<osg::Node> makeOsg( urdf::ModelInterfaceSharedPtr urdf_model );
 
     void makeOsg2(

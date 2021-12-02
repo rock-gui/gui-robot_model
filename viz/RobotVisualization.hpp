@@ -25,6 +25,7 @@ class RobotVisualization
     Q_PROPERTY(bool followModelWithCamera READ getFollowModelWithCamera WRITE setFollowModelWithCamera)
     Q_PROPERTY(QString rootLink READ getRootLink WRITE setRootLink)
     Q_PROPERTY(bool segmentNamesEnabled READ areSegmentNamesEnabled WRITE setSegmentNamesEnabled)
+    Q_PROPERTY(bool showCollision READ areCollisionsEnabled WRITE setCollisionsEnabled)
 
 public:
     RobotVisualization();
@@ -89,6 +90,8 @@ public slots:
     void hideSegmentText(QString link_name);
     bool areSegmentNamesEnabled() const;
     void setSegmentNamesEnabled(bool value);
+    bool areCollisionsEnabled() const;
+    void setCollisionsEnabled(bool value);
     QQuaternion getRotation(QString source_frame, QString target_frame);
     QVector3D getTranslation(QString source_frame, QString target_frame);
 
@@ -116,6 +119,7 @@ private:
     bool framesEnabled_;
     bool followModelWithCamera;
     bool segmentNamesEnabled_;
+    bool collisionsEnabled_;
     double joints_size;
     Data* p;
     QString _modelFile;
