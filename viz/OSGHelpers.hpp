@@ -1,5 +1,11 @@
 #ifndef OSGHELPERS_HPP
 #define OSGHELPERS_HPP
+#include <osg/Matrix>
+#include <osg/Vec3>
+#include <osg/PositionAttitudeTransform>
+#include <kdl/chain.hpp>
+#include <urdf_model/pose.h>
+#include <ignition/math.hh>
 
 inline void sdf_to_osg(ignition::math::Pose3d const& in, osg::PositionAttitudeTransform& out) {
     out.setPosition(osg::Vec3(in.Pos().X(), in.Pos().Y(), in.Pos().Z()));
@@ -55,7 +61,7 @@ inline void urdf_to_osg(urdf::Pose& in, osg::PositionAttitudeTransform& out){
     out.setAttitude(osg::Quat(in.rotation.x, in.rotation.y, in.rotation.z, in.rotation.w));
 }
 
-void printNodeStructureRecursive(osg::Node* node, int levelCount){
+inline void printNodeStructureRecursive(osg::Node* node, int levelCount){
 
     for (int i = 0; i < levelCount; i++) std::cout << "--";
     std::cout << node->className() << "(" <<  node->getName() << ")" << std::endl;
@@ -73,7 +79,7 @@ void printNodeStructureRecursive(osg::Node* node, int levelCount){
 
 }
 
-void printNodeStructure(osg::Node *node){
+inline void printNodeStructure(osg::Node *node){
     printNodeStructureRecursive(node, 0);
 }
 

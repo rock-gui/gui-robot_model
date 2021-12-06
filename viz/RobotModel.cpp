@@ -1,20 +1,10 @@
 #include "RobotModel.h"
-#include <urdf_parser/urdf_parser.h>
-#include "fstream"
-#include "sstream"
-#include "osg/Texture2D"
-#include "osg/BlendFunc"
-#include "osg/AlphaFunc"
-#include "osg/Billboard"
-#include "osg/PointSprite"
-#include "osg/Point"
-#include "osg/Geometry"
-#include "osg/Image"
-#include "osg/Material"
-#include "osg/ShapeDrawable"
-#include "osg/TextureRectangle"
-#include "osg/TexMat"
 #include "OSGHelpers.hpp"
+
+#include <urdf_parser/urdf_parser.h>
+#include <fstream>
+#include <sstream>
+
 #include <base-logging/Logging.hpp>
 #include <QFileInfo>
 #include <osg/ShadeModel>
@@ -24,543 +14,7 @@
 #include <streambuf>
 #include <locale>
 
-#include <osgDB/Registry>
-#include <osgDB/ReadFile>
-#include <osgDB/WriteFile>
-#include <osgDB/FileNameUtils>
-#include <osgDB/ReaderWriter>
-#include <osgDB/PluginQuery>
 
-#include <osgUtil/Optimizer>
-
-OSGSegment::OSGSegment(KDL::Segment seg, bool useVBO)
-{
-    isSelected_=false;
-    seg_ = seg;
-    jointPos_ = 0;
-    label_ = 0;
-    visual_ = 0;
-    useVBO_ = useVBO;
-    post_transform_ = new osg::Group();
-    toTipOsg_ = new osg::PositionAttitudeTransform();
-    toTipOsg_->addChild(post_transform_);
-    toTipOsg_->setName(seg_.getJoint().getName());
-    post_transform_->setUserData( this );
-    post_transform_->setUpdateCallback(new OSGSegmentCallback);
-
-    toTipOsg_->setUserData(this);
-
-    setupTextLabel();
-    updateJoint();
-}
-
-std::map<std::string, osg::ref_ptr<osg::Node>> OSGSegment::meshCache;
-
-void OSGSegment::clearMeshCache()
-{
-    meshCache.clear();
-}
-
-osg::ref_ptr<osg::Group> OSGSegment::getGroup() const{
-    return post_transform_;
-}
-
-void OSGSegment::updateJoint(){
-    toTipKdl_ = seg_.pose(jointPos_);
-    kdl_to_osg(toTipKdl_, *toTipOsg_);
-}
-
-void OSGSegment::attachVisuals(const std::vector<urdf::VisualSharedPtr > &visual_array, QDir prefix)
-{
-    std::vector<urdf::VisualSharedPtr >::const_iterator itr = visual_array.begin();
-    std::vector<urdf::VisualSharedPtr >::const_iterator itr_end = visual_array.end();
-
-    for(itr = visual_array.begin(); itr != itr_end; ++itr)
-    {
-        urdf::VisualSharedPtr visual = *itr;
-        visual_ = createVisual(visual, prefix);
-        post_transform_->addChild(visual_);
-    }
-}
-
-void OSGSegment::attachCollisions(const std::vector<urdf::CollisionSharedPtr> &collision_array, QDir prefix)
-{
-    std::vector<urdf::CollisionSharedPtr >::const_iterator itr = collision_array.begin();
-    std::vector<urdf::CollisionSharedPtr >::const_iterator itr_end = collision_array.end();
-
-    for(itr = collision_array.begin(); itr != itr_end; ++itr)
-    {
-        urdf::CollisionSharedPtr elem = *itr;
-        //Convert to visual, then call create visual and attach it as collision
-        urdf::VisualSharedPtr visual = urdf::VisualSharedPtr(new urdf::Visual());
-        visual->geometry = elem->geometry;
-        visual->name = elem->name;
-        visual->origin = elem->origin;
-        visual->material = urdf::MaterialSharedPtr(new urdf::Material());
-        visual->material->color.r = 0;
-        visual->material->color.g = 1;
-        visual->material->color.b = 0;
-        visual->material->color.a = 0.7;
-        collision_ = createVisual(visual, prefix);
-    }
-}
-
-class VBOVisitor : public osg::NodeVisitor
-{
-public:
-    VBOVisitor()
-    {
-        setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
-    }
-
-    virtual void apply(osg::Node& node)
-    {
-        osg::Geode *geode = node.asGeode();
-        if (geode != NULL)
-        {
-            for (unsigned int i = 0; i < geode->getNumDrawables(); i++)
-            {
-                osg::Drawable &drawable = *geode->getDrawable(i);
-                drawable.setUseDisplayList(false);
-                drawable.setUseVertexBufferObjects(true);
-            }
-        }
-        traverse(node);
-    }
-};
-
-osg::ref_ptr<osg::Group> OSGSegment::createVisual(urdf::VisualSharedPtr visual, QDir baseDir)
-{
-    osg::ref_ptr<osg::PositionAttitudeTransform> to_visual(new osg::PositionAttitudeTransform());
-    if (visual)
-        urdf_to_osg(visual->origin, *to_visual);
-
-
-    osg::ref_ptr<osg::Group> root = osg::ref_ptr<osg::Group>(new osg::Group());
-    osg::Node* osg_visual;
-    if(visual && visual->geometry->type == urdf::Geometry::MESH){
-        urdf::Mesh* mesh = dynamic_cast<urdf::Mesh*>(visual->geometry.get());
-        to_visual->setScale(urdf_to_osg(mesh->scale));
-
-        std::string prefix = "file://";
-        std::string filename = "";
-        if(mesh->filename.compare(0, prefix.length(), prefix) == 0){
-            filename = mesh->filename.substr(prefix.length());
-        }
-        else
-            filename = mesh->filename;
-        LOG_DEBUG("Trying to load mesh file %s", filename.c_str());
-
-        QString qfilename = QString::fromStdString(filename);
-        if (QFileInfo(qfilename).isRelative())
-            qfilename = baseDir.absoluteFilePath(qfilename);
-        if (QFileInfo(qfilename + ".osgb").exists())
-            qfilename = qfilename + ".osgb";
-
-        //Force 'classic' ('C'-style) encoding before loading mesh files.
-        //This allows loading of .obj files from within an Qt App on a german system.
-        //Otherwise decimal delimeter confusion prevents loading of obj-files correctly
-        std::locale::global(std::locale::classic());
-        filename = qfilename.toStdString();
-        std::map<std::string, osg::ref_ptr<osg::Node>>::iterator it = meshCache.find(filename);
-        if (it == meshCache.end()) {
-            osg_visual = osgDB::readNodeFile(filename);
-            meshCache[filename] = osg_visual;
-        }
-        else {
-            osg_visual = it->second;
-        }
-
-        if(!osg_visual){
-            LOG_ERROR("OpenSceneGraph did not succees loading the mesh file %s.", filename.c_str());
-            throw std::runtime_error("Error loading mesh file.");
-        }
-        if(!osg_visual){
-            LOG_ERROR("Unecpected error loading mesh file %s", mesh->filename.c_str());
-            throw(std::runtime_error("Couldn't load mesh file."));
-        }
-    }
-    else if(visual && visual->geometry->type == urdf::Geometry::BOX){
-        urdf::Box* box = dynamic_cast<urdf::Box*>(visual->geometry.get());
-        osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3d(0,0,0), box->dim.x, box->dim.y, box->dim.z));
-        osg_visual = new osg::Geode;
-        osg_visual->asGeode()->addDrawable(drawable);
-    }
-    else if(visual && visual->geometry->type == urdf::Geometry::CYLINDER){
-        urdf::Cylinder* cylinder = dynamic_cast<urdf::Cylinder*>(visual->geometry.get());
-        osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Cylinder(osg::Vec3d(0,0,0), cylinder->radius, cylinder->length));
-
-        osg_visual = new osg::Geode;
-        osg_visual->asGeode()->addDrawable(drawable);
-    }
-    else if(visual && visual->geometry->type == urdf::Geometry::SPHERE){
-        urdf::Sphere* sphere = dynamic_cast<urdf::Sphere*>(visual->geometry.get());
-        osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Sphere(osg::Vec3d(0,0,0), sphere->radius));
-
-        osg_visual = new osg::Geode;
-        osg_visual->asGeode()->addDrawable(drawable);
-    }
-    else
-    {
-        osg_visual = new osg::Geode;
-    }
-
-    //Set material
-    if(visual){
-        if(visual->material){
-            osg::ref_ptr<osg::StateSet> nodess = osg_visual->getOrCreateStateSet();
-            nodess->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
-
-            osg::ref_ptr<osg::Material> nodematerial = new osg::Material;
-
-            std::string filename = visual->material->texture_filename;
-            if(filename != ""){
-                QString qfilename = QString::fromStdString(visual->material->texture_filename);
-                if (QFileInfo(qfilename).isRelative())
-                    filename = baseDir.absoluteFilePath(qfilename).toStdString();
-                osg::ref_ptr<osg::Image> texture_img = osgDB::readImageFile(filename);
-                if(texture_img){
-                    osg::ref_ptr<osg::TextureRectangle> texture_rect = osg::ref_ptr<osg::TextureRectangle>(new osg::TextureRectangle(texture_img));
-                    osg::ref_ptr<osg::TexMat> texmat = new osg::TexMat;
-                    texmat->setScaleByTextureRectangleSize(true);
-                    nodess->setTextureAttributeAndModes(0, texture_rect, osg::StateAttribute::ON);
-                    nodess->setTextureAttributeAndModes(0, texmat, osg::StateAttribute::ON);
-                }
-                else{
-                    std::cout << "Could not load texture from file '"<<visual->material->texture_filename<<"'." << std::endl;
-                }
-            }
-            //Specifying the colour of the object
-            nodematerial->setDiffuse(osg::Material::FRONT,osg::Vec4(visual->material->color.r,
-                                                                    visual->material->color.g,
-                                                                    visual->material->color.b,
-                                                                    visual->material->color.a));
-            nodematerial->setSpecular(osg::Material::FRONT,osg::Vec4(0.2,
-                                                                     0.2,
-                                                                     0.2,
-                                                                     1));
-
-            //Attaching the newly defined state set object to the node state set
-            nodess->setAttribute(nodematerial.get());
-        }
-    }
-
-    useVBOIfEnabled(osg_visual);
-
-    to_visual->addChild(osg_visual);
-    root->addChild(to_visual);
-
-    return root;
-}
-
-osg::ref_ptr<osg::Geode> OSGSegment::createVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
-
-    osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
-    sdf_to_osg(sdf_visual->GetElement("pose")->Get<ignition::math::Pose3d>(), *to_visual);
-
-//    toTipOsg_->addChild(to_visual);
-    post_transform_->addChild(to_visual);
-
-    osg::Node* osg_visual = 0;
-    if (sdf_visual->HasElement("geometry")){
-
-        sdf::ElementPtr sdf_geometry  = sdf_visual->GetElement("geometry");
-        sdf::ElementPtr sdf_geom_elem = sdf_geometry->GetFirstElement();
-        if (!sdf_geom_elem){
-            LOG_WARN("SDF: no geometry element");
-            osg_visual = new osg::Geode;
-        }
-        else if (sdf_geom_elem->GetName() == "box"){
-            osg::Vec3f size;
-            sdf_to_osg(sdf_geom_elem->GetElement("size")->Get<ignition::math::Vector3d>(), size);
-            osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3(0,0,0), size.x(), size.y(), size.z()));
-            osg_visual = new osg::Geode;
-            osg_visual->asGeode()->addDrawable(drawable);
-        }
-        else if (sdf_geom_elem->GetName() == "cylinder"){
-            double radius = sdf_geom_elem->GetElement("radius")->Get<double>();
-            double length = sdf_geom_elem->GetElement("length")->Get<double>();
-            osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Cylinder(osg::Vec3d(0,0,0), radius, length));
-            osg_visual = new osg::Geode;
-            osg_visual->asGeode()->addDrawable(drawable);
-        }
-        else if (sdf_geom_elem->GetName() == "sphere"){
-            double radius = sdf_geom_elem->GetElement("radius")->Get<double>();
-            osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Sphere(osg::Vec3d(0,0,0), radius));
-            osg_visual = new osg::Geode;
-            osg_visual->asGeode()->addDrawable(drawable);
-        }
-        else if (sdf_geom_elem->GetName() == "mesh") {
-            osg::Vec3 scale;
-            sdf_to_osg(sdf_geom_elem->GetElement("scale")->Get<ignition::math::Vector3d>(), scale);
-
-            to_visual->setScale(scale);
-
-            std::string uri = sdf_geom_elem->GetElement("uri")->Get<std::string>();
-            std::string filename = sdf::findFile(uri, true, false);
-            if (!QFileInfo(QString::fromStdString(filename)).exists()) {
-                std::string model_prefix = "model://";
-                if(uri.compare(0, model_prefix.length(), model_prefix) == 0) {
-                    filename = uri.substr(model_prefix.length());
-                }
-                else {
-                    filename = uri;
-                }
-
-                QString qfilename = QString::fromStdString(filename);
-                if (QFileInfo(qfilename).isRelative()){
-                    QDir modelPaths = baseDir;
-                    modelPaths.cdUp();
-                    filename = modelPaths.absoluteFilePath(qfilename).toStdString();
-                }
-            }
-
-            if (QFileInfo(QString::fromStdString(filename + ".osgb")).exists())
-                filename = filename + ".osgb";
-
-            LOG_INFO("loading visual %s", filename.c_str());
-            auto it = meshCache.find(filename);
-            if (it == meshCache.end()) {
-                osg_visual = osgDB::readNodeFile(filename);
-                meshCache[filename] = osg_visual;
-            }
-            else {
-                LOG_INFO("visual already in cache");
-                osg_visual = it->second;
-            }
-
-            if (!osg_visual) {
-                LOG_WARN("OpenSceneGraph did not succeed in loading the mesh file %s.", filename.c_str());
-                osg_visual = new osg::Geode;
-            }
-        }
-        else {
-            LOG_WARN("SDF: %s is not a supported geometry", sdf_geom_elem->GetName().c_str());
-            osg_visual = new osg::Geode;
-        }
-    }
-
-    if (sdf_visual->HasElement("material")){
-
-        osg::ref_ptr<osg::Material> nodematerial = new osg::Material;
-
-        nodematerial->setSpecular(osg::Material::FRONT,osg::Vec4(0.2,
-                                                                 0.2,
-                                                                 0.2,
-                                                                 1));
-
-        sdf::ElementPtr sdf_material = sdf_visual->GetElement("material");
-
-        if (sdf_material->HasElement("ambient")){
-            osg::Vec4 ambient;
-            sdf_to_osg(sdf_material->GetElement("ambient")->Get<sdf::Color>(), ambient);
-            nodematerial->setAmbient(osg::Material::FRONT,ambient);
-        }
-
-        if (sdf_material->HasElement("diffuse")){
-            osg::Vec4 diffuse;
-            sdf_to_osg(sdf_material->GetElement("diffuse")->Get<sdf::Color>(), diffuse);
-            nodematerial->setDiffuse(osg::Material::FRONT,diffuse);
-        }
-
-        if (sdf_material->HasElement("specular")){
-            osg::Vec4 specular;
-            sdf_to_osg(sdf_material->GetElement("specular")->Get<sdf::Color>(), specular);
-            nodematerial->setSpecular(osg::Material::FRONT, specular);
-
-        }
-
-        if (sdf_material->HasElement("emissive")){
-            osg::Vec4 emissive;
-            sdf_to_osg(sdf_material->GetElement("emissive")->Get<sdf::Color>(), emissive);
-            nodematerial->setEmission(osg::Material::FRONT, emissive);
-        }
-
-        osg::ref_ptr<osg::StateSet> nodess = osg_visual->getOrCreateStateSet();
-        nodess->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
-        nodess->setAttribute(nodematerial.get());
-    }
-
-    useVBOIfEnabled(osg_visual);
-
-    to_visual->addChild(osg_visual);
-    return osg_visual->asGeode();
-}
-
-void OSGSegment::useVBOIfEnabled(osg::Node* node)
-{
-    if (useVBO_)
-    {
-        LOG_DEBUG("Using VBOs to display meshes")
-        VBOVisitor vbo;
-        node->accept(vbo);
-    }
-    else {
-        LOG_DEBUG("Not using VBOs to display meshes, enable globally with ROCK_VIZ_USE_VBO")
-    }
-}
-
-void OSGSegment::attachVisuals(std::vector<sdf::ElementPtr> const &visual_array, QDir prefix){
-
-    std::vector<sdf::ElementPtr>::const_iterator
-        itr,
-        itr_end = visual_array.end();
-
-    for(itr = visual_array.begin(); itr != itr_end; ++itr)
-    {
-        sdf::ElementPtr visual = *itr;
-        visual_ = createVisual(visual, prefix);
-        post_transform_->addChild(visual_);
-    }
-}
-
-
-void OSGSegment::removeLabel(){
-    if(label_)
-        post_transform_->removeChild(label_);
-    label_ = 0;
-}
-
-void OSGSegment::attachLabel(std::string name, std::string filepath){
-    if(label_)
-        removeLabel();
-
-    osg::ref_ptr<osg::Geode> geode = osg::ref_ptr<osg::Geode>(new osg::Geode());
-    osg::ref_ptr<osg::Geometry> geometry = osg::ref_ptr<osg::Geometry>(new osg::Geometry());
-
-    osg::ref_ptr<osg::Vec3Array> vertices = osg::ref_ptr<osg::Vec3Array>(new osg::Vec3Array);
-    vertices->push_back (osg::Vec3 (0, 0, 0.0));
-
-    geometry->setVertexArray (vertices);
-
-    geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS,0,vertices->size()));
-
-    geode->addDrawable(geometry);
-    osg::ref_ptr<osg::StateSet> set = geode->getOrCreateStateSet();
-
-    /// Setup the point sprites
-    osg::ref_ptr<osg::PointSprite> sprite = osg::ref_ptr<osg::PointSprite>(new osg::PointSprite());
-    set->setTextureAttributeAndModes(0, sprite, osg::StateAttribute::ON);
-
-    /// Give some size to the points to be able to see the sprite
-    osg::ref_ptr<osg::Point> point = osg::ref_ptr<osg::Point>(new osg::Point());
-    point->setSize(50);
-    set->setAttribute(point);
-
-    /// Disable depth test to avoid sort problems and Lighting
-    set->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
-    set->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-
-    osg::ref_ptr<osg::BlendFunc> texture_blending_function = new osg::BlendFunc();
-    set->setAttributeAndModes(texture_blending_function.get(), osg::StateAttribute::ON);
-
-    osg::ref_ptr<osg::AlphaFunc> alpha_transparency_function = new osg::AlphaFunc();
-    alpha_transparency_function->setFunction(osg::AlphaFunc::GEQUAL, 0.05);
-    set->setAttributeAndModes(alpha_transparency_function.get(), osg::StateAttribute::ON );
-
-    /// The texture for the sprites
-    osg::ref_ptr<osg::Texture2D> tex = osg::ref_ptr<osg::Texture2D>(new osg::Texture2D());
-    osg::ref_ptr<osg::Image> image = osgDB::readImageFile(filepath);
-    image->flipVertical();
-    tex->setImage(image);
-
-    set->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON);
-
-    post_transform_->addChild(geode);
-
-    geode->setName(name);
-    geode->setUserData(this);
-
-    label_ = geode;
-}
-
-void OSGSegment::setupTextLabel(){
-    text_label_ = osg::ref_ptr<osgText::Text>(new osgText::Text());
-    text_label_geode_ = osg::ref_ptr<osg::Geode>(new osg::Geode());
-    osg::ref_ptr<osg::StateSet> set = text_label_geode_->getOrCreateStateSet();
-    /// Disable depth test and Lighting
-    set->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
-    set->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-    text_label_geode_->addDrawable(text_label_);
-
-    //Text should be rather small and be always readable on the screen
-    text_label_->setCharacterSizeMode(osgText::Text::SCREEN_COORDS);
-    text_label_->setCharacterSize(20);
-
-    osgText::Font* font = osgText::Font::getDefaultFont();
-    font->setMinFilterHint(osg::Texture::NEAREST); // aliasing when zoom out, this doesnt look so ugly because text is small
-    font->setMagFilterHint(osg::Texture::NEAREST); // aliasing when zoom in
-    text_label_->setFont(font);
-
-    text_label_->setAxisAlignment(osgText::Text::SCREEN);
-
-    // Set the text to render with alignment anchor and bounding box around it:
-    text_label_->setDrawMode(osgText::Text::TEXT |
-                           osgText::Text::ALIGNMENT);
-    text_label_->setAlignment(osgText::Text::CENTER_TOP);
-    text_label_->setPosition( osg::Vec3(0,0,0) );
-    text_label_->setColor( osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
-
-    text_label_->setBackdropType(osgText::Text::OUTLINE);
-    text_label_->setBackdropColor(osg::Vec4(0, 0, 0, 1.0f));
-}
-
-void OSGSegment::attachTextLabel(std::string text){
-    if(text == ""){
-        text = seg_.getName();
-    }
-    text_label_->setText(text);
-    post_transform_->addChild(text_label_geode_);
-}
-
-void OSGSegment::removeTextLabel()
-{
-    post_transform_->removeChild(text_label_geode_);
-}
-
-void OSGSegment::attachCollision(){
-    if(collision_){
-        post_transform_->addChild(collision_);
-    }
-}
-
-void OSGSegment::removeCollision()
-{
-    if(collision_){
-        post_transform_->removeChild(collision_);
-    }
-}
-
-bool OSGSegment::toggleSelected(){
-    isSelected_ = !isSelected_;
-
-    if(!visual_){
-        std::clog << "Tried to highlight " << seg_.getName() << ", but it has no visual." << std::endl;
-        return false;
-    }
-    osg::ref_ptr<osg::Group> parent = visual_->getParent(0);
-
-    if(isSelected_){
-        osg::ref_ptr<osgFX::Outline> scribe = osg::ref_ptr<osgFX::Outline>(new osgFX::Outline());
-        scribe->setWidth(1);
-        scribe->setColor(osg::Vec4(1,0,0,1));
-        scribe->addChild(visual_);
-        parent->replaceChild(visual_, scribe);
-    }
-    else{
-        //node already picked so we want to remove marker to unpick it.
-        osg::Node::ParentList parentList = parent->getParents();
-        for(osg::Node::ParentList::iterator itr=parentList.begin();
-            itr!=parentList.end();
-            ++itr)
-        {
-            (*itr)->replaceChild(parent, visual_);
-        }
-    }
-
-    //update_visual();
-    return isSelected_;
-}
 
 
 RobotModel::RobotModel() {
@@ -581,15 +35,17 @@ osg::ref_ptr<osg::Node> RobotModel::loadEmptyScene(){
 
 void RobotModel::makeOsg2(KDL::Segment kdl_seg, const std::vector<urdf::VisualSharedPtr>& visuals, const std::vector<urdf::CollisionSharedPtr>& collisions, OSGSegment& seg)
 {
-    seg.attachVisuals(visuals, rootPrefix);
-    seg.attachCollisions(collisions, rootPrefix);
+    seg.createVisuals(visuals, rootPrefix);
+    seg.createCollisions(collisions, rootPrefix);
 }
 
-void RobotModel::makeOsg2(KDL::Segment const& kdl_seg, std::vector<sdf::ElementPtr> const& visuals, OSGSegment& seg){
+void RobotModel::makeOsg2(KDL::Segment const& kdl_seg, std::vector<sdf::ElementPtr> const& visuals, std::vector<sdf::ElementPtr> const& collisions, std::vector<sdf::ElementPtr> const& inertias, OSGSegment& seg){
 
     if (visuals.size() > 0)
     {
-        seg.attachVisuals(visuals, rootPrefix);
+        seg.createVisuals(visuals, rootPrefix);
+        seg.createCollisions(collisions, rootPrefix);
+        seg.createInertias(inertias);
     }
     else {
         //in sdf files it is possible to create links without visuals
@@ -701,6 +157,8 @@ osg::Node* RobotModel::makeOsg( sdf::ElementPtr sdf_model )
         SDFLinkIterator sdf = sdf_links.find(kdl.getName());
 
         std::vector<sdf::ElementPtr> visuals;
+        std::vector<sdf::ElementPtr> collisions;
+        std::vector<sdf::ElementPtr> inertials;
         if (sdf != sdf_links.end()){
             sdf::ElementPtr sdf_link = sdf->second;
             sdf::ElementPtr visualElem = sdf_link->GetElement("visual");
@@ -708,9 +166,19 @@ osg::Node* RobotModel::makeOsg( sdf::ElementPtr sdf_model )
                 visuals.push_back(visualElem);
                 visualElem = visualElem->GetNextElement("visual");
             }
+            sdf::ElementPtr collisionElem = sdf_link->GetElement("collision");
+            while (collisionElem){
+                collisions.push_back(collisionElem);
+                collisionElem = collisionElem->GetNextElement("collision");
+            }
+            sdf::ElementPtr inertialElem = sdf_link->GetElement("inertial");
+            while (inertialElem){
+                inertials.push_back(inertialElem);
+                inertialElem = inertialElem->GetNextElement("inertial");
+            }
         }
 
-        makeOsg2(kdl, visuals, *seg);
+        makeOsg2(kdl, visuals, collisions, inertials, *seg);
 
         //Set name to the main osg node so it can be found by name in the OSG graph
         osg::ref_ptr<osg::Group> osg = seg->getGroup();
@@ -740,6 +208,39 @@ osg::Node* RobotModel::makeOsg( sdf::ElementPtr sdf_model )
 osg::ref_ptr<osg::Node> RobotModel::load(QString path){
 
     return loadFromFile(path);
+}
+
+void RobotModel::attachCollisions(bool value)
+{
+    for (size_t i=0; i<segmentNames_.size(); i++){
+        OSGSegment* seg = getSegment(segmentNames_[i]);
+        if(value)
+            seg->attachCollision();
+        else
+            seg->removeCollision();
+    }
+}
+
+void RobotModel::attachInertias(bool value)
+{
+    for (size_t i=0; i<segmentNames_.size(); i++){
+        OSGSegment* seg = getSegment(segmentNames_[i]);
+        if(value)
+            seg->attachInertia();
+        else
+            seg->removeInertia();
+    }
+}
+
+void RobotModel::attachVisuals(bool value)
+{
+    for (size_t i=0; i<segmentNames_.size(); i++){
+        OSGSegment* seg = getSegment(segmentNames_[i]);
+        if(value)
+            seg->attachVisual();
+        else
+            seg->removeVisual();
+    }
 }
 
 osg::ref_ptr<osg::Node> RobotModel::loadFromFile(QString path, ROBOT_MODEL_FORMAT format)
