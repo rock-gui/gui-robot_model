@@ -33,9 +33,6 @@ public:
     RobotVisualization();
     ~RobotVisualization();
 
-    void setModelFile(QString modelFile);
-    QString modelFile() const;
-
     Q_INVOKABLE void clearMeshCache();
 
     Q_INVOKABLE void updateData(base::samples::Joints const &sample)
@@ -47,6 +44,9 @@ public:
     {updateData(sample);}
 
 public slots:
+    void setModelFile(QString modelFile);
+    QString modelFile() const;
+    
     void setRootLink(QString segment_name){
         bool st= relocateRoot(segment_name.toStdString());
         if(!st){
