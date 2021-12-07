@@ -3,15 +3,8 @@
 #include "OSGHelpers.hpp"
 #include "VBOVisitor.hpp"
 
-#include <osg/Texture2D>
-#include <osg/BlendFunc>
-#include <osg/AlphaFunc>
-#include <osg/Billboard>
-#include <osg/PointSprite>
-#include <osg/Point>
 #include <osg/Geometry>
 #include <osg/Image>
-#include <osg/Material>
 #include <osg/ShapeDrawable>
 #include <osg/TextureRectangle>
 #include <osg/TexMat>
@@ -34,8 +27,6 @@
 
 
 
-
-
 OSGSegment::OSGSegment(KDL::Segment seg, bool useVBO)
 {
     isSelected_=false;
@@ -53,7 +44,7 @@ OSGSegment::OSGSegment(KDL::Segment seg, bool useVBO)
 
     toTipOsg_->setUserData(this);
 
-    setupTextLabel();
+    text_label_geode_ = createTextLabel(seg.getName(), text_label_);
     updateJoint();
 }
 
@@ -73,17 +64,6 @@ void OSGSegment::updateJoint(){
     kdl_to_osg(toTipKdl_, *toTipOsg_);
 }
 
-void OSGSegment::createVisuals(const std::vector<urdf::VisualSharedPtr > &visual_array, QDir prefix)
-{
-    std::vector<urdf::VisualSharedPtr >::const_iterator itr = visual_array.begin();
-    std::vector<urdf::VisualSharedPtr >::const_iterator itr_end = visual_array.end();
-
-    for(itr = visual_array.begin(); itr != itr_end; ++itr)
-    {
-        urdf::VisualSharedPtr visual = *itr;
-        visual_ = createVisual(visual, prefix);
-    }
-}
 
 void OSGSegment::createCollisions(const std::vector<urdf::CollisionSharedPtr> &collision_array, QDir prefix)
 {
@@ -147,104 +127,25 @@ void OSGSegment::createCollisions(std::vector<sdf::ElementPtr> const& collision_
 }
 
 
-osg::ref_ptr<osg::Group> DrawEllipsoid(unsigned int uiStacks, unsigned int uiSlices, float fA, float fB, float fC)
+void OSGSegment::createInertias(const std::vector<urdf::InertialSharedPtr> &inertia_array)
 {
-    osg::ref_ptr<osg::Group> root(new osg::Group());
-    osg::Vec4d color((float) rand()/INT_MAX, (float) rand()/INT_MAX, (float) rand()/INT_MAX, 0.5);
+    std::vector<urdf::InertialSharedPtr>::const_iterator itr = inertia_array.begin();
+    std::vector<urdf::InertialSharedPtr >::const_iterator itr_end = inertia_array.end();
 
-    //Create Vertices. Taken from https://www.gamedev.net/forums/topic/126624-generating-an-ellipsoid-in-opengl/
-    float tStep = (M_PI) / (float)uiSlices;
-    float sStep = (M_PI) / (float)uiStacks;
-    for(float t = -M_PI/2; t <= (M_PI/2)+.0001; t += tStep)
+    inertia_ = osg::ref_ptr<osg::Group>(new osg::Group());
+    for(itr = inertia_array.begin(); itr != itr_end; ++itr)
     {
-        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array();
-        osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array();
-        osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array();
+        urdf::InertialSharedPtr elem = *itr;
+        osg::PositionAttitudeTransform* to_cog = new osg::PositionAttitudeTransform();
+        urdf_to_osg(elem->origin, *to_cog);
+        inertia_->addChild(to_cog);
 
-        for(float s = -M_PI; s <= M_PI+.0001; s += sStep)
-        {
-            osg::Vec3d p( fA * cos(t) * cos(s),
-                        fB * cos(t) * sin(s),
-                        fC * sin(t));
-            vertices->push_back( p );
-            p.normalize();
-            normals->push_back( p );
-
-            osg::Vec3d q( fA * cos(t+tStep) * cos(s),
-                        fB * cos(t+tStep) * sin(s),
-                        fC * sin(t+tStep));
-            vertices->push_back( q );
-            q.normalize();
-            normals->push_back( q );
-
-            colors->push_back(osg::Vec4d(1.0, 1.0, 0.0, 0.5));
-        }
-        osg::ref_ptr<osg::Geometry> polygon = new osg::Geometry;
-        polygon->setVertexArray( vertices.get() );
-        polygon->setNormalArray( normals.get() );
-        polygon->setNormalBinding( osg::Geometry::BIND_PER_VERTEX );
-        polygon->addPrimitiveSet( new osg::DrawArrays(GL_TRIANGLE_STRIP, 0, vertices->size()) );
-
-        polygon->setColorArray( colors.get() );
-
-        osg::ref_ptr<osg::StateSet> nodess = polygon->getOrCreateStateSet();
-        nodess->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
-        osg::ref_ptr<osg::Material> nodematerial = new osg::Material;
-
-        nodematerial->setAmbient(osg::Material::FRONT, color);
-        nodematerial->setDiffuse(osg::Material::FRONT, color);
-        nodematerial->setSpecular(osg::Material::FRONT, color);
-        nodematerial->setEmission(osg::Material::FRONT, color);
-        nodess->setAttribute(nodematerial.get());
-
-        osg::ref_ptr<osg::Geode> geode(new osg::Geode);
-        geode->addDrawable( polygon.get() );
-
-        root->addChild(geode);
+        osg::ref_ptr<osg::Group> geode = make_ellispoid(elem->ixx, elem->ixy, elem->ixz,
+                                                        elem->iyy, elem->iyz,
+                                                        elem->izz,
+                                                        elem->mass);
+        to_cog->addChild(geode);
     }
-
-    return root;
-}
-
-osg::ref_ptr<osg::Group> DrawBox(double fA, double fB, double fC)
-{
-    osg::Vec4d color((float) rand()/INT_MAX, (float) rand()/INT_MAX, (float) rand()/INT_MAX, 0.5);
-
-    osg::ref_ptr<osg::Material> nodematerial = new osg::Material;
-    nodematerial->setAmbient(osg::Material::FRONT, color);
-    nodematerial->setDiffuse(osg::Material::FRONT, color);
-    nodematerial->setSpecular(osg::Material::FRONT, color);
-    nodematerial->setEmission(osg::Material::FRONT, color);
-    osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3d(0,0,0), fA, fB, fC));
-    osg::ref_ptr<osg::StateSet> nodess = drawable->getOrCreateStateSet();
-    nodess->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
-    nodess->setAttribute(nodematerial.get());
-    osg::ref_ptr<osg::Group> root(new osg::Group());
-    root->addChild(drawable);
-    return root;
-}
-
-osg::ref_ptr<osg::Group> make_ellispoid(float x, float y, float z, float xx, float xy, float xz, float yy, float yz, float zz, float m)
-{
-    ignition::math::MassMatrix3d M;
-    M.Mass(m);
-    bool ok = M.InertiaMatrix(xx, yy, zz, xy, xz, yz);
-    assert(ok);
-
-    ignition::math::Vector3d radii;
-    ignition::math::Quaterniond rot;
-    M.EquivalentBox(radii, rot);
-    osg::ref_ptr<osg::PositionAttitudeTransform> T(new osg::PositionAttitudeTransform());
-    T->setPosition(osg::Vec3d(0., 0., 0.));
-    T->setAttitude(osg::Quat(rot.X(), rot.Y(), rot.Z(), rot.W()));
-
-    osg::ref_ptr<osg::Group> root(new osg::Group());
-    root->addChild(T);
-
-    //T->addChild(DrawBox(radii.X(), radii.Y(), radii.Z()));
-    T->addChild(DrawEllipsoid(25, 25, radii.X(), radii.Y(), radii.Z()));
-
-    return root;
 }
 
 
@@ -259,10 +160,10 @@ void OSGSegment::createInertias(std::vector<sdf::ElementPtr> const& inertia_arra
     {
         sdf::ElementPtr elem = *itr;
         //<inertial>
-        //            <origin rpy="0.0 0.0 0.0" xyz="0.0079897 0.0 0.00019625"/>
-        //            <mass value="1.1943"/>
-        //            <inertia ixx="0.00089755" ixy="1.4484e-08" ixz="-2.6127e-07" iyy="0.00057565" iyz="-7.8027e-07" izz="0.00056347"/>
-        //        </inertial>
+        //  <origin rpy="0.0 0.0 0.0" xyz="0.0079897 0.0 0.00019625"/>
+        //  <mass value="1.1943"/>
+        //  <inertia ixx="0.00089755" ixy="1.4484e-08" ixz="-2.6127e-07" iyy="0.00057565" iyz="-7.8027e-07" izz="0.00056347"/>
+        //</inertial>
         osg::PositionAttitudeTransform* to_cog = new osg::PositionAttitudeTransform();
         ignition::math::Pose3d pose = elem->GetElement("pose")->Get<ignition::math::Pose3d>();
         sdf_to_osg(pose , *to_cog);
@@ -276,20 +177,8 @@ void OSGSegment::createInertias(std::vector<sdf::ElementPtr> const& inertia_arra
         elem->GetElement("inertia")->GetElement("iyz")->GetValue()->Get(iyz);
         elem->GetElement("inertia")->GetElement("izz")->GetValue()->Get(izz);
         elem->GetElement("mass")->GetValue()->Get(m);
-        osg::ref_ptr<osg::Group> geode = make_ellispoid(0,0,0, ixx, ixy, ixz, iyy, iyz, izz, m);
+        osg::ref_ptr<osg::Group> geode = make_ellispoid(ixx, ixy, ixz, iyy, iyz, izz, m);
         to_cog->addChild(geode);
-
-        osg::ref_ptr<osg::Material> nodematerial = new osg::Material;
-        nodematerial->setSpecular(osg::Material::FRONT,osg::Vec4(1,
-                                                                 1,
-                                                                 0,
-                                                                 0.5));
-        osg::ShapeDrawable* cog_drawable = new osg::ShapeDrawable(new osg::Sphere(osg::Vec3d(0,0,0), 0.03));
-        osg::ref_ptr<osg::StateSet> nodess = cog_drawable->getOrCreateStateSet();
-        nodess->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
-        nodess->setAttribute(nodematerial.get());
-
-        to_cog->addChild(cog_drawable);
     }
 }
 
@@ -581,6 +470,19 @@ void OSGSegment::useVBOIfEnabled(osg::Node* node)
     }
 }
 
+void OSGSegment::createVisuals(const std::vector<urdf::VisualSharedPtr > &visual_array, QDir prefix)
+{
+    std::vector<urdf::VisualSharedPtr >::const_iterator itr = visual_array.begin();
+    std::vector<urdf::VisualSharedPtr >::const_iterator itr_end = visual_array.end();
+
+    visual_ = osg::ref_ptr<osg::Group>(new osg::Group());
+    for(itr = visual_array.begin(); itr != itr_end; ++itr)
+    {
+        urdf::VisualSharedPtr visual = *itr;
+        visual_->addChild(createVisual(visual, prefix));
+    }
+}
+
 void OSGSegment::createVisuals(std::vector<sdf::ElementPtr> const &visual_array, QDir prefix){
 
     std::vector<sdf::ElementPtr>::const_iterator
@@ -596,95 +498,24 @@ void OSGSegment::createVisuals(std::vector<sdf::ElementPtr> const &visual_array,
 }
 
 
-void OSGSegment::removeLabel(){
+void OSGSegment::removeIconLabel(){
     if(label_)
         post_transform_->removeChild(label_);
     label_ = 0;
 }
 
-void OSGSegment::attachLabel(std::string name, std::string filepath){
+
+void OSGSegment::attachIconLabel(std::string name, std::string filepath){
     if(label_)
-        removeLabel();
+        removeIconLabel();
 
-    osg::ref_ptr<osg::Geode> geode = osg::ref_ptr<osg::Geode>(new osg::Geode());
-    osg::ref_ptr<osg::Geometry> geometry = osg::ref_ptr<osg::Geometry>(new osg::Geometry());
-
-    osg::ref_ptr<osg::Vec3Array> vertices = osg::ref_ptr<osg::Vec3Array>(new osg::Vec3Array);
-    vertices->push_back (osg::Vec3 (0, 0, 0.0));
-
-    geometry->setVertexArray (vertices);
-
-    geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS,0,vertices->size()));
-
-    geode->addDrawable(geometry);
-    osg::ref_ptr<osg::StateSet> set = geode->getOrCreateStateSet();
-
-    /// Setup the point sprites
-    osg::ref_ptr<osg::PointSprite> sprite = osg::ref_ptr<osg::PointSprite>(new osg::PointSprite());
-    set->setTextureAttributeAndModes(0, sprite, osg::StateAttribute::ON);
-
-    /// Give some size to the points to be able to see the sprite
-    osg::ref_ptr<osg::Point> point = osg::ref_ptr<osg::Point>(new osg::Point());
-    point->setSize(50);
-    set->setAttribute(point);
-
-    /// Disable depth test to avoid sort problems and Lighting
-    set->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
-    set->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-
-    osg::ref_ptr<osg::BlendFunc> texture_blending_function = new osg::BlendFunc();
-    set->setAttributeAndModes(texture_blending_function.get(), osg::StateAttribute::ON);
-
-    osg::ref_ptr<osg::AlphaFunc> alpha_transparency_function = new osg::AlphaFunc();
-    alpha_transparency_function->setFunction(osg::AlphaFunc::GEQUAL, 0.05);
-    set->setAttributeAndModes(alpha_transparency_function.get(), osg::StateAttribute::ON );
-
-    /// The texture for the sprites
-    osg::ref_ptr<osg::Texture2D> tex = osg::ref_ptr<osg::Texture2D>(new osg::Texture2D());
-    osg::ref_ptr<osg::Image> image = osgDB::readImageFile(filepath);
-    image->flipVertical();
-    tex->setImage(image);
-
-    set->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON);
-
-    post_transform_->addChild(geode);
-
-    geode->setName(name);
+    osg::ref_ptr<osg::Geode> geode = createIconLabel(name, filepath);
     geode->setUserData(this);
+    post_transform_->addChild(geode);
 
     label_ = geode;
 }
 
-void OSGSegment::setupTextLabel(){
-    text_label_ = osg::ref_ptr<osgText::Text>(new osgText::Text());
-    text_label_geode_ = osg::ref_ptr<osg::Geode>(new osg::Geode());
-    osg::ref_ptr<osg::StateSet> set = text_label_geode_->getOrCreateStateSet();
-    /// Disable depth test and Lighting
-    set->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
-    set->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-    text_label_geode_->addDrawable(text_label_);
-
-    //Text should be rather small and be always readable on the screen
-    text_label_->setCharacterSizeMode(osgText::Text::SCREEN_COORDS);
-    text_label_->setCharacterSize(20);
-
-    osgText::Font* font = osgText::Font::getDefaultFont();
-    font->setMinFilterHint(osg::Texture::NEAREST); // aliasing when zoom out, this doesnt look so ugly because text is small
-    font->setMagFilterHint(osg::Texture::NEAREST); // aliasing when zoom in
-    text_label_->setFont(font);
-
-    text_label_->setAxisAlignment(osgText::Text::SCREEN);
-
-    // Set the text to render with alignment anchor and bounding box around it:
-    text_label_->setDrawMode(osgText::Text::TEXT |
-                           osgText::Text::ALIGNMENT);
-    text_label_->setAlignment(osgText::Text::CENTER_TOP);
-    text_label_->setPosition( osg::Vec3(0,0,0) );
-    text_label_->setColor( osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
-
-    text_label_->setBackdropType(osgText::Text::OUTLINE);
-    text_label_->setBackdropColor(osg::Vec4(0, 0, 0, 1.0f));
-}
 
 void OSGSegment::attachTextLabel(std::string text){
     if(text == ""){

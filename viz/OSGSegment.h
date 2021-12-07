@@ -52,7 +52,7 @@ public:
      * @brief Remove curretn label from node
      *
      */
-    void removeLabel();
+    void removeIconLabel();
 
     /**
      * @brief Attach a label to node
@@ -60,10 +60,9 @@ public:
      * @param name: A name of the label, currently not internally used.
      * @param filepath: Path to an image file for the label. Should 256x256 Pixel.
      */
-    void attachLabel(std::string name, std::string filepath);
+    void attachIconLabel(std::string name, std::string filepath);
 
 
-    void setupTextLabel();
     /**
      * Attach a text label to a segemnt. If en empty string is given, the segment name is used
      * as label.
@@ -139,6 +138,7 @@ protected:
   */
   void createCollisions(const std::vector<urdf::CollisionSharedPtr> &collision_array, QDir prefix = QDir());
   void createCollisions(std::vector<sdf::ElementPtr> const& collision_array, QDir prefix);
+  void createInertias(const std::vector<urdf::InertialSharedPtr> &inertia_array);
   void createInertias(std::vector<sdf::ElementPtr> const& inertia_array);
 
 

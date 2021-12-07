@@ -33,10 +33,11 @@ osg::ref_ptr<osg::Node> RobotModel::loadEmptyScene(){
     return root_;
 }
 
-void RobotModel::makeOsg2(KDL::Segment kdl_seg, const std::vector<urdf::VisualSharedPtr>& visuals, const std::vector<urdf::CollisionSharedPtr>& collisions, OSGSegment& seg)
+void RobotModel::makeOsg2(KDL::Segment kdl_seg, const std::vector<urdf::VisualSharedPtr>& visuals, const std::vector<urdf::CollisionSharedPtr>& collisions, const std::vector<urdf::InertialSharedPtr>& inertias, OSGSegment& seg)
 {
     seg.createVisuals(visuals, rootPrefix);
     seg.createCollisions(collisions, rootPrefix);
+    seg.createInertias(inertias);
 }
 
 void RobotModel::makeOsg2(KDL::Segment const& kdl_seg, std::vector<sdf::ElementPtr> const& visuals, std::vector<sdf::ElementPtr> const& collisions, std::vector<sdf::ElementPtr> const& inertias, OSGSegment& seg){
@@ -96,7 +97,11 @@ osg::ref_ptr<osg::Node> RobotModel::makeOsg( urdf::ModelInterfaceSharedPtr urdf_
         if(urdf_link->collision)
             collisions.push_back(urdf_link->collision);
 
-        makeOsg2(kdl, visuals, collisions, *seg);
+        std::vector<urdf::InertialSharedPtr> inertias;
+        if(urdf_link->inertial)
+            inertias.push_back(urdf_link->inertial);
+
+        makeOsg2(kdl, visuals, collisions, inertias, *seg);
 
         //Set name to the main osg node so it can be found by name in the OSG graph
         osg::ref_ptr<osg::Group> osg = seg->getGroup();

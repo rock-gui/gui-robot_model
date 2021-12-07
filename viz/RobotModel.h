@@ -161,7 +161,9 @@ public:
     bool getUseVBO() const;
 
 protected:
-    void makeOsg2(KDL::Segment kdl_seg, const std::vector<urdf::VisualSharedPtr> &visuals, const std::vector<urdf::CollisionSharedPtr> &collisions, OSGSegment &seg);
+    void makeOsg2(KDL::Segment kdl_seg, const std::vector<urdf::VisualSharedPtr> &visuals,
+                  const std::vector<urdf::CollisionSharedPtr> &collisions,
+                  const std::vector<urdf::InertialSharedPtr> &inertias, OSGSegment &seg);
     osg::ref_ptr<osg::Node> makeOsg( urdf::ModelInterfaceSharedPtr urdf_model );
 
     void makeOsg2(KDL::Segment const &kdl_seg,

@@ -3,6 +3,19 @@
 #include <osg/Matrix>
 #include <osg/Vec3>
 #include <osg/PositionAttitudeTransform>
+#include <osgDB/ReadFile>
+#include <osg/Texture2D>
+#include <osg/BlendFunc>
+#include <osg/AlphaFunc>
+#include <osg/Billboard>
+#include <osg/Material>
+#include <osg/Point>
+#include <osg/PointSprite>
+#include <osg/ShapeDrawable>
+#include<osgText/Text>
+#include<osgText/Font>
+#include <osg/Depth>
+
 #include <kdl/chain.hpp>
 #include <urdf_model/pose.h>
 #include <ignition/math.hh>
@@ -284,5 +297,230 @@ inline osg::Node* makeFrustumFromCamera( osg::Camera* camera )
     return mt;
 }
 
+
+inline osg::ref_ptr<osg::Group> drawEllipsoid(unsigned int uiStacks, unsigned int uiSlices,
+                                              float fA, float fB, float fC)
+{
+    osg::ref_ptr<osg::Group> root(new osg::Group());
+    osg::Vec4d color((float) rand()/INT_MAX, (float) rand()/INT_MAX, (float) rand()/INT_MAX, 0.5);
+
+    //Create Vertices. Taken from https://www.gamedev.net/forums/topic/126624-generating-an-ellipsoid-in-opengl/
+    float tStep = (M_PI) / (float)uiSlices;
+    float sStep = (M_PI) / (float)uiStacks;
+    for(float t = -M_PI/2; t <= (M_PI/2)+.0001; t += tStep)
+    {
+        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array();
+        osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array();
+        osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array();
+
+        for(float s = -M_PI; s <= M_PI+.0001; s += sStep)
+        {
+            osg::Vec3d p( fA * cos(t) * cos(s),
+                        fB * cos(t) * sin(s),
+                        fC * sin(t));
+            vertices->push_back( p );
+            p.normalize();
+            normals->push_back( p );
+
+            osg::Vec3d q( fA * cos(t+tStep) * cos(s),
+                        fB * cos(t+tStep) * sin(s),
+                        fC * sin(t+tStep));
+            vertices->push_back( q );
+            q.normalize();
+            normals->push_back( q );
+
+            colors->push_back(osg::Vec4d(1.0, 1.0, 0.0, 0.5));
+        }
+        osg::ref_ptr<osg::Geometry> polygon = new osg::Geometry;
+        polygon->setVertexArray( vertices.get() );
+        polygon->setNormalArray( normals.get() );
+        polygon->setNormalBinding( osg::Geometry::BIND_PER_VERTEX );
+        polygon->addPrimitiveSet( new osg::DrawArrays(GL_TRIANGLE_STRIP, 0, vertices->size()) );
+
+        polygon->setColorArray( colors.get() );
+
+        osg::ref_ptr<osg::StateSet> nodess = polygon->getOrCreateStateSet();
+        nodess->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
+        osg::ref_ptr<osg::Material> nodematerial = new osg::Material;
+
+        nodematerial->setAmbient(osg::Material::FRONT, color);
+        nodematerial->setDiffuse(osg::Material::FRONT, color);
+        nodematerial->setSpecular(osg::Material::FRONT, color);
+        nodematerial->setEmission(osg::Material::FRONT, color);
+        nodess->setAttribute(nodematerial.get());
+
+        osg::ref_ptr<osg::Geode> geode(new osg::Geode);
+        geode->addDrawable( polygon.get() );
+
+        root->addChild(geode);
+    }
+
+    //Draw Principal axes as cross insde the ellisoid
+    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array();
+    vertices->push_back(osg::Vec3d(-fA/2., 0, 0));
+    vertices->push_back(osg::Vec3d(fA/2., 0, 0));
+    vertices->push_back(osg::Vec3d(0, -fB/2., 0));
+    vertices->push_back(osg::Vec3d(0, fB/2., 0));
+    vertices->push_back(osg::Vec3d(0, 0, -fC/2.));
+    vertices->push_back(osg::Vec3d(0, 0, fC/2.));
+
+    osg::ref_ptr<osg::Geometry> cross = new osg::Geometry;
+    cross->setVertexArray( vertices.get() );
+    cross->addPrimitiveSet( new osg::DrawArrays(GL_LINES, 0, vertices->size()) );
+
+    osg::ref_ptr<osg::StateSet> nodess = cross->getOrCreateStateSet();
+    nodess->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
+    osg::ref_ptr<osg::Material> nodematerial = new osg::Material;
+
+    color.set(color.r(), color.g(), color.b(), 1.);
+    nodematerial->setAmbient(osg::Material::FRONT, color);
+    nodematerial->setDiffuse(osg::Material::FRONT, color);
+    nodematerial->setSpecular(osg::Material::FRONT, color);
+    nodematerial->setEmission(osg::Material::FRONT, color);
+    nodess->setAttribute(nodematerial.get());
+
+    osg::ref_ptr<osg::Depth> depth(new osg::Depth());
+    depth->setFunction(osg::Depth::ALWAYS);
+    nodess->setAttributeAndModes(depth, osg::StateAttribute::ON);
+
+    osg::ref_ptr<osg::Geode> cross_geode(new osg::Geode);
+    cross_geode->addDrawable( cross.get() );
+
+    root->addChild(cross_geode);
+
+    return root;
+}
+
+inline osg::ref_ptr<osg::Group> drawBox(double fA, double fB, double fC)
+{
+    osg::Vec4d color((float) rand()/INT_MAX, (float) rand()/INT_MAX, (float) rand()/INT_MAX, 0.5);
+
+    osg::ref_ptr<osg::Material> nodematerial = new osg::Material;
+    nodematerial->setAmbient(osg::Material::FRONT, color);
+    nodematerial->setDiffuse(osg::Material::FRONT, color);
+    nodematerial->setSpecular(osg::Material::FRONT, color);
+    nodematerial->setEmission(osg::Material::FRONT, color);
+    osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3d(0,0,0), fA, fB, fC));
+    osg::ref_ptr<osg::StateSet> nodess = drawable->getOrCreateStateSet();
+    nodess->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
+    nodess->setAttribute(nodematerial.get());
+    osg::ref_ptr<osg::Group> root(new osg::Group());
+    root->addChild(drawable);
+    return root;
+}
+#include <ignition/math.hh>
+inline osg::ref_ptr<osg::Group> make_ellispoid(float xx, float xy, float xz, float yy,
+                                               float yz, float zz, float m)
+{
+    osg::ref_ptr<osg::Group> root(new osg::Group());
+
+    ignition::math::MassMatrix3d M;
+    M.Mass(m);
+    bool ok = M.InertiaMatrix(xx, yy, zz, xy, xz, yz);
+    if(!ok){
+        std::cerr << "Inertia matrix " << M.MOI() << " with mass " << M.Mass() << " is invalid" << std::endl;
+        return root;
+    }
+
+    ignition::math::Vector3d radii;
+    ignition::math::Quaterniond rot;
+    M.EquivalentBox(radii, rot);
+    osg::ref_ptr<osg::PositionAttitudeTransform> T(new osg::PositionAttitudeTransform());
+    T->setPosition(osg::Vec3d(0., 0., 0.));
+    T->setAttitude(osg::Quat(rot.X(), rot.Y(), rot.Z(), rot.W()));
+
+    root->addChild(T);
+
+    //T->addChild(DrawBox(radii.X(), radii.Y(), radii.Z()));
+    T->addChild(drawEllipsoid(25, 25, radii.X(), radii.Y(), radii.Z()));
+
+    return root;
+}
+
+
+inline osg::ref_ptr<osg::Geode> createTextLabel(const std::string& text, osg::ref_ptr<osgText::Text>& text_label)
+{
+    osg::ref_ptr<osg::Geode> geode(new osg::Geode());
+    text_label = osg::ref_ptr<osgText::Text>(new osgText::Text());
+    text_label->setText(text);
+
+    osg::ref_ptr<osg::StateSet> set = geode->getOrCreateStateSet();
+    /// Disable depth test and Lighting
+    set->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
+    set->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+    geode->addDrawable(text_label);
+
+    //Text should be rather small and be always readable on the screen
+    text_label->setCharacterSizeMode(osgText::Text::SCREEN_COORDS);
+    text_label->setCharacterSize(20);
+
+    osgText::Font* font = osgText::Font::getDefaultFont();
+    font->setMinFilterHint(osg::Texture::NEAREST); // aliasing when zoom out, this doesnt look so ugly because text is small
+    font->setMagFilterHint(osg::Texture::NEAREST); // aliasing when zoom in
+    text_label->setFont(font);
+
+    text_label->setAxisAlignment(osgText::Text::SCREEN);
+
+    // Set the text to render with alignment anchor and bounding box around it:
+    text_label->setDrawMode(osgText::Text::TEXT |
+                           osgText::Text::ALIGNMENT);
+    text_label->setAlignment(osgText::Text::CENTER_TOP);
+    text_label->setPosition( osg::Vec3(0,0,0) );
+    text_label->setColor( osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+
+    text_label->setBackdropType(osgText::Text::OUTLINE);
+    text_label->setBackdropColor(osg::Vec4(0, 0, 0, 1.0f));
+
+    return geode;
+}
+
+
+inline osg::ref_ptr<osg::Geode> createIconLabel(const std::string& name, const std::string& filepath)
+{
+    osg::ref_ptr<osg::Geode> geode = osg::ref_ptr<osg::Geode>(new osg::Geode());
+    osg::ref_ptr<osg::Geometry> geometry = osg::ref_ptr<osg::Geometry>(new osg::Geometry());
+
+    osg::ref_ptr<osg::Vec3Array> vertices = osg::ref_ptr<osg::Vec3Array>(new osg::Vec3Array);
+    vertices->push_back (osg::Vec3 (0, 0, 0.0));
+
+    geometry->setVertexArray (vertices);
+
+    geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS, 0, vertices->size()));
+
+    geode->addDrawable(geometry);
+    osg::ref_ptr<osg::StateSet> set = geode->getOrCreateStateSet();
+
+    /// Setup the point sprites
+    osg::ref_ptr<osg::PointSprite> sprite = osg::ref_ptr<osg::PointSprite>(new osg::PointSprite());
+    set->setTextureAttributeAndModes(0, sprite, osg::StateAttribute::ON);
+
+    /// Give some size to the points to be able to see the sprite
+    osg::ref_ptr<osg::Point> point = osg::ref_ptr<osg::Point>(new osg::Point());
+    point->setSize(50);
+    set->setAttribute(point);
+
+    /// Disable depth test to avoid sort problems and Lighting
+    set->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
+    set->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+
+    osg::ref_ptr<osg::BlendFunc> texture_blending_function = new osg::BlendFunc();
+    set->setAttributeAndModes(texture_blending_function.get(), osg::StateAttribute::ON);
+
+    osg::ref_ptr<osg::AlphaFunc> alpha_transparency_function = new osg::AlphaFunc();
+    alpha_transparency_function->setFunction(osg::AlphaFunc::GEQUAL, 0.05);
+    set->setAttributeAndModes(alpha_transparency_function.get(), osg::StateAttribute::ON );
+
+    /// The texture for the sprites
+    osg::ref_ptr<osg::Texture2D> tex = osg::ref_ptr<osg::Texture2D>(new osg::Texture2D());
+    osg::ref_ptr<osg::Image> image = osgDB::readImageFile(filepath);
+
+    image->flipVertical();
+    tex->setImage(image);
+
+    set->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON);
+    geode->setName(name);
+
+    return geode;
+}
 
 #endif
