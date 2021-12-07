@@ -370,17 +370,8 @@ osg::ref_ptr<osg::Group> OSGSegment::createVisual(sdf::ElementPtr sdf_visual, QD
                 }
 
                 QString qfilename = QString::fromStdString(filename);
-                std::cout << "qfilename: " << qfilename.toStdString() << std::endl;
                 if (QFileInfo(qfilename).isRelative()){
-                    std::cout << "relative" << std::endl;
-                    std::cout << "modelPaths:"<< modelPaths.absolutePath().toStdString() << std::endl;
-
-                    std::cout << "modelPaths2:"<< modelPaths.absolutePath().toStdString()<< std::endl;
                     filename = modelPaths.absoluteFilePath(qfilename).toStdString();
-                    std::cout << "filename:"<< filename << std::endl;
-                }
-                else{
-                    std::cout << "not relative" << std::endl;
                 }
             }
 
