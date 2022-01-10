@@ -22,16 +22,16 @@ class RobotVisualization
     Q_PROPERTY(QString modelFile READ modelFile WRITE setModelFile)
     Q_PROPERTY(bool framesEnabled READ areFramesEnabled WRITE setFramesEnabled)
     Q_PROPERTY(double jointsSize READ getJointsSize WRITE setJointsSize)
-    Q_PROPERTY(bool followModelWithCamera READ getFollowModelWithCamera WRITE setFollowModelWithCamera)
+    Q_PROPERTY(bool followModelWithCamera_ READ getFollowModelWithCamera WRITE setFollowModelWithCamera)
     Q_PROPERTY(QString rootLink READ getRootLink WRITE setRootLink)
     Q_PROPERTY(bool segmentNamesEnabled READ areSegmentNamesEnabled WRITE setSegmentNamesEnabled)
+    Q_PROPERTY(bool showVisuals READ areVisualsEnabled WRITE setVisualsEnabled)
+    Q_PROPERTY(bool showCollision READ areCollisionsEnabled WRITE setCollisionsEnabled)
+    Q_PROPERTY(bool showInertias READ areInertiasEnabled WRITE setInertiasEnabled)
 
 public:
     RobotVisualization();
     ~RobotVisualization();
-
-    void setModelFile(QString modelFile);
-    QString modelFile() const;
 
     Q_INVOKABLE void clearMeshCache();
 
@@ -44,6 +44,9 @@ public:
     {updateData(sample);}
 
 public slots:
+    void setModelFile(QString modelFile);
+    QString modelFile() const;
+    
     void setRootLink(QString segment_name){
         bool st= relocateRoot(segment_name.toStdString());
         if(!st){
@@ -89,6 +92,12 @@ public slots:
     void hideSegmentText(QString link_name);
     bool areSegmentNamesEnabled() const;
     void setSegmentNamesEnabled(bool value);
+    bool areVisualsEnabled() const;
+    void setVisualsEnabled(bool value);
+    bool areCollisionsEnabled() const;
+    void setCollisionsEnabled(bool value);
+    bool areInertiasEnabled() const;
+    void setInertiasEnabled(bool value);
     QQuaternion getRotation(QString source_frame, QString target_frame);
     QVector3D getTranslation(QString source_frame, QString target_frame);
 
@@ -113,9 +122,12 @@ protected:
 
 private:
     struct Data;
-    bool framesEnabled_;
-    bool followModelWithCamera;
-    bool segmentNamesEnabled_;
+    bool framesEnabled_ = false;
+    bool followModelWithCamera_;
+    bool segmentNamesEnabled_ = false;
+    bool visualsEnabled_ = true;
+    bool collisionsEnabled_ = false;
+    bool inertiasEnabled_ = false;
     double joints_size;
     Data* p;
     QString _modelFile;

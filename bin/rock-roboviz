@@ -52,8 +52,8 @@ rock-roboviz --optimize-meshes [options] FILES
     opt.on '--urdf', 'load the given file as URDF' do
         model_file_mode = 'urdf'
     end
-    opt.on '--sdf', 'load the given file as SDF' do
-        model_file_mode = 'sdf'
+    opt.on '--sdf', 'Enable bundle support to resolve inter-model dependencies inside the SDF' do
+        model_file_mode = 'sdfbundle'
     end
     opt.on '--no-test-gui', 'disable the test GUI if no task context has been given' do
         use_test_gui = false
@@ -146,17 +146,19 @@ if !model_file
 end
 
 if model_file_mode == 'auto'
-    if model_file =~ /^model:\/\// || model_file.end_with?(".sdf")
+    if model_file =~ /^model:\/\//
+        model_file_mode = 'sdfbundle'
+    elsif  model_file.end_with?(".sdf")
         model_file_mode = 'sdf'
     end
 end
 
-if model_file_mode == 'sdf'
+if model_file_mode == 'sdfbundle'
     # Enable bundle support to resolve inter-model dependencies inside the SDF
     require 'rock/bundle'
     require 'sdf'
     Bundles.load
-    Bundles.find_dirs('models', 'sdf', all: true, order: :specific_last).each do |path|
+    candidates = Bundles.find_dirs('models', 'sdf', all: true, order: :specific_last).each do |path|
         SDF::XML.model_path << path
     end
 else
@@ -216,14 +218,14 @@ if live
     layout.add_widget(task_states)
 end
 
-if model_file_mode == 'sdf'
+if model_file_mode == 'sdfbundle'
     sdf_string = SDF.to_xml(SDF::Root.load(model_file).each_model.first)
     vis_gui.loadFromString(sdf_string.dup, 'sdf')
     if ctrl_gui
         ctrl_gui.initFromString(sdf_string.dup, model_file_mode.dup)
     end
-else
-    vis_gui.loadFromFile(model_file.dup, model_file_mode.dup)
+else #Same behavior for sdf and urdf
+    vis_gui.setModelFile(model_file.dup)
     if ctrl_gui
         ctrl_gui.initFromFile(model_file.dup, model_file_mode.dup)
     end
@@ -235,7 +237,7 @@ if live
     end
     Orocos.initialize
 
-    state_tasks.each do | task_name, port_name | 
+    state_tasks.each do | task_name, port_name |
         task = discover_and_connect_to_port task_name, port_name,
             filter:  ->(port) { port.is_a?(Orocos::OutputPort) and p.type == Types::Base::Samples::Joints },
             handler: ->(port) { port.on_data { |sample| vis_gui.updateData(sample) } }
@@ -254,7 +256,7 @@ if live
 
 elsif use_test_gui
     ctrl_gui.enabled = true
-    ctrl_gui.connect(SIGNAL('sendSignal()')) do 
+    ctrl_gui.connect(SIGNAL('sendSignal()')) do
         sample = ctrl_gui.getJoints()
         vis_gui.updateData(sample)
     end
@@ -263,5 +265,3 @@ end
 
 main.show
 Vizkit.exec
-
-

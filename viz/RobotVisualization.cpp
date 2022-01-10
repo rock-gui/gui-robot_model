@@ -23,9 +23,6 @@ RobotVisualization::RobotVisualization()
     this->modelPos = new osg::PositionAttitudeTransform();
     connect(this, SIGNAL(propertyChanged(QString)), this, SLOT(handlePropertyChanged(QString)));
     setJointsSize(0.1);
-    setFramesEnabled(false);
-    setSegmentNamesEnabled(false);
-    setFollowModelWithCamera(false);
 }
 
 RobotVisualization::~RobotVisualization()
@@ -57,7 +54,7 @@ void RobotVisualization::handlePropertyChanged(QString property){
                 try {
                     relocateRoot(original_root_);
                 }
-                catch(std::invalid_argument) {}
+                catch(std::invalid_argument&) {}
             }
         }
     }
@@ -89,6 +86,13 @@ void RobotVisualization::setModelFile(QString modelFile)
 {
     LOG_INFO("setting model file to  %s", modelFile.toLatin1().data());
     loadFromFile(modelFile);
+
+    // After loading attach those elements that have been selects to be shown
+    setFramesEnabled(framesEnabled_);
+    setSegmentNamesEnabled(segmentNamesEnabled_);
+    setFollowModelWithCamera(followModelWithCamera_);
+    setCollisionsEnabled(collisionsEnabled_);
+    setVisualsEnabled(visualsEnabled_);
 }
 
 static RobotVisualization::ROBOT_MODEL_FORMAT formatFromString(QString type)
@@ -214,6 +218,39 @@ void RobotVisualization::setSegmentNamesEnabled(bool value)
     }
 }
 
+bool RobotVisualization::areCollisionsEnabled() const
+{
+    return collisionsEnabled_;
+}
+
+void RobotVisualization::setCollisionsEnabled(bool value)
+{
+    collisionsEnabled_ = value;
+    attachCollisions(value);
+}
+
+bool RobotVisualization::areInertiasEnabled() const
+{
+    return inertiasEnabled_;
+}
+
+void RobotVisualization::setInertiasEnabled(bool value)
+{
+    inertiasEnabled_ = value;
+    attachInertias(value);
+}
+
+bool RobotVisualization::areVisualsEnabled() const
+{
+    return visualsEnabled_;
+}
+
+void RobotVisualization::setVisualsEnabled(bool value)
+{
+    visualsEnabled_ = value;
+    attachVisuals(value);
+}
+
 QQuaternion RobotVisualization::getRotation(QString source_frame, QString target_frame){
     osg::Matrixd tr = getRelativeTransform(target_frame.toStdString(), source_frame.toStdString());
     osg::Quat q = tr.getRotate();
@@ -227,10 +264,10 @@ QVector3D RobotVisualization::getTranslation(QString source_frame, QString targe
 }
 
 bool RobotVisualization::getFollowModelWithCamera() const{
-	return followModelWithCamera;
+    return followModelWithCamera_;
 }
 void RobotVisualization::setFollowModelWithCamera(bool value){
-	followModelWithCamera = value;
+    followModelWithCamera_ = value;
 }
 
 QString RobotVisualization::modelFile() const{
@@ -255,7 +292,7 @@ void RobotVisualization::updateMainNode ( osg::Node* node )
         osg::Vec3d position(p->pos.position.x(), p->pos.position.y(), p->pos.position.z());
         modelPos->setPosition(position);
 
-        if (followModelWithCamera){
+        if (followModelWithCamera_){
             Vizkit3DWidget * widget = dynamic_cast<Vizkit3DWidget *>(this->parent());
 
             QVector3D lookAtPos, eyePos, upVector;
