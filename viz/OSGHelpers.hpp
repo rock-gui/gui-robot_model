@@ -404,8 +404,10 @@ inline osg::ref_ptr<osg::Group> drawBox(double fA, double fB, double fC)
     osg::ref_ptr<osg::StateSet> nodess = drawable->getOrCreateStateSet();
     nodess->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
     nodess->setAttribute(nodematerial.get());
+    osg::ref_ptr<osg::Geode> geode(new osg::Geode());
+    geode->addDrawable(drawable);
     osg::ref_ptr<osg::Group> root(new osg::Group());
-    root->addChild(drawable);
+    root->addChild(geode);
     return root;
 }
 #include <ignition/math.hh>
