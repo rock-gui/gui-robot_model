@@ -98,6 +98,10 @@ args = options.parse(ARGV)
 
 class ConversionFailed < RuntimeError; end
 if mode_optimize
+    st = system("which osgconv > /dev/null 2>&1")
+    if not st
+      raise ConversionFailed, "Conversion failed. The program 'osgconv' is required but could not be found. Please install it (on Ubuntu: 'sudo apt install openscenegraph')."
+    end
     queue = Queue.new
     env = Hash[
         'OSG_OPTIMIZER' => 'INDEX_MASH STATIC_OBJECT_DETECTION VERTEX_POSTTRANSFORM',
