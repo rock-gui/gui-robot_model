@@ -4,6 +4,7 @@
 #include <vizkit3d/Vizkit3DWidget.hpp>
 #include <base-logging/Logging.hpp>
 #include <osg/Geode>
+#include <osg/Material>
 
 using namespace vizkit3d;
 using namespace std;
@@ -23,6 +24,7 @@ RobotVisualization::RobotVisualization()
     this->modelPos = new osg::PositionAttitudeTransform();
     connect(this, SIGNAL(propertyChanged(QString)), this, SLOT(handlePropertyChanged(QString)));
     setJointsSize(0.1);
+    setOpacity(1.0);
 }
 
 RobotVisualization::~RobotVisualization()
@@ -251,6 +253,21 @@ void RobotVisualization::setVisualsEnabled(bool value)
     attachVisuals(value);
 }
 
+double RobotVisualization::getOpacity() const
+{
+    return opacity_;
+}
+
+void RobotVisualization::setOpacity(double value)
+{
+    opacity_ = value;
+    if(root_) {
+        TransparencyVisitor visitor(value);
+        visitor.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
+        root_->accept(visitor);
+    }
+}
+
 QQuaternion RobotVisualization::getRotation(QString source_frame, QString target_frame){
     osg::Matrixd tr = getRelativeTransform(target_frame.toStdString(), source_frame.toStdString());
     osg::Quat q = tr.getRotate();
@@ -354,6 +371,20 @@ void RobotVisualization::updateDataIntern(base::samples::Joints const& sample)
 
 void RobotVisualization::updateDataIntern(base::samples::RigidBodyState const& pos){
     p->pos = pos;
+}
+
+void RobotVisualization::TransparencyVisitor::apply(osg::Node& node) {
+    osg::ref_ptr<osg::StateSet> nodess = node.getStateSet();
+    if (nodess.valid()) {
+        osg::StateAttribute *state = nodess->getAttribute(osg::StateAttribute::MATERIAL);
+        if (state) {
+            osg::Material *mat = dynamic_cast<osg::Material *>(state);
+            if (mat) {
+                mat->setTransparency(osg::Material::FRONT_AND_BACK, transparency);
+            }
+        }
+    }
+    traverse(node);
 }
 
 //Macro that makes this plugin loadable in ruby, this is optional.
