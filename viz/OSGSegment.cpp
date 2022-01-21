@@ -290,10 +290,10 @@ osg::ref_ptr<osg::Group> OSGSegment::createVisual(urdf::VisualSharedPtr visual, 
                                                                     visual->material->color.g,
                                                                     visual->material->color.b,
                                                                     visual->material->color.a));
-            nodematerial->setSpecular(osg::Material::FRONT,osg::Vec4(0.2,
-                                                                     0.2,
-                                                                     0.2,
-                                                                     1));
+            nodematerial->setSpecular(osg::Material::FRONT,osg::Vec4(visual->material->color.r,
+                                                                    visual->material->color.g,
+                                                                    visual->material->color.b,
+                                                                     0));
 
             //Attaching the newly defined state set object to the node state set
             nodess->setAttribute(nodematerial.get());
