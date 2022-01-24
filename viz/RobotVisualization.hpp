@@ -6,6 +6,7 @@
 #include <base/samples/Joints.hpp>
 #include <base/samples/RigidBodyState.hpp>
 #include <QMessageBox>
+#include <osg/NodeVisitor>
 #include "RobotModel.h"
 
 namespace vizkit3d
@@ -28,6 +29,7 @@ class RobotVisualization
     Q_PROPERTY(bool showVisuals READ areVisualsEnabled WRITE setVisualsEnabled)
     Q_PROPERTY(bool showCollision READ areCollisionsEnabled WRITE setCollisionsEnabled)
     Q_PROPERTY(bool showInertias READ areInertiasEnabled WRITE setInertiasEnabled)
+    Q_PROPERTY(double opacity READ getOpacity WRITE setOpacity)
 
 public:
     RobotVisualization();
@@ -98,6 +100,8 @@ public slots:
     void setCollisionsEnabled(bool value);
     bool areInertiasEnabled() const;
     void setInertiasEnabled(bool value);
+    double getOpacity() const;
+    void setOpacity(double value);
     QQuaternion getRotation(QString source_frame, QString target_frame);
     QVector3D getTranslation(QString source_frame, QString target_frame);
 
@@ -121,6 +125,18 @@ protected:
     void deleteFrameVisualizers();
 
 private:
+
+    class TransparencyVisitor : public osg::NodeVisitor {
+     public:
+        explicit TransparencyVisitor(double transparency):transparency(1.0-transparency) {}
+        virtual ~TransparencyVisitor() {}
+
+        void apply(osg::Node& node);
+
+     private:
+        double transparency;
+    };
+
     struct Data;
     bool framesEnabled_ = false;
     bool followModelWithCamera_;
@@ -128,6 +144,7 @@ private:
     bool visualsEnabled_ = true;
     bool collisionsEnabled_ = false;
     bool inertiasEnabled_ = false;
+    double opacity_;
     double joints_size;
     Data* p;
     QString _modelFile;
