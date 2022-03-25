@@ -10,5 +10,5 @@
   <depend package="control/kdl_parser" />
   <depend package="control/urdfdom" />
   <depend package="control/sdformat" />
-  <depend package="gui/vizkit" />
+  <depend package="gui/vizkit3d" />
 </package>
