@@ -387,6 +387,3 @@ void RobotVisualization::TransparencyVisitor::apply(osg::Node& node) {
     traverse(node);
 }
 
-//Macro that makes this plugin loadable in ruby, this is optional.
-VizkitQtPlugin(RobotVisualization)
-

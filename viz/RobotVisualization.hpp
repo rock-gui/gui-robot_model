@@ -152,5 +152,9 @@ private:
 
     osg::ref_ptr<osg::PositionAttitudeTransform> modelPos;
 };
+
+VizkitQtPlugin(RobotVisualization)
+
 }
+
 #endif
