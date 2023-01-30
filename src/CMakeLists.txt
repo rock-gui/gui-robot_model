@@ -5,5 +5,7 @@ rock_executable(rock_roboviz Main.cpp
         eigen3
         sdformat
         robot_model-viz
+        control_ui
+        base-types
     LIBS Qt5::Core Qt5::Widgets Qt5::Gui
     NOINSTALL)
