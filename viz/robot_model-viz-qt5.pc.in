@@ -1,0 +1,12 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=@CMAKE_INSTALL_PREFIX@
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: @TARGET_NAME@
+Description: vizKit plugin for the robot_model library
+Requires: @PKGCONFIG_DEPS@ urdfdom kdl_parser
+Version: @PROJECT_VERSION@
+Libs: -L${libdir} -l@TARGET_NAME@
+Cflags: -I${includedir}
+

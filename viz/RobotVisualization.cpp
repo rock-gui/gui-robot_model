@@ -387,3 +387,7 @@ void RobotVisualization::TransparencyVisitor::apply(osg::Node& node) {
     traverse(node);
 }
 
+namespace vizkit3d
+{
+VizkitQtPluginImpl(RobotVisualization)
+}
