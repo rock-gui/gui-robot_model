@@ -1,5 +1,5 @@
 #include "vizkit3d/Vizkit3DWidget.hpp"
-#include <vizkit3d/RobotVisualization.hpp>
+#include "../viz/RobotVisualization.hpp"
 #include <control_ui/ControlUi.h>
 #include <QApplication>
 #include <QDockWidget>
