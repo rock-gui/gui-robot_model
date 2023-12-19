@@ -235,6 +235,10 @@ else #Same behavior for sdf and urdf
     end
 end
 
+view3d.setCameraManipulator("Trackball")
+view3d.setCameraLookAt(0,0,0)
+view3d.setCameraEye(4, 4, 3)
+
 if live
     if hostname
         Orocos::CORBA.name_service.ip = hostname
