@@ -3,9 +3,6 @@ rock_find_qt4()
 # Add further possible sdformat options here if necessary
 pkg_search_module(SDFORMAT REQUIRED sdformat sdformat9 sdformat12 sdformat14 sdformat15)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 rock_vizkit_plugin(robot_model-viz
     RobotVisualization.cpp RobotModel.cpp OSGHelpers.hpp OSGSegment.cpp VBOVisitor.hpp
     DEPS_PKGCONFIG kdl_parser base-types base-viz base-lib base-logging ${SDFORMAT_MODULE_NAME} urdfdom
