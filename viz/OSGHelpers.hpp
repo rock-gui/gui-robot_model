@@ -18,23 +18,30 @@
 
 #include <kdl/chain.hpp>
 #include <urdf_model/pose.h>
-#include <ignition/math.hh>
 
-inline void sdf_to_osg(ignition::math::Pose3d const& in, osg::PositionAttitudeTransform& out) {
+#if SDF_MAJOR_VERSION >= 14
+#include <gz/math.hh>
+namespace math = gz::math;
+#else
+#include <ignition/math.hh>
+namespace math = ignition::math;
+#endif
+
+inline void sdf_to_osg(math::Pose3d const& in, osg::PositionAttitudeTransform& out) {
     out.setPosition(osg::Vec3(in.Pos().X(), in.Pos().Y(), in.Pos().Z()));
     out.setAttitude(osg::Quat(in.Rot().X(), in.Rot().Y(), in.Rot().Z(), in.Rot().W()));
 }
 
-inline void sdf_to_osg(ignition::math::Vector3d const& in, osg::PositionAttitudeTransform& out) {
+inline void sdf_to_osg(math::Vector3d const& in, osg::PositionAttitudeTransform& out) {
     out.setPosition(osg::Vec3(in.X(), in.Y(), in.Z()));
 }
 
-inline void sdf_to_osg(ignition::math::Vector3d const& in, osg::Vec3& out) {
+inline void sdf_to_osg(math::Vector3d const& in, osg::Vec3& out) {
     out.set(in.X(), in.Y(), in.Z());
 }
 
-inline void sdf_to_osg(sdf::Color in, osg::Vec4& out) {
-    out.set(in.r, in.g, in.b, in.a);
+inline void sdf_to_osg(math::Color in, osg::Vec4& out) {
+    out.set(in.R(), in.G(), in.B(), in.A());
 }
 
 //inline void sdf_pose_to_osg(sdf::ElementPtr pose, osg::Vec3& pos, osg::Quat& quat)
@@ -410,22 +417,30 @@ inline osg::ref_ptr<osg::Group> drawBox(double fA, double fB, double fC)
     root->addChild(geode);
     return root;
 }
-#include <ignition/math.hh>
+
 inline osg::ref_ptr<osg::Group> make_ellispoid(float xx, float xy, float xz, float yy,
                                                float yz, float zz, float m)
 {
     osg::ref_ptr<osg::Group> root(new osg::Group());
 
-    ignition::math::MassMatrix3d M;
+    math::MassMatrix3d M;
+#if SDF_MAJOR_VERSION >= 12
+    M.SetMass(m);
+    bool ok = M.SetInertiaMatrix(xx, yy, zz, xy, xz, yz);
+    if(!ok){
+        std::cerr << "Inertia matrix " << M.Moi() << " with mass " << M.Mass() << " is invalid" << std::endl;
+        return root;
+    }
+#else
     M.Mass(m);
     bool ok = M.InertiaMatrix(xx, yy, zz, xy, xz, yz);
     if(!ok){
         std::cerr << "Inertia matrix " << M.MOI() << " with mass " << M.Mass() << " is invalid" << std::endl;
         return root;
     }
-
-    ignition::math::Vector3d radii;
-    ignition::math::Quaterniond rot;
+#endif
+    math::Vector3d radii;
+    math::Quaterniond rot;
     M.EquivalentBox(radii, rot);
     osg::ref_ptr<osg::PositionAttitudeTransform> T(new osg::PositionAttitudeTransform());
     T->setPosition(osg::Vec3d(0., 0., 0.));
