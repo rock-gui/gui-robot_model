@@ -172,7 +172,7 @@ public:
     }
 private:
     bool done;
-    osg::Matrix* wcMatrix;
+    osg::Matrixd* wcMatrix;
 };
 
 // Given a valid node placed in a scene under a transform, return the

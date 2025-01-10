@@ -226,7 +226,7 @@ if model_file_mode == 'sdfbundle'
     sdf_string = SDF.to_xml(SDF::Root.load(model_file).each_model.first)
     vis_gui.loadFromString(sdf_string.dup, 'sdf')
     if ctrl_gui
-        ctrl_gui.initFromString(sdf_string.dup, model_file_mode.dup)
+        ctrl_gui.initFromString(sdf_string.dup, 'sdf')
     end
 else #Same behavior for sdf and urdf
     vis_gui.setModelFile(model_file.dup)
