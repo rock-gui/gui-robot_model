@@ -165,7 +165,7 @@ void OSGSegment::createInertias(std::vector<sdf::ElementPtr> const& inertia_arra
         //  <inertia ixx="0.00089755" ixy="1.4484e-08" ixz="-2.6127e-07" iyy="0.00057565" iyz="-7.8027e-07" izz="0.00056347"/>
         //</inertial>
         osg::PositionAttitudeTransform* to_cog = new osg::PositionAttitudeTransform();
-        ignition::math::Pose3d pose = elem->GetElement("pose")->Get<ignition::math::Pose3d>();
+        math::Pose3d pose = elem->GetElement("pose")->Get<math::Pose3d>();
         sdf_to_osg(pose , *to_cog);
         inertia_->addChild(to_cog);
 
@@ -311,7 +311,7 @@ osg::ref_ptr<osg::Group> OSGSegment::createVisual(urdf::VisualSharedPtr visual, 
 osg::ref_ptr<osg::Group> OSGSegment::createVisual(sdf::ElementPtr sdf_visual, QDir baseDir){
 
     osg::PositionAttitudeTransform* to_visual = new osg::PositionAttitudeTransform();
-    sdf_to_osg(sdf_visual->GetElement("pose")->Get<ignition::math::Pose3d>(), *to_visual);
+    sdf_to_osg(sdf_visual->GetElement("pose")->Get<math::Pose3d>(), *to_visual);
 
     osg::ref_ptr<osg::Group> root = osg::ref_ptr<osg::Group>(new osg::Group());
     osg::Node* osg_visual = 0;
@@ -325,7 +325,7 @@ osg::ref_ptr<osg::Group> OSGSegment::createVisual(sdf::ElementPtr sdf_visual, QD
         }
         else if (sdf_geom_elem->GetName() == "box"){
             osg::Vec3f size;
-            sdf_to_osg(sdf_geom_elem->GetElement("size")->Get<ignition::math::Vector3d>(), size);
+            sdf_to_osg(sdf_geom_elem->GetElement("size")->Get<math::Vector3d>(), size);
             osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3(0,0,0), size.x(), size.y(), size.z()));
             osg_visual = new osg::Geode;
             osg_visual->asGeode()->addDrawable(drawable);
@@ -345,7 +345,7 @@ osg::ref_ptr<osg::Group> OSGSegment::createVisual(sdf::ElementPtr sdf_visual, QD
         }
         else if (sdf_geom_elem->GetName() == "mesh") {
             osg::Vec3 scale;
-            sdf_to_osg(sdf_geom_elem->GetElement("scale")->Get<ignition::math::Vector3d>(), scale);
+            sdf_to_osg(sdf_geom_elem->GetElement("scale")->Get<math::Vector3d>(), scale);
 
             to_visual->setScale(scale);
 
@@ -413,26 +413,26 @@ osg::ref_ptr<osg::Group> OSGSegment::createVisual(sdf::ElementPtr sdf_visual, QD
 
         if (sdf_material->HasElement("ambient")){
             osg::Vec4 ambient;
-            sdf_to_osg(sdf_material->GetElement("ambient")->Get<sdf::Color>(), ambient);
+            sdf_to_osg(sdf_material->GetElement("ambient")->Get<math::Color>(), ambient);
             nodematerial->setAmbient(osg::Material::FRONT,ambient);
         }
 
         if (sdf_material->HasElement("diffuse")){
             osg::Vec4 diffuse;
-            sdf_to_osg(sdf_material->GetElement("diffuse")->Get<sdf::Color>(), diffuse);
+            sdf_to_osg(sdf_material->GetElement("diffuse")->Get<math::Color>(), diffuse);
             nodematerial->setDiffuse(osg::Material::FRONT,diffuse);
         }
 
         if (sdf_material->HasElement("specular")){
             osg::Vec4 specular;
-            sdf_to_osg(sdf_material->GetElement("specular")->Get<sdf::Color>(), specular);
+            sdf_to_osg(sdf_material->GetElement("specular")->Get<math::Color>(), specular);
             nodematerial->setSpecular(osg::Material::FRONT, specular);
 
         }
 
         if (sdf_material->HasElement("emissive")){
             osg::Vec4 emissive;
-            sdf_to_osg(sdf_material->GetElement("emissive")->Get<sdf::Color>(), emissive);
+            sdf_to_osg(sdf_material->GetElement("emissive")->Get<math::Color>(), emissive);
             nodematerial->setEmission(osg::Material::FRONT, emissive);
         }
 
