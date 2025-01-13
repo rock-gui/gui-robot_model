@@ -1,6 +1,9 @@
 rock_find_qt4(OPTIONAL)
 rock_find_qt5(OPTIONAL Widgets)
 
+# Add further possible sdformat options here if necessary
+pkg_search_module(SDFORMAT REQUIRED sdformat sdformat9 sdformat12 sdformat14 sdformat15)
+
 if(ROCK_QT_VERSION_4)
     rock_vizkit_plugin(robot_model-viz
         RobotVisualization.cpp RobotModel.cpp OSGHelpers.hpp OSGSegment.cpp VBOVisitor.hpp
