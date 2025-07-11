@@ -11,4 +11,5 @@
   <depend package="control/urdfdom" />
   <depend package="control/sdformat" />
   <depend package="gui/vizkit3d" />
+  <depend package="tools/orocos_cpp" />
 </package>
