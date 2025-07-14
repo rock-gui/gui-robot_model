@@ -6,9 +6,9 @@ add_definitions(-DOROCOS_TARGET=gnulinux)
 find_package(Boost COMPONENTS program_options REQUIRED )
 
 rock_library(tasks
-                RemoteTasks.cpp
+                RemoteTasks.cpp LocalTask.cpp
             HEADERS
-                RemoteTasks.hpp
+                RemoteTasks.hpp LocalTask.hpp
             DEPS_PKGCONFIG
                 orocos_cpp
 )

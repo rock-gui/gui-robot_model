@@ -1,6 +1,7 @@
 
-#include <rtt/OutputPort.hpp>
-#include <rtt/InputPort.hpp>
+
+#include "RemoteTasks.hpp"
+#include "LocalTask.hpp"
 
 #include <vizkit3d/Vizkit3DWidget.hpp>
 #include "../viz/RobotVisualization.hpp"
@@ -9,16 +10,9 @@
 #include <QDockWidget>
 #include <QObject>
 #include <QTimer>
-#include <base/samples/Joints.hpp>
 
 #include <boost/program_options.hpp>
-// #include <rtt/typelib/TypelibMarshallerBase.hpp>
 
-
-#include <orocos_cpp/orocos_cpp.hpp>
-#include <orocos_cpp_base/OrocosHelpers.hpp>
-
-#include "RemoteTasks.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -61,18 +55,11 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    RTT::Logger::log().setLogLevel(RTT::Logger::Never);    
 
-    std::shared_ptr<orocos_cpp::OrocosCpp> orocos;
-    orocos_cpp::OrocosCppConfig config;
+    LocalTask localtask("rock-roboviz");
 
-    config.load_all_packages = true;
-    config.load_typekits = true; //TODO: only load base-types 
-    config.corba_host = host;
-    orocos = std::make_shared<orocos_cpp::OrocosCpp>();
-    orocos->initialize(config, true);
-    OrocosHelpers::initClientTask("rock-roboviz");
-
-    // collect task data
+    // collect remote task data
     RemoteTasks taskinfo;
     if (!taskinfo.connect()) {
         std::cout << "Could not connect to Nameserver " << std::endl;
@@ -143,21 +130,11 @@ int main(int argc, char *argv[])
 
     printf("connecting %s:%s\n", joint_state_task.c_str(), joint_state_port.c_str());
 
-    // setup local task and ports
-
-    RTT::TaskContext *localtask;
-    localtask = OrocosHelpers::getClientTask();
-    RTT::InputPort<base::samples::Joints> sample_port ("samples");
-    localtask->ports()->addPort(sample_port.getName(), sample_port );    
-    RTT::OutputPort<base::samples::Joints> control_port("control");
-    localtask->ports()->addPort(control_port.getName(), control_port );
 
     //connect samples
-
     RTT::base::OutputPortInterface* portInterfacePtr = taskinfo.getOutputPort(joint_state_task, joint_state_port);
     if (portInterfacePtr) {
-        printf("%s:%i\n", __PRETTY_FUNCTION__, __LINE__);
-        portInterfacePtr->connectTo(&sample_port);    
+        localtask.connectSamples(portInterfacePtr);
     }
 
     // connect control 
@@ -165,11 +142,9 @@ int main(int argc, char *argv[])
         printf("connecting control %s:%s\n", joint_control_task.c_str(), joint_control_port.c_str());
         RTT::base::InputPortInterface* controlPortInterfacePtr = taskinfo.getInputPort(joint_control_task, joint_control_port);
         if (controlPortInterfacePtr) {
-            control_port.connectTo(controlPortInterfacePtr);
+            localtask.connectCommands(controlPortInterfacePtr);
         }
     }
-
-    localtask->start();
     
     // create GUI
 
@@ -195,15 +170,22 @@ int main(int argc, char *argv[])
 
 
     // ----- load control ui
-    ControlUi *controlWidget = new ControlUi();
-    controlWidget->initFromURDF(filepath);
+    ControlUi *controlWidget = nullptr;
+    if (joint_control_task != "" && joint_control_port != "") {
+        ControlUi *controlWidget = new ControlUi();
+        controlWidget->initFromURDF(filepath);
 
-    QDockWidget *controlDockWidget = new QDockWidget();
-    controlDockWidget->setWidget(controlWidget);
+        QDockWidget *controlDockWidget = new QDockWidget();
+        controlDockWidget->setWidget(controlWidget);
 
-    vizkitWidget->addDockWidget(Qt::BottomDockWidgetArea, controlDockWidget);
+        vizkitWidget->addDockWidget(Qt::BottomDockWidgetArea, controlDockWidget);
 
-    QObject::connect(controlWidget, SIGNAL(newVal(base::samples::Joints)),vizPlugin,SLOT(setJointsState(base::samples::Joints)));
+        QObject::connect(controlWidget, SIGNAL(newVal(base::samples::Joints)),vizPlugin,SLOT(setJointsState(base::samples::Joints)));
+
+        QObject::connect(controlWidget, &ControlUi::sendSignal, [&]() {
+            localtask.sendCommand(controlWidget->getJoints());
+        });
+    }
 
     vizkitWidget->show();
 
@@ -213,26 +195,15 @@ int main(int argc, char *argv[])
     base::samples::Joints data;
     QTimer updateTimer(vizkitWidget);
     QObject::connect(&updateTimer, &QTimer::timeout, [&](){
-        if (sample_port.readNewest(data) == RTT::NewData) {
+        if (localtask.getSample(&data)) {
             vizPlugin->updateData(data);
-            
         }
     });
     updateTimer.start(20); // update every 20ms
 
-    if (control_port.connected()) {
-        QObject::connect(controlWidget, &ControlUi::sendSignal, [&]() {
-            control_port.write(controlWidget->getJoints());
-        });
-    }
-
-    a.exec();
-
-    //cleanup
-    localtask->stop();
 
 
-    return 0;
 
+    return a.exec();
 }
 
