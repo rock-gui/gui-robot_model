@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
     }
 
     if (joint_control_task == "" && joint_control_port == "") {
-        std::map<std::string, std::vector<std::string>> jointControlTasksAndPorts = taskinfo.getInputPortsByType("/base/samples/Joints");
+        std::map<std::string, std::vector<std::string>> jointControlTasksAndPorts = taskinfo.getInputPortsByType("/base/commands/Joints");
         if (jointControlTasksAndPorts.size() >= 1) {
             printf("\nJoint control ports found, explicitly provide task and port to connect\n\n");
             for (const auto& task : jointControlTasksAndPorts) {
