@@ -7,16 +7,16 @@
 #include <base/samples/RigidBodyState.hpp>
 #include <QMessageBox>
 #include <osg/NodeVisitor>
-#include "RobotModel.h"
+
+class RobotModel;
 
 namespace vizkit3d
 {
     class RigidBodyStateVisualization;
 
 class RobotVisualization
-        : public vizkit3d::Vizkit3DPlugin<base::samples::Joints>,
-          public vizkit3d::VizPluginAddType<base::samples::RigidBodyState>,
-          public RobotModel
+        : public vizkit3d::Vizkit3DPlugin<base::samples::Joints>
+        , public vizkit3d::VizPluginAddType<base::samples::RigidBodyState>
         , boost::noncopyable
 {
     Q_OBJECT
@@ -30,6 +30,8 @@ class RobotVisualization
     Q_PROPERTY(bool showCollision READ areCollisionsEnabled WRITE setCollisionsEnabled)
     Q_PROPERTY(bool showInertias READ areInertiasEnabled WRITE setInertiasEnabled)
     Q_PROPERTY(double opacity READ getOpacity WRITE setOpacity)
+
+    std::unique_ptr<RobotModel> model_;
 
 public:
     RobotVisualization();
@@ -49,15 +51,8 @@ public slots:
     void setModelFile(QString modelFile);
     QString modelFile() const;
     
-    void setRootLink(QString segment_name){
-        bool st= relocateRoot(segment_name.toStdString());
-        if(!st){
-            QMessageBox::critical(NULL, "vizkit3d::RobotVisualization", "Could not set root link to "+segment_name+"."\
-                                 "Does this body part exist?");
-        }
-    }
-    QString getRootLink()
-    {return QString(current_root_name_.c_str());}
+    void setRootLink(QString segment_name);
+    QString getRootLink();
 
     /** Loads a model from a file
      *
