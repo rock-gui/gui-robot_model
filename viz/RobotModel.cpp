@@ -252,7 +252,7 @@ osg::ref_ptr<osg::Node> RobotModel::loadFromFile(QString path, ROBOT_MODEL_FORMA
 {
     if (format == ROBOT_MODEL_AUTO)
     {
-        kdl_parser::ROBOT_MODEL_FORMAT kdl_format = 
+        kdl_parser::ROBOT_MODEL_FORMAT kdl_format =
             kdl_parser::guessFormatFromFilename(path.toStdString());
         LOG_INFO("file %s guessed to be of type %s", path.toStdString().c_str(),
                 kdl_parser::formatNameFromID(kdl_format));
@@ -394,7 +394,7 @@ bool RobotModel::setJointState(std::string jointName, double jointVal)
             jointName << " ) directly, ignoring value" << std::endl;
         return true;
     }
-    
+
     // Loops through all the mimic joints to check it the joint needs to be mimiced
     for( std::map< std::string, MimicJoint >::const_iterator it = mimic_joints_.begin();
          it != mimic_joints_.end(); ++it ) {

@@ -40,9 +40,17 @@ inline void sdf_to_osg(math::Vector3d const& in, osg::Vec3& out) {
     out.set(in.X(), in.Y(), in.Z());
 }
 
+#if SDF_MAJOR_VERSION >= 12
+typedef math::Color gzColor;
 inline void sdf_to_osg(math::Color in, osg::Vec4& out) {
     out.set(in.R(), in.G(), in.B(), in.A());
 }
+#else
+typedef sdf::Color gzColor;
+inline void sdf_to_osg(sdf::Color in, osg::Vec4& out) {
+    out.set(in.r, in.g, in.b, in.a);
+}
+#endif
 
 //inline void sdf_pose_to_osg(sdf::ElementPtr pose, osg::Vec3& pos, osg::Quat& quat)
 //{

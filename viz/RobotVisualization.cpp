@@ -5,6 +5,7 @@
 #include <base-logging/Logging.hpp>
 #include <osg/Geode>
 #include <osg/Material>
+#include "RobotModel.h"
 
 using namespace vizkit3d;
 using namespace std;
@@ -19,7 +20,8 @@ struct RobotVisualization::Data {
 
 
 RobotVisualization::RobotVisualization()
-    : p(new Data)
+    : model_(new RobotModel())
+    , p(new Data)
 {
     this->modelPos = new osg::PositionAttitudeTransform();
     connect(this, SIGNAL(propertyChanged(QString)), this, SLOT(handlePropertyChanged(QString)));
@@ -40,9 +42,9 @@ void RobotVisualization::clearMeshCache()
 
 void RobotVisualization::handlePropertyChanged(QString property){
     if(property == "frame"){
-        std::vector<std::string>::iterator it;
-        it = std::find(segmentNames_.begin(), segmentNames_.end(), getVisualizationFrame().toStdString());
-        if(it != segmentNames_.end()){
+        auto& segmentNames = model_->getSegmentNames();
+        auto it = std::find(segmentNames.begin(), segmentNames.end(), getVisualizationFrame().toStdString());
+        if(it != segmentNames.end()){
             setRootLink(getVisualizationFrame());
         }
         else{
@@ -54,7 +56,7 @@ void RobotVisualization::handlePropertyChanged(QString property){
             }
             else{ //Its world_osg, set to original root if it was determined yet
                 try {
-                    relocateRoot(original_root_);
+                    model_->relocateRoot(model_->getOriginalRoot());
                 }
                 catch(std::invalid_argument&) {}
             }
@@ -63,24 +65,24 @@ void RobotVisualization::handlePropertyChanged(QString property){
 }
 
 void RobotVisualization::highlightSegment(QString link_name){
-    bool highlighted = toggleHighlight(link_name.toStdString());
+    bool highlighted = model_->toggleHighlight(link_name.toStdString());
     if(!highlighted)
-        toggleHighlight(link_name.toStdString());
+        model_->toggleHighlight(link_name.toStdString());
 }
 
 void RobotVisualization::deHighlightSegment(QString link_name){
-    bool highlighted = toggleHighlight(link_name.toStdString());
+    bool highlighted = model_->toggleHighlight(link_name.toStdString());
     if(highlighted)
-        toggleHighlight(link_name.toStdString());
+        model_->toggleHighlight(link_name.toStdString());
 }
 
 void RobotVisualization::showSegmentText(QString link_name, QString text){
-    OSGSegment* seg = getSegment(link_name.toStdString());
+    OSGSegment* seg = model_->getSegment(link_name.toStdString());
     seg->attachTextLabel(text.toStdString());
 }
 
 void RobotVisualization::hideSegmentText(QString link_name){
-    OSGSegment* seg = getSegment(link_name.toStdString());
+    OSGSegment* seg = model_->getSegment(link_name.toStdString());
     seg->removeTextLabel();
 }
 
@@ -97,14 +99,14 @@ void RobotVisualization::setModelFile(QString modelFile)
     setVisualsEnabled(visualsEnabled_);
 }
 
-static RobotVisualization::ROBOT_MODEL_FORMAT formatFromString(QString type)
+static RobotModel::ROBOT_MODEL_FORMAT formatFromString(QString type)
 {
     if (type == "auto")
-        return RobotVisualization::ROBOT_MODEL_AUTO;
+        return RobotModel::ROBOT_MODEL_AUTO;
     else if (type == "sdf")
-        return RobotVisualization::ROBOT_MODEL_SDF;
+        return RobotModel::ROBOT_MODEL_SDF;
     else if (type == "urdf")
-        return RobotVisualization::ROBOT_MODEL_URDF;
+        return RobotModel::ROBOT_MODEL_URDF;
     else
         throw std::invalid_argument("invalid file format " + type.toStdString() + ", known types are auto, sdf and urdf");
 }
@@ -112,9 +114,9 @@ static RobotVisualization::ROBOT_MODEL_FORMAT formatFromString(QString type)
 void RobotVisualization::loadFromFile(QString path, QString _format)
 {
     LOG_INFO("loading %s", path.toLatin1().data());
-    ROBOT_MODEL_FORMAT format = formatFromString(_format);
+    RobotModel::ROBOT_MODEL_FORMAT format = formatFromString(_format);
 
-    bool st = RobotModel::loadFromFile(path, format);
+    bool st = model_->loadFromFile(path, format);
     if(!st)
         LOG_FATAL_S << "cannot load " << path.toStdString()
                    << ", it either does not exist or is not a proper robot model file";
@@ -130,19 +132,19 @@ void RobotVisualization::loadFromFile(QString path, QString _format)
 
 void RobotVisualization::loadFromString(QString value, QString _format, QString rootPrefix)
 {
-    ROBOT_MODEL_FORMAT format = formatFromString(_format);
-    if (format == ROBOT_MODEL_AUTO)
+    RobotModel::ROBOT_MODEL_FORMAT format = formatFromString(_format);
+    if (format == RobotModel::ROBOT_MODEL_AUTO)
         throw invalid_argument("cannot guess format of a string, only of files");
-    RobotModel::loadFromString(value, format, rootPrefix);
+    model_->loadFromString(value, format, rootPrefix);
 }
 
 void RobotVisualization::createFrameVisualizers()
 {
     deleteFrameVisualizers();
-    vector<string> segments = getSegmentNames();
+    vector<string> const& segments = model_->getSegmentNames();
     for (std::size_t i = 0; i != segments.size(); ++i)
     {
-        osg::ref_ptr<OSGSegment> segment = getSegment(segments[i]);
+        osg::ref_ptr<OSGSegment> segment = model_->getSegment(segments[i]);
         assert(segment);
         vizkit3d::RigidBodyStateVisualization* frame =
                 new vizkit3d::RigidBodyStateVisualization(this);
@@ -176,8 +178,9 @@ bool RobotVisualization::areFramesEnabled() const
 void RobotVisualization::setFramesEnabled(bool value)
 {
     framesEnabled_ = value;
-    for (size_t i=0; i<segmentNames_.size(); i++){
-        setFrameEnabled(QString(segmentNames_[i].c_str()), framesEnabled_, joints_size);
+    auto const& segmentNames = model_->getSegmentNames();
+    for (size_t i=0; i<segmentNames.size(); i++){
+        setFrameEnabled(QString(segmentNames[i].c_str()), framesEnabled_, joints_size);
     }
 }
 
@@ -211,8 +214,8 @@ bool RobotVisualization::areSegmentNamesEnabled() const
 void RobotVisualization::setSegmentNamesEnabled(bool value)
 {
     segmentNamesEnabled_ = value;
-    for (size_t i=0; i<segmentNames_.size(); i++){
-        OSGSegment* seg = getSegment(segmentNames_[i]);
+    for (auto const& name: model_->getSegmentNames()) {
+        OSGSegment* seg = model_->getSegment(name);
         if(value)
             seg->attachTextLabel();
         else
@@ -228,7 +231,7 @@ bool RobotVisualization::areCollisionsEnabled() const
 void RobotVisualization::setCollisionsEnabled(bool value)
 {
     collisionsEnabled_ = value;
-    attachCollisions(value);
+    model_->attachCollisions(value);
 }
 
 bool RobotVisualization::areInertiasEnabled() const
@@ -239,7 +242,7 @@ bool RobotVisualization::areInertiasEnabled() const
 void RobotVisualization::setInertiasEnabled(bool value)
 {
     inertiasEnabled_ = value;
-    attachInertias(value);
+    model_->attachInertias(value);
 }
 
 bool RobotVisualization::areVisualsEnabled() const
@@ -250,7 +253,7 @@ bool RobotVisualization::areVisualsEnabled() const
 void RobotVisualization::setVisualsEnabled(bool value)
 {
     visualsEnabled_ = value;
-    attachVisuals(value);
+    model_->attachVisuals(value);
 }
 
 double RobotVisualization::getOpacity() const
@@ -261,21 +264,21 @@ double RobotVisualization::getOpacity() const
 void RobotVisualization::setOpacity(double value)
 {
     opacity_ = value;
-    if(root_) {
+    if(model_->getRoot()) {
         TransparencyVisitor visitor(value);
         visitor.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
-        root_->accept(visitor);
+        model_->getRoot()->accept(visitor);
     }
 }
 
 QQuaternion RobotVisualization::getRotation(QString source_frame, QString target_frame){
-    osg::Matrixd tr = getRelativeTransform(target_frame.toStdString(), source_frame.toStdString());
+    osg::Matrixd tr = model_->getRelativeTransform(target_frame.toStdString(), source_frame.toStdString());
     osg::Quat q = tr.getRotate();
     return QQuaternion(q.w(), q.x(), q.y(), q.z());
 }
 
 QVector3D RobotVisualization::getTranslation(QString source_frame, QString target_frame){
-    osg::Matrixd tr = getRelativeTransform(target_frame.toStdString(), source_frame.toStdString());
+    osg::Matrixd tr = model_->getRelativeTransform(target_frame.toStdString(), source_frame.toStdString());
     osg::Vec3d t = tr.getTrans();
     return QVector3D(t.x(),t.y(),t.z());
 }
@@ -293,11 +296,11 @@ QString RobotVisualization::modelFile() const{
 
 osg::ref_ptr<osg::Node> RobotVisualization::createMainNode()
 {
-    if(!root_){
-        loadEmptyScene();
+    if(!model_->getRoot()){
+        model_->loadEmptyScene();
     }
 
-    modelPos->addChild(root_);
+    modelPos->addChild(model_->getRoot());
 
     return modelPos;
 }
@@ -327,6 +330,17 @@ void RobotVisualization::updateMainNode ( osg::Node* node )
 
 }
 
+void RobotVisualization::setRootLink(QString segment_name) {
+    bool st = model_->relocateRoot(segment_name.toStdString());
+    if(!st){
+        QMessageBox::critical(NULL, "vizkit3d::RobotVisualization", "Could not set root link to "+segment_name+"."\
+                             "Does this body part exist?");
+    }
+}
+
+QString RobotVisualization::getRootLink() {
+    return QString(model_->getRootName().c_str());
+}
 
 double RobotVisualization::getJointsSize() const
 {
@@ -341,9 +355,14 @@ void RobotVisualization::setJointsSize(double size)
 }
 
 void RobotVisualization::setJointsState(const base::samples::Joints &sample){
-    vector<string> names = getJointNames();
-    if (sample.hasNames())
+    vector<string> names;
+    if (sample.hasNames()) {
         names = sample.names;
+    }
+    else {
+        names = model_->getJointNames();
+    }
+
     if (names.size() != sample.elements.size())
         throw std::runtime_error("RobotVisualization::updateDataIntern: state vector size and expected joint size differ, and there are no names in the Joints sample");
 
@@ -356,10 +375,10 @@ void RobotVisualization::setJointsState(const base::samples::Joints &sample){
                 LOG_ERROR("Position of joint %d is invalid: %d", i, sample[i].position);
             }
             //throw std::runtime_error("RobotVisualization::updateDataIntern: invalid joint position detected.");
-            setJointState(names[i], 0);
+            model_->setJointState(names[i], 0);
         }
         else{
-            setJointState(names[i], sample[i].position);
+            model_->setJointState(names[i], sample[i].position);
         }
     }
 }
