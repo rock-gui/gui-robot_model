@@ -192,9 +192,9 @@ int main(int argc, char *argv[])
 
     // create and connect a timer that updates the data, so
     // qapplication::exec() can be used instaed of custom loop with qapplication::processevents
-    base::samples::Joints data;
     QTimer updateTimer(vizkitWidget);
     QObject::connect(&updateTimer, &QTimer::timeout, [&](){
+        base::samples::Joints data;
         if (localtask.getSample(&data)) {
             vizPlugin->updateData(data);
         }
