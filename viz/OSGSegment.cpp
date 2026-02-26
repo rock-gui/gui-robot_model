@@ -413,26 +413,26 @@ osg::ref_ptr<osg::Group> OSGSegment::createVisual(sdf::ElementPtr sdf_visual, QD
 
         if (sdf_material->HasElement("ambient")){
             osg::Vec4 ambient;
-            sdf_to_osg(sdf_material->GetElement("ambient")->Get<math::Color>(), ambient);
+            sdf_to_osg(sdf_material->GetElement("ambient")->Get<gzColor>(), ambient);
             nodematerial->setAmbient(osg::Material::FRONT,ambient);
         }
 
         if (sdf_material->HasElement("diffuse")){
             osg::Vec4 diffuse;
-            sdf_to_osg(sdf_material->GetElement("diffuse")->Get<math::Color>(), diffuse);
+            sdf_to_osg(sdf_material->GetElement("diffuse")->Get<gzColor>(), diffuse);
             nodematerial->setDiffuse(osg::Material::FRONT,diffuse);
         }
 
         if (sdf_material->HasElement("specular")){
             osg::Vec4 specular;
-            sdf_to_osg(sdf_material->GetElement("specular")->Get<math::Color>(), specular);
+            sdf_to_osg(sdf_material->GetElement("specular")->Get<gzColor>(), specular);
             nodematerial->setSpecular(osg::Material::FRONT, specular);
 
         }
 
         if (sdf_material->HasElement("emissive")){
             osg::Vec4 emissive;
-            sdf_to_osg(sdf_material->GetElement("emissive")->Get<math::Color>(), emissive);
+            sdf_to_osg(sdf_material->GetElement("emissive")->Get<gzColor>(), emissive);
             nodematerial->setEmission(osg::Material::FRONT, emissive);
         }
 

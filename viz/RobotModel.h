@@ -12,8 +12,7 @@
 #include <QObject>
 #include "OSGSegment.h"
 
-
-/** 
+/**
  * Struct to hold mimic joint properties
  */
 struct MimicJoint {
@@ -141,7 +140,7 @@ public:
      */
     bool relocateRoot(std::string name);
 
-    /** 
+    /**
      * @brief Finds the relevant node and sets the position value
      */
     bool setJointPos(std::string jointName, double jointVal);
@@ -159,6 +158,15 @@ public:
      * Checks whether VBOs will be used or not
      */
     bool getUseVBO() const;
+
+    /** The name of the current root node */
+    std::string getRootName() const { return current_root_name_; }
+
+    /** The current root node */
+    osg::ref_ptr<osg::Group> getRoot() { return root_; }
+
+    /** The initial root, unaffects by calls to relocateRoot */
+    osg::ref_ptr<osg::Group> getOriginalRoot() { return original_root_; }
 
 protected:
     void makeOsg2(KDL::Segment kdl_seg, const std::vector<urdf::VisualSharedPtr> &visuals,
