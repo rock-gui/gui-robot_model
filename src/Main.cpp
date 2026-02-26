@@ -13,6 +13,8 @@
 
 #include <boost/program_options.hpp>
 
+#include "Adapter.hpp"
+
 
 int main(int argc, char *argv[])
 {
@@ -130,7 +132,6 @@ int main(int argc, char *argv[])
 
     printf("connecting %s:%s\n", joint_state_task.c_str(), joint_state_port.c_str());
 
-
     //connect samples
     RTT::base::OutputPortInterface* portInterfacePtr = taskinfo.getOutputPort(joint_state_task, joint_state_port);
     if (portInterfacePtr) {
@@ -168,6 +169,7 @@ int main(int argc, char *argv[])
     // load the model file
     vizPlugin->setModelFile(filepath);
 
+    Adapter *adapter = new Adapter(&localtask, vizPlugin);
 
     // ----- load control ui
     ControlUi *controlWidget = nullptr;
@@ -182,28 +184,24 @@ int main(int argc, char *argv[])
 
         QObject::connect(controlWidget, SIGNAL(newVal(base::samples::Joints)),vizPlugin,SLOT(setJointsState(base::samples::Joints)));
 
-        QObject::connect(controlWidget, &ControlUi::sendSignal, [&]() {
-            localtask.sendCommand(controlWidget->getJoints());
-        });
+        adapter->setControlWidget(controlWidget);
+
+        QObject::connect(controlWidget, SIGNAL(sendSignal()),
+                         adapter, SLOT(controlSend()));
     }
 
     vizkitWidget->show();
 
-
     // create and connect a timer that updates the data, so
     // qapplication::exec() can be used instaed of custom loop with qapplication::processevents
     QTimer updateTimer(vizkitWidget);
-    QObject::connect(&updateTimer, &QTimer::timeout, [&](){
-        base::samples::Joints data;
-        if (localtask.getSample(&data)) {
-            vizPlugin->updateData(data);
-        }
-    });
+    QObject::connect(&updateTimer, SIGNAL(timeout()),
+                     adapter, SLOT(timer()));
     updateTimer.start(20); // update every 20ms
 
+    a.exec();
+    delete adapter;
 
-
-
-    return a.exec();
+    return 0;
 }
 

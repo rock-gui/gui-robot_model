@@ -14,7 +14,11 @@ rock_library(tasks
 )
 
 if(ROCK_QT_VERSION_4)
-    rock_executable(rock-roboviz_bin Main.cpp
+    rock_executable(rock-roboviz_bin
+            Main.cpp
+            Adapter.cpp
+        MOC
+            Adapter.hpp
         DEPS_PKGCONFIG
             vizkit3d
             control_ui
@@ -24,7 +28,11 @@ if(ROCK_QT_VERSION_4)
         DEPS Boost::program_options tasks
         )
     if(ROCK_QT_VERSION_5)
-        rock_executable(rock-roboviz_bin-qt5 Main.cpp
+        rock_executable(rock-roboviz_bin-qt5
+                Main.cpp
+                Adapter.cpp
+            MOC5
+                Adapter.hpp
             DEPS_PKGCONFIG
                 vizkit3d-qt5
                 control_ui-qt5
@@ -34,7 +42,11 @@ if(ROCK_QT_VERSION_4)
             )
     endif()
 elseif(ROCK_QT_VERSION_5)
-    rock_executable(rock-roboviz_bin Main.cpp
+    rock_executable(rock-roboviz_bin
+            Main.cpp
+            Adapter.cpp
+        MOC5
+            Adapter.hpp
         DEPS_PKGCONFIG
             vizkit3d-qt5
             control_ui-qt5
