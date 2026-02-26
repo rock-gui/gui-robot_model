@@ -30,7 +30,9 @@ LocalTask::~LocalTask(){
 
 bool LocalTask::connectSamples(RTT::base::OutputPortInterface* remotePort) {
     remotePort->connectTo(sample_port.get());
+    return true;
 }
 bool LocalTask::connectCommands(RTT::base::InputPortInterface* remotePort) {
     control_port->connectTo(remotePort);
+    return true;
 }
